@@ -84,7 +84,31 @@
   input[type=text], input[type=date]{
     width:100%; padding:9px 10px; border:1px solid var(--khaki);
     border-radius:5px; background:#fff; font-family:'Inter'; font-size:13px;
-    margin-bottom:8px;
+    margin-bottom:8px; color:var(--ink);
+  }
+  .choice-group{
+    display:flex; gap:10px; margin-bottom:10px; flex-wrap:wrap;
+  }
+  .choice-option{
+    display:flex; align-items:center; gap:10px;
+    border:1px solid var(--khaki); border-radius:8px;
+    padding:11px 14px; cursor:pointer; flex:1; min-width:150px;
+    background:#fff; transition:border-color .15s, background .15s;
+    font-size:13px; color:var(--ink); position:relative;
+  }
+  .choice-option:hover{border-color:var(--olive-mid);}
+  .choice-option input[type=radio]{
+    position:absolute; opacity:0; width:0; height:0; margin:0;
+  }
+  .choice-radio{
+    width:16px; height:16px; border-radius:50%; border:2px solid var(--olive-mid);
+    flex-shrink:0; position:relative;
+  }
+  .choice-option.selected{border-color:var(--rust); background:var(--khaki-light);}
+  .choice-option.selected .choice-radio{border-color:var(--rust);}
+  .choice-option.selected .choice-radio::after{
+    content:''; position:absolute; top:2px; left:2px; width:8px; height:8px;
+    border-radius:50%; background:var(--rust);
   }
   input:focus, select:focus, button:focus-visible{
     outline:2px solid var(--rust); outline-offset:1px;
@@ -139,6 +163,7 @@
     transition:border-color .15s, background .15s;
   }
   .dropzone.drag{border-color:var(--rust); background:var(--khaki);}
+  .dropzone.selected{border-color:var(--rust); box-shadow:0 0 0 2px rgba(193,89,46,.35); outline:none;}
   .dropzone .icon{font-size:28px; margin-bottom:6px;}
   .dropzone p{margin:2px 0; font-size:13px; color:#33361f;}
   .dropzone .hint{font-size:11px; color:var(--olive-mid);}
@@ -171,11 +196,18 @@
 
   .event-card{
     border:1px solid var(--khaki); border-radius:6px; margin-bottom:10px; overflow:hidden;
-    background:#fff;
+    background:#fff; border-top:2px solid transparent;
   }
+  .event-card.dragging{opacity:.4;}
+  .event-card.drag-over{border-top-color:var(--rust);}
   .event-head{
     display:flex; align-items:stretch; background:var(--khaki-light);
   }
+  .event-drag-handle{
+    display:flex; align-items:center; padding:0 4px 0 12px;
+    cursor:grab; color:var(--olive-mid); font-size:13px; touch-action:none;
+  }
+  .event-drag-handle:active{cursor:grabbing;}
   .event-toggle{
     flex:1; text-align:left; background:transparent; border:none; cursor:pointer;
     padding:11px 14px; display:flex; align-items:center; gap:12px;
@@ -205,6 +237,24 @@
   .edit-row{cursor:pointer;}
   .edit-row input[type=checkbox]{width:auto; margin:0;}
   .edit-actions{display:flex; gap:8px; margin-top:12px;}
+
+  .attendance-columns{
+    display:grid; grid-template-columns:1fr 1fr; gap:18px;
+  }
+  @media (max-width:520px){ .attendance-columns{grid-template-columns:1fr;} }
+  .attendance-col h4{
+    font-size:10px; text-transform:uppercase; letter-spacing:.08em;
+    color:var(--olive-mid); margin:0 0 8px; font-family:'Oswald',sans-serif;
+  }
+  .attendance-chip{
+    display:flex; align-items:center; gap:8px;
+    background:var(--khaki-light); border-left:3px solid var(--ok);
+    border-radius:4px; padding:6px 10px; font-size:12px; margin-bottom:6px;
+  }
+  .attendance-chip.absent{border-left-color:var(--rust); opacity:.85;}
+  .attendance-chip .glyph{font-weight:700; width:14px; text-align:center;}
+  .attendance-chip.present .glyph{color:var(--ok);}
+  .attendance-chip.absent .glyph{color:var(--rust-dark);}
 
   .company-wrap{position:relative;}
   .company-menu{
@@ -266,13 +316,24 @@
   <div class="page" id="page-event">
     <div class="panel">
       <h2>New Event Entry</h2>
-      <input type="text" id="eventName" placeholder="Event name (e.g. General Meeting)">
+      <div class="choice-group" id="eventTypeGroup" role="radiogroup" aria-label="Event type">
+        <label class="choice-option selected">
+          <input type="radio" name="eventType" value="General Meeting" checked>
+          <span class="choice-radio"></span>
+          <span class="choice-label">General Meeting</span>
+        </label>
+        <label class="choice-option">
+          <input type="radio" name="eventType" value="FTX">
+          <span class="choice-radio"></span>
+          <span class="choice-label">FTX</span>
+        </label>
+      </div>
       <input type="date" id="eventDate">
 
-      <div class="dropzone" id="dropzone">
+      <div class="dropzone" id="dropzone" tabindex="0">
         <div class="icon">&#128203;</div>
-        <p><strong>Drop a screenshot</strong> or click to upload</p>
-        <p class="hint">Discord voice channel, chat log, or reaction list</p>
+        <p><strong>Drop a screenshot</strong>, or click here then paste (Cmd/Ctrl+V)</p>
+        <p class="hint">Double-click to browse files &mdash; Discord voice channel, chat log, or reaction list</p>
         <input type="file" id="fileInput" accept="image/*" style="display:none">
       </div>
 
@@ -570,8 +631,39 @@ function bestMatch(name){
   return {match:best, confidence};
 }
 
+// ---------- event type choice boxes ----------
+document.querySelectorAll('#eventTypeGroup input[type=radio]').forEach(radio=>{
+  radio.addEventListener('change', ()=>{
+    document.querySelectorAll('#eventTypeGroup .choice-option').forEach(opt=>opt.classList.remove('selected'));
+    radio.closest('.choice-option').classList.add('selected');
+  });
+});
+
 // ---------- upload ----------
-dropzone.addEventListener('click', ()=>fileInput.click());
+// Single click selects the dropzone (so it can receive a pasted image);
+// double-click opens the file browser instead.
+dropzone.addEventListener('click', ()=>{
+  dropzone.classList.add('selected');
+  dropzone.focus();
+});
+dropzone.addEventListener('blur', ()=>{
+  dropzone.classList.remove('selected');
+});
+dropzone.addEventListener('dblclick', ()=>fileInput.click());
+dropzone.addEventListener('paste', e=>{
+  const items = e.clipboardData && e.clipboardData.items;
+  if(!items) return;
+  for(const item of items){
+    if(item.type && item.type.startsWith('image/')){
+      const file = item.getAsFile();
+      if(file){
+        e.preventDefault();
+        handleFile(file);
+      }
+      break;
+    }
+  }
+});
 dropzone.addEventListener('dragover', e=>{e.preventDefault(); dropzone.classList.add('drag');});
 dropzone.addEventListener('dragleave', ()=>dropzone.classList.remove('drag'));
 dropzone.addEventListener('drop', e=>{
@@ -680,7 +772,7 @@ readBtn.addEventListener('click', async ()=>{
     currentMatches = names
       .map(n=>{
         const {match, confidence} = bestMatch(n);
-        return { raw:n, match, confidence, included:true };
+        return { raw:n, match, confidence, included: confidence >= 55 };
       })
       .filter(m => m.confidence >= 30);
 
@@ -744,11 +836,22 @@ function renderTags(){
 }
 
 // ---------- commit attendance ----------
+// Formats an ISO date (yyyy-mm-dd) as e.g. "25JUL26" to match the "Event - Date" naming.
+function formatEventDateTag(isoDate){
+  const d = new Date(isoDate + 'T00:00:00');
+  const months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+  const day = String(d.getDate()).padStart(2,'0');
+  const mon = months[d.getMonth()];
+  const yr = String(d.getFullYear()).slice(-2);
+  return `${day}${mon}${yr}`;
+}
+
 commitBtn.addEventListener('click', ()=>{
-  const nameInput = document.getElementById('eventName');
   const dateInput = document.getElementById('eventDate');
-  const eventName = nameInput.value.trim() || 'Untitled Event';
+  const checkedRadio = document.querySelector('#eventTypeGroup input[name="eventType"]:checked');
+  const eventType = checkedRadio ? checkedRadio.value : 'General Meeting';
   const eventDate = dateInput.value || new Date().toISOString().slice(0,10);
+  const eventName = `${eventType} - ${formatEventDateTag(eventDate)}`;
 
   const present = [...new Set(
     currentMatches.filter(m=>m.included && m.match).map(m=>m.match)
@@ -766,7 +869,10 @@ commitBtn.addEventListener('click', ()=>{
   renderHistory();
 
   // reset the entry form
-  nameInput.value=''; dateInput.value='';
+  const radios = document.querySelectorAll('#eventTypeGroup input[name="eventType"]');
+  radios.forEach((r,i)=>{ r.checked = (i===0); });
+  document.querySelectorAll('#eventTypeGroup .choice-option').forEach((opt,i)=>opt.classList.toggle('selected', i===0));
+  dateInput.value='';
   dropzone.style.display = 'block';
   previewActions.style.display = 'none';
   previewWrap.style.display='none';
@@ -783,35 +889,47 @@ function renderHistory(){
     historyWrap.innerHTML = '<div class="empty">No events logged yet.</div>';
     return;
   }
-  const indexed = EVENTS.map((ev, idx)=>({ev, idx})).reverse(); // newest first
-  historyWrap.innerHTML = indexed.map(({ev, idx}) => eventCardHTML(ev, idx)).join('');
+  historyWrap.innerHTML = EVENTS.map((ev, idx) => eventCardHTML(ev, idx)).join('');
   attachHistoryHandlers();
 }
 
 function eventCardHTML(ev, idx){
-  const sortedMembers = [...MEMBERS].sort((a,b)=>a.localeCompare(b));
-  const rows = sortedMembers.map(name=>{
-    const there = ev.present.includes(name);
-    return `<div class="member-row ${there?'check':'miss'}"><span>${escapeHtml(name)}</span><span>${there?'&#10003;':'X'}</span></div>`;
-  }).join('');
+  // Member order here follows the Roster page's own order, not alphabetical.
+  const rosterMembers = MEMBERS;
+  const present = rosterMembers.filter(name => ev.present.includes(name));
+  const absent = rosterMembers.filter(name => !ev.present.includes(name));
+  const chip = (name, isPresent) => `<div class="attendance-chip ${isPresent?'present':'absent'}"><span class="glyph">${isPresent?'&#10003;':'X'}</span><span>${escapeHtml(name)}</span></div>`;
+  const presentHtml = present.length ? present.map(n=>chip(n,true)).join('') : '<div class="empty" style="padding:6px 0;">None</div>';
+  const absentHtml = absent.length ? absent.map(n=>chip(n,false)).join('') : '<div class="empty" style="padding:6px 0;">None</div>';
   return `
-  <div class="event-card">
+  <div class="event-card" draggable="true" data-idx="${idx}">
     <div class="event-head">
+      <span class="drag-handle event-drag-handle" aria-hidden="true" title="Drag to reorder">&#9776;</span>
       <button class="event-toggle" data-idx="${idx}">
         <span class="chevron">&#9656;</span>
         <span class="event-title">${escapeHtml(ev.name)}</span>
         <span class="event-date mono">${ev.date}</span>
-        <span class="event-count">${ev.present.length}/${sortedMembers.length} present</span>
+        <span class="event-count">${ev.present.length}/${rosterMembers.length} present</span>
       </button>
       <button class="btn ghost small edit-btn" data-idx="${idx}">Edit</button>
       <button class="btn ghost small icon-only delete-btn" data-idx="${idx}" title="Delete event" aria-label="Delete event">&#10005;</button>
     </div>
     <div class="event-body" id="eventBody${idx}" style="display:none;">
-      <div class="member-grid">${rows}</div>
+      <div class="attendance-columns">
+        <div class="attendance-col">
+          <h4>Present (${present.length})</h4>
+          ${presentHtml}
+        </div>
+        <div class="attendance-col">
+          <h4>Absent (${absent.length})</h4>
+          ${absentHtml}
+        </div>
+      </div>
     </div>
   </div>`;
 }
 
+let eventDragSrcIdx = null;
 function attachHistoryHandlers(){
   historyWrap.querySelectorAll('.event-toggle').forEach(btn=>{
     btn.addEventListener('click', ()=>{
@@ -835,6 +953,34 @@ function attachHistoryHandlers(){
       renderHistory();
     });
   });
+  historyWrap.querySelectorAll('.event-card').forEach(card=>{
+    card.addEventListener('dragstart', ()=>{
+      eventDragSrcIdx = Number(card.dataset.idx);
+      card.classList.add('dragging');
+    });
+    card.addEventListener('dragend', ()=>{
+      card.classList.remove('dragging');
+      historyWrap.querySelectorAll('.event-card').forEach(c=>c.classList.remove('drag-over'));
+    });
+    card.addEventListener('dragover', (e)=>{
+      e.preventDefault();
+      card.classList.add('drag-over');
+    });
+    card.addEventListener('dragleave', ()=>{
+      card.classList.remove('drag-over');
+    });
+    card.addEventListener('drop', async (e)=>{
+      e.preventDefault();
+      card.classList.remove('drag-over');
+      const targetIdx = Number(card.dataset.idx);
+      if(eventDragSrcIdx === null || eventDragSrcIdx === targetIdx) return;
+      const moved = EVENTS.splice(eventDragSrcIdx, 1)[0];
+      EVENTS.splice(targetIdx, 0, moved);
+      eventDragSrcIdx = null;
+      await persist();
+      renderHistory();
+    });
+  });
 }
 
 function openEditForm(idx){
@@ -843,13 +989,14 @@ function openEditForm(idx){
   const toggle = document.querySelector(`.event-toggle[data-idx="${idx}"]`);
   body.style.display = 'block';
   toggle.classList.add('open');
-  const sortedMembers = [...MEMBERS].sort((a,b)=>a.localeCompare(b));
+  // Member order here follows the Roster page's own order, not alphabetical.
+  const rosterMembers = MEMBERS;
 
   body.innerHTML = `
     <input type="text" id="editName${idx}" value="${escapeHtml(ev.name)}" placeholder="Event name">
     <input type="date" id="editDate${idx}" value="${ev.date}">
     <div class="member-grid">
-      ${sortedMembers.map(name=>`
+      ${rosterMembers.map(name=>`
         <label class="member-row edit-row">
           <span>${escapeHtml(name)}</span>
           <input type="checkbox" data-name="${escapeHtml(name)}" ${ev.present.includes(name)?'checked':''}>
