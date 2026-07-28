@@ -1,0 +1,742 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>UNKSO Attendance</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --olive-dark:#33361f;
+    --olive:#4c5230;
+    --olive-mid:#6b7245;
+    --khaki:#cbb994;
+    --khaki-light:#e9e0c8;
+    --cream:#f2ecda;
+    --rust:#c1592e;
+    --rust-dark:#98431f;
+    --ink:#211f16;
+    --ok:#5c7a3f;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--cream);
+    color:var(--ink);
+    font-family:'Inter',system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .display{font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:.04em;}
+  .mono{font-family:'JetBrains Mono',monospace;}
+
+  header{
+    background:var(--olive-dark);
+    color:var(--khaki-light);
+    padding:18px 28px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    border-bottom:4px solid var(--rust);
+  }
+  header .brand{display:flex; align-items:center; gap:12px;}
+  header .brand .patch{
+    width:34px;height:34px;border-radius:4px;
+    background:var(--rust);
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Oswald',sans-serif;font-weight:700;color:var(--olive-dark);
+    transform:rotate(-3deg);
+  }
+  header h1{font-size:20px; margin:0; font-weight:600;}
+  header .sub{font-size:11px; opacity:.65; letter-spacing:.12em; margin-top:2px;}
+
+  nav.pagenav{
+    background:var(--olive);
+    display:flex; gap:2px;
+    padding:0 28px;
+  }
+  nav.pagenav button{
+    background:transparent; border:none; cursor:pointer;
+    color:var(--khaki-light); opacity:.75;
+    font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:.05em;
+    font-size:13px; font-weight:500;
+    padding:11px 16px;
+    border-bottom:3px solid transparent;
+  }
+  nav.pagenav button:hover{opacity:1;}
+  nav.pagenav button.active{
+    opacity:1; border-bottom-color:var(--rust); background:var(--olive-dark);
+  }
+
+  main{max-width:900px; margin:0 auto; padding:28px 20px 80px;}
+  .page{display:none;}
+  .page.active{display:block;}
+
+  .panel{
+    background:var(--khaki-light);
+    border:1px solid var(--khaki);
+    border-radius:8px;
+    padding:18px;
+    margin-bottom:20px;
+  }
+  .panel h2{
+    font-size:13px; margin:0 0 14px; color:var(--olive-dark);
+    display:flex; align-items:center; gap:8px;
+  }
+  .panel h2 .tag{
+    background:var(--olive); color:var(--khaki-light);
+    font-size:10px; padding:2px 7px; border-radius:3px; letter-spacing:.08em;
+  }
+
+  input[type=text], input[type=date]{
+    width:100%; padding:9px 10px; border:1px solid var(--khaki);
+    border-radius:5px; background:#fff; font-family:'Inter'; font-size:13px;
+    margin-bottom:8px;
+  }
+  input:focus, select:focus, button:focus-visible{
+    outline:2px solid var(--rust); outline-offset:1px;
+  }
+
+  .btn{
+    display:inline-flex; align-items:center; gap:6px;
+    background:var(--rust); color:#fff; border:none;
+    padding:9px 16px; border-radius:6px; font-weight:600; font-size:13px;
+    cursor:pointer; transition:background .15s;
+    font-family:'Inter';
+  }
+  .btn:hover{background:var(--rust-dark);}
+  .btn:disabled{background:#b8ac8c; cursor:not-allowed;}
+  .btn.ghost{
+    background:transparent; color:var(--olive-dark); border:1px solid var(--olive-mid);
+  }
+  .btn.ghost:hover{background:var(--khaki);}
+  .btn.small{padding:5px 10px; font-size:11px;}
+
+  .roster-list{list-style:none; margin:0; padding:0; max-height:460px; overflow-y:auto;}
+  .roster-list li{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:7px 9px; border-radius:5px; font-size:13px;
+    border-bottom:1px solid var(--khaki);
+  }
+  .roster-list li:last-child{border-bottom:none;}
+  .roster-list .count{
+    font-family:'JetBrains Mono'; font-size:11px; color:var(--olive-mid);
+  }
+  .remove-x{
+    background:none;border:none;color:var(--rust);cursor:pointer;font-size:14px;padding:0 4px;
+  }
+
+  .dropzone{
+    border:2px dashed var(--olive-mid);
+    border-radius:8px;
+    padding:30px 16px;
+    text-align:center;
+    background:var(--cream);
+    cursor:pointer;
+    transition:border-color .15s, background .15s;
+  }
+  .dropzone.drag{border-color:var(--rust); background:var(--khaki-light);}
+  .dropzone .icon{font-size:28px; margin-bottom:6px;}
+  .dropzone p{margin:2px 0; font-size:13px; color:var(--olive-dark);}
+  .dropzone .hint{font-size:11px; color:var(--olive-mid);}
+
+  .preview-wrap{margin-top:14px;}
+  .preview-wrap img{max-width:100%; border-radius:6px; border:1px solid var(--khaki);}
+
+  .tag-row{display:flex; flex-wrap:wrap; gap:8px; margin-top:14px;}
+  .dogtag{
+    background:var(--olive-dark); color:var(--khaki-light);
+    border-radius:5px; padding:8px 10px; font-size:12px;
+    display:flex; flex-direction:column; gap:4px; min-width:170px;
+    border-left:4px solid var(--rust);
+  }
+  .dogtag.matched{border-left-color:var(--ok);}
+  .dogtag .raw{font-family:'JetBrains Mono'; font-size:11px; opacity:.7;}
+  .dogtag select{
+    background:var(--khaki-light); color:var(--ink); border:none;
+    border-radius:3px; font-size:12px; padding:3px 5px; font-family:'Inter';
+  }
+  .dogtag .conf{font-size:10px; letter-spacing:.06em;}
+  .dogtag label{display:flex; align-items:center; gap:6px; font-size:11px; margin-top:2px;}
+
+  .empty{
+    text-align:center; padding:30px 10px; color:var(--olive-mid); font-size:13px;
+  }
+  .status-line{font-size:12px; color:var(--olive-mid); margin-top:8px;}
+  .status-line.err{color:var(--rust-dark);}
+
+  .event-card{
+    border:1px solid var(--khaki); border-radius:6px; margin-bottom:10px; overflow:hidden;
+    background:#fff;
+  }
+  .event-head{
+    display:flex; align-items:stretch; background:var(--khaki-light);
+  }
+  .event-toggle{
+    flex:1; text-align:left; background:transparent; border:none; cursor:pointer;
+    padding:11px 14px; display:flex; align-items:center; gap:12px;
+    font-family:'Inter'; font-size:13px; color:var(--ink);
+  }
+  .event-toggle:hover{background:var(--khaki);}
+  .event-title{font-weight:600; flex:1;}
+  .event-date{font-size:11px; color:var(--olive-mid);}
+  .event-count{
+    font-size:11px; background:var(--olive); color:var(--khaki-light);
+    padding:2px 8px; border-radius:10px;
+  }
+  .chevron{transition:transform .15s; font-size:11px; color:var(--olive-mid);}
+  .event-toggle.open .chevron{transform:rotate(90deg);}
+  .edit-btn{margin:8px 10px; flex-shrink:0;}
+  .event-body{padding:12px 14px 14px; border-top:1px solid var(--khaki);}
+  .member-grid{
+    display:grid; grid-template-columns:repeat(auto-fill, minmax(160px, 1fr)); gap:6px 14px;
+  }
+  .member-row{
+    display:flex; align-items:center; justify-content:space-between;
+    font-size:12px; padding:4px 0; border-bottom:1px solid var(--khaki-light);
+  }
+  .member-row.check span:last-child{color:var(--ok); font-weight:700;}
+  .member-row.miss span:last-child{color:var(--rust-dark); font-weight:700;}
+  .edit-row{cursor:pointer;}
+  .edit-row input[type=checkbox]{width:auto; margin:0;}
+  .edit-actions{display:flex; gap:8px; margin-top:12px;}
+
+  .footer-note{
+    font-size:11px; color:var(--olive-mid); text-align:center; margin-top:30px; line-height:1.6;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <div class="patch display">U</div>
+    <div>
+      <h1 class="display">UNKSO Attendance</h1>
+      <div class="sub">Attendance Ledger</div>
+    </div>
+  </div>
+  <button class="btn" id="exportBtn">Export CSV</button>
+</header>
+
+<nav class="pagenav">
+  <button class="active" data-page="roster">Roster</button>
+  <button data-page="event">New Event</button>
+  <button data-page="attendance">Attendance History</button>
+</nav>
+
+<main>
+
+  <div class="page active" id="page-roster">
+    <div class="panel">
+      <h2>Roster <span class="tag" id="rosterCount">0</span></h2>
+      <input type="text" id="newMember" placeholder="Add member name...">
+      <button class="btn ghost small" id="addMemberBtn" style="width:100%">+ Add to roster</button>
+      <ul class="roster-list" id="rosterList" style="margin-top:12px;"></ul>
+    </div>
+  </div>
+
+  <div class="page" id="page-event">
+    <div class="panel">
+      <h2>New Event Entry</h2>
+      <input type="text" id="eventName" placeholder="Event name (e.g. General Meeting)">
+      <input type="date" id="eventDate">
+
+      <div class="dropzone" id="dropzone">
+        <div class="icon">&#128203;</div>
+        <p><strong>Drop a screenshot</strong> or click to upload</p>
+        <p class="hint">Discord voice channel, chat log, or reaction list</p>
+        <input type="file" id="fileInput" accept="image/*" style="display:none">
+      </div>
+
+      <div class="preview-wrap" id="previewWrap" style="display:none;">
+        <img id="previewImg" alt="Screenshot preview">
+      </div>
+
+      <div style="margin-top:12px; display:flex; gap:8px;">
+        <button class="btn" id="readBtn" disabled>Read names from screenshot</button>
+      </div>
+      <div class="status-line" id="statusLine"></div>
+
+      <div id="matchSections">
+        <div id="highSection" style="display:none;">
+          <h3 style="font-size:12px; margin:14px 0 6px; color:var(--olive-dark);">55%+ match</h3>
+          <div class="tag-row" id="tagRowHigh"></div>
+        </div>
+        <div id="lowSection" style="display:none;">
+          <h3 style="font-size:12px; margin:14px 0 6px; color:var(--olive-dark);">30&ndash;54% match &mdash; review before including</h3>
+          <div class="tag-row" id="tagRowLow"></div>
+        </div>
+      </div>
+
+      <div style="margin-top:16px;">
+        <button class="btn" id="commitBtn" style="display:none;">Log this event's attendance</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="page" id="page-attendance">
+    <div class="panel">
+      <h2>Attendance History</h2>
+      <div id="historyWrap"><div class="empty">No events logged yet.</div></div>
+    </div>
+  </div>
+
+  <div class="footer-note" id="footerNote">
+    Roster and attendance history are shared &mdash; anyone with access to this site can see, add, or edit them.<br>
+    There's no login or per-person permissions, so treat the URL itself as the access control.
+  </div>
+</main>
+
+<script>
+let MEMBERS = [];
+let EVENTS = []; // {name, date, present: [memberName,...]}
+let currentMatches = []; // working review state for the screenshot currently open
+let currentImageBase64 = null;
+let usingSharedApi = false;
+
+const rosterList = document.getElementById('rosterList');
+const rosterCount = document.getElementById('rosterCount');
+const dropzone = document.getElementById('dropzone');
+const fileInput = document.getElementById('fileInput');
+const previewWrap = document.getElementById('previewWrap');
+const previewImg = document.getElementById('previewImg');
+const readBtn = document.getElementById('readBtn');
+const statusLine = document.getElementById('statusLine');
+const commitBtn = document.getElementById('commitBtn');
+const historyWrap = document.getElementById('historyWrap');
+const footerNote = document.getElementById('footerNote');
+
+// ---------- page nav ----------
+document.querySelectorAll('nav.pagenav button').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('nav.pagenav button').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('page-'+btn.dataset.page).classList.add('active');
+  });
+});
+
+// ---------- storage ----------
+// Primary path: this site's own /api/members and /api/events routes, backed by a
+// Cloudflare KV namespace (see the Pages Functions in /functions/api). This is what
+// makes attendance shared and visible to everyone who visits the deployed site.
+// Fallback path: window.storage, which only works while previewing this file here in
+// chat (it does nothing once deployed) — it's there so the app is still testable before
+// you've wired up Cloudflare KV.
+async function apiGet(key){
+  const res = await fetch('/api/' + key);
+  if(!res.ok) throw new Error('api unavailable');
+  return res.json();
+}
+async function apiPost(key, value){
+  const res = await fetch('/api/' + key, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(value)
+  });
+  if(!res.ok) throw new Error('api unavailable');
+}
+
+async function persist(){
+  if(usingSharedApi){
+    try{
+      await apiPost('members', MEMBERS);
+      await apiPost('events', EVENTS);
+      return;
+    }catch(e){ /* fall through to preview storage below */ }
+  }
+  try{
+    await window.storage.set('members', JSON.stringify(MEMBERS), true);
+    await window.storage.set('events', JSON.stringify(EVENTS), true);
+  }catch(e){ /* no storage available at all; nothing more we can do */ }
+}
+
+async function load(){
+  try{
+    MEMBERS = await apiGet('members');
+    EVENTS = await apiGet('events');
+    usingSharedApi = true;
+  }catch(apiErr){
+    usingSharedApi = false;
+    try{
+      const m = await window.storage.get('members', true);
+      const e = await window.storage.get('events', true);
+      MEMBERS = m ? JSON.parse(m.value) : ['Vega','Ironsight','Prowler','Ashwood','Blackfin','Nightjar'];
+      EVENTS = e ? JSON.parse(e.value) : [];
+      footerNote.innerHTML = 'Previewing with temporary shared storage (chat only) &mdash; deploy with the included Cloudflare Function + KV setup for real shared hosting.';
+    }catch(err){
+      MEMBERS = ['Vega','Ironsight','Prowler','Ashwood','Blackfin','Nightjar'];
+      EVENTS = [];
+    }
+  }
+  renderRoster();
+  renderHistory();
+}
+
+// ---------- roster ----------
+function renderRoster(){
+  rosterCount.textContent = MEMBERS.length;
+  rosterList.innerHTML = '';
+  MEMBERS.sort((a,b)=>a.localeCompare(b)).forEach(name=>{
+    const count = EVENTS.filter(ev=>ev.present.includes(name)).length;
+    const li = document.createElement('li');
+    li.innerHTML = `<span>${escapeHtml(name)}</span>
+      <span style="display:flex;align-items:center;gap:8px;">
+        <span class="count">${count}/${EVENTS.length}</span>
+        <button class="remove-x" title="Remove from roster" data-name="${escapeHtml(name)}">&#10005;</button>
+      </span>`;
+    rosterList.appendChild(li);
+  });
+  rosterList.querySelectorAll('.remove-x').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      MEMBERS = MEMBERS.filter(m=>m!==btn.dataset.name);
+      renderRoster(); renderHistory(); persist();
+    });
+  });
+}
+
+document.getElementById('addMemberBtn').addEventListener('click', ()=>{
+  const input = document.getElementById('newMember');
+  const val = input.value.trim();
+  if(val && !MEMBERS.includes(val)){
+    MEMBERS.push(val);
+    input.value='';
+    renderRoster(); renderHistory(); persist();
+  }
+});
+document.getElementById('newMember').addEventListener('keydown', e=>{
+  if(e.key === 'Enter') document.getElementById('addMemberBtn').click();
+});
+
+// ---------- fuzzy match ----------
+function levenshtein(a,b){
+  a=a.toLowerCase(); b=b.toLowerCase();
+  const m=a.length, n=b.length;
+  const dp = Array.from({length:m+1},()=>new Array(n+1).fill(0));
+  for(let i=0;i<=m;i++) dp[i][0]=i;
+  for(let j=0;j<=n;j++) dp[0][j]=j;
+  for(let i=1;i<=m;i++){
+    for(let j=1;j<=n;j++){
+      dp[i][j] = a[i-1]===b[j-1] ? dp[i-1][j-1] : 1+Math.min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1]);
+    }
+  }
+  return dp[m][n];
+}
+function bestMatch(name){
+  let best=null, bestDist=Infinity;
+  MEMBERS.forEach(m=>{
+    const d = levenshtein(name, m);
+    if(d<bestDist){ bestDist=d; best=m; }
+  });
+  if(!best) return {match:null, confidence:0};
+  const maxLen = Math.max(name.length, best.length) || 1;
+  const confidence = Math.round((1 - bestDist/maxLen) * 100);
+  return {match:best, confidence};
+}
+
+// ---------- upload ----------
+dropzone.addEventListener('click', ()=>fileInput.click());
+dropzone.addEventListener('dragover', e=>{e.preventDefault(); dropzone.classList.add('drag');});
+dropzone.addEventListener('dragleave', ()=>dropzone.classList.remove('drag'));
+dropzone.addEventListener('drop', e=>{
+  e.preventDefault(); dropzone.classList.remove('drag');
+  if(e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+});
+fileInput.addEventListener('change', ()=>{
+  if(fileInput.files[0]) handleFile(fileInput.files[0]);
+});
+
+function clearMatchSections(){
+  document.getElementById('tagRowHigh').innerHTML = '';
+  document.getElementById('tagRowLow').innerHTML = '';
+  document.getElementById('highSection').style.display = 'none';
+  document.getElementById('lowSection').style.display = 'none';
+}
+
+function handleFile(file){
+  const reader = new FileReader();
+  reader.onload = () => {
+    currentImageBase64 = reader.result.split(',')[1];
+    previewImg.src = reader.result;
+    previewWrap.style.display = 'block';
+    readBtn.disabled = false;
+    clearMatchSections();
+    commitBtn.style.display = 'none';
+    statusLine.textContent = '';
+    statusLine.className = 'status-line';
+  };
+  reader.readAsDataURL(file);
+}
+
+// ---------- read names via API ----------
+readBtn.addEventListener('click', async ()=>{
+  if(!currentImageBase64) return;
+  readBtn.disabled = true;
+  statusLine.textContent = 'Reading screenshot…';
+  statusLine.className = 'status-line';
+  clearMatchSections();
+
+  try{
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-6",
+        max_tokens: 1000,
+        messages: [{
+          role: "user",
+          content: [
+            { type: "image", source: { type: "base64", media_type: "image/png", data: currentImageBase64 } },
+            { type: "text", text: "This is a screenshot of a Discord channel (voice member list, chat log, or reaction list). Identify every distinct person's visible username or display name.\n\nRules:\n1. Skip any entry that is a bot or system indicator rather than a person, such as one starting with \"[RECORDING]\".\n2. Names are formatted as \"RANK.Name\" (a rank abbreviation, a period, then the actual name) — return only the part AFTER the period. For example \"SGT.Vega\" should be returned as \"Vega\", and \"CPL.Ironsight\" as \"Ironsight\". If an entry has no period, return it as-is.\n3. Some names have a clan/team tag appended in the format \"=TAG=\", e.g. \"Weezey=US=\" — strip that off too, so it becomes \"Weezey\".\n\nRespond with ONLY a JSON array of the resulting names, nothing else, no markdown fences. Example: [\"Vega\",\"Ironsight\"]" }
+          ]
+        }]
+      })
+    });
+    const data = await response.json();
+    const textBlock = (data.content || []).map(b=>b.text || '').join('');
+    let names;
+    try{
+      names = JSON.parse(textBlock.trim().replace(/^```json|```$/g,'').trim());
+    }catch(parseErr){
+      throw new Error('Could not parse a name list from the response.');
+    }
+    if(!Array.isArray(names) || names.length===0){
+      statusLine.textContent = 'No names detected — try a clearer screenshot.';
+      statusLine.className = 'status-line err';
+      readBtn.disabled = false;
+      return;
+    }
+
+    names = names
+      .filter(n => !/\[recording\]/i.test(n))
+      .map(n => {
+        const dot = n.indexOf('.');
+        let cleaned = dot > -1 ? n.slice(dot + 1).trim() : n.trim();
+        cleaned = cleaned.split('=')[0].trim();
+        return cleaned;
+      })
+      .filter(n => n.length > 0);
+
+    if(names.length===0){
+      statusLine.textContent = 'Everything detected was filtered out (recording indicator only) — try a different screenshot.';
+      statusLine.className = 'status-line err';
+      readBtn.disabled = false;
+      return;
+    }
+
+    currentMatches = names
+      .map(n=>{
+        const {match, confidence} = bestMatch(n);
+        return { raw:n, match, confidence, included:true };
+      })
+      .filter(m => m.confidence >= 30);
+
+    if(currentMatches.length===0){
+      statusLine.textContent = 'No matches at or above 30% confidence — nothing to review.';
+      statusLine.className = 'status-line err';
+      readBtn.disabled = false;
+      return;
+    }
+
+    statusLine.textContent = `Found ${currentMatches.length} name(s) at 30%+ confidence. Review the matches below, then log attendance.`;
+    renderTags();
+    commitBtn.style.display = 'inline-flex';
+  }catch(err){
+    statusLine.textContent = 'Could not read the screenshot: ' + err.message;
+    statusLine.className = 'status-line err';
+  }
+  readBtn.disabled = false;
+});
+
+function renderTags(){
+  const tagRowHigh = document.getElementById('tagRowHigh');
+  const tagRowLow = document.getElementById('tagRowLow');
+  const highSection = document.getElementById('highSection');
+  const lowSection = document.getElementById('lowSection');
+  tagRowHigh.innerHTML = '';
+  tagRowLow.innerHTML = '';
+
+  currentMatches.forEach((m, idx)=>{
+    const isHigh = m.confidence >= 55;
+    const div = document.createElement('div');
+    div.className = 'dogtag' + (isHigh ? ' matched' : '');
+    const options = MEMBERS.map(name=>
+      `<option value="${escapeHtml(name)}" ${name===m.match?'selected':''}>${escapeHtml(name)}</option>`
+    ).join('');
+    div.innerHTML = `
+      <span class="raw">${escapeHtml(m.raw)}</span>
+      <select data-idx="${idx}">
+        <option value="">— unmatched, skip —</option>
+        ${options}
+      </select>
+      <span class="conf">${m.match ? m.confidence+'% match confidence' : 'no roster match'}</span>
+      <label><input type="checkbox" data-idx="${idx}" ${m.included?'checked':''}> include in attendance</label>
+    `;
+    (isHigh ? tagRowHigh : tagRowLow).appendChild(div);
+  });
+
+  highSection.style.display = tagRowHigh.children.length ? 'block' : 'none';
+  lowSection.style.display = tagRowLow.children.length ? 'block' : 'none';
+
+  document.getElementById('matchSections').querySelectorAll('select').forEach(sel=>{
+    sel.addEventListener('change', ()=>{
+      currentMatches[sel.dataset.idx].match = sel.value || null;
+    });
+  });
+  document.getElementById('matchSections').querySelectorAll('input[type=checkbox]').forEach(cb=>{
+    cb.addEventListener('change', ()=>{
+      currentMatches[cb.dataset.idx].included = cb.checked;
+    });
+  });
+}
+
+// ---------- commit attendance ----------
+commitBtn.addEventListener('click', ()=>{
+  const nameInput = document.getElementById('eventName');
+  const dateInput = document.getElementById('eventDate');
+  const eventName = nameInput.value.trim() || 'Untitled Event';
+  const eventDate = dateInput.value || new Date().toISOString().slice(0,10);
+
+  const present = [...new Set(
+    currentMatches.filter(m=>m.included && m.match).map(m=>m.match)
+  )];
+
+  if(present.length===0){
+    statusLine.textContent = 'No matched names were included — nothing to log.';
+    statusLine.className = 'status-line err';
+    return;
+  }
+
+  EVENTS.push({ name: eventName, date: eventDate, present });
+  persist();
+  renderRoster();
+  renderHistory();
+
+  // reset the entry form
+  nameInput.value=''; dateInput.value='';
+  previewWrap.style.display='none';
+  clearMatchSections();
+  commitBtn.style.display='none';
+  readBtn.disabled = true;
+  currentImageBase64 = null; currentMatches = [];
+  statusLine.textContent = `Logged "${eventName}" with ${present.length} member(s) present.`;
+  statusLine.className = 'status-line';
+});
+
+// ---------- history (collapsible per-event cards, with edit) ----------
+function renderHistory(){
+  if(EVENTS.length===0){
+    historyWrap.innerHTML = '<div class="empty">No events logged yet.</div>';
+    return;
+  }
+  const indexed = EVENTS.map((ev, idx)=>({ev, idx})).reverse(); // newest first
+  historyWrap.innerHTML = indexed.map(({ev, idx}) => eventCardHTML(ev, idx)).join('');
+  attachHistoryHandlers();
+}
+
+function eventCardHTML(ev, idx){
+  const sortedMembers = [...MEMBERS].sort((a,b)=>a.localeCompare(b));
+  const rows = sortedMembers.map(name=>{
+    const there = ev.present.includes(name);
+    return `<div class="member-row ${there?'check':'miss'}"><span>${escapeHtml(name)}</span><span>${there?'&#10003;':'X'}</span></div>`;
+  }).join('');
+  return `
+  <div class="event-card">
+    <div class="event-head">
+      <button class="event-toggle" data-idx="${idx}">
+        <span class="chevron">&#9656;</span>
+        <span class="event-title">${escapeHtml(ev.name)}</span>
+        <span class="event-date mono">${ev.date}</span>
+        <span class="event-count">${ev.present.length}/${sortedMembers.length} present</span>
+      </button>
+      <button class="btn ghost small edit-btn" data-idx="${idx}">Edit</button>
+    </div>
+    <div class="event-body" id="eventBody${idx}" style="display:none;">
+      <div class="member-grid">${rows}</div>
+    </div>
+  </div>`;
+}
+
+function attachHistoryHandlers(){
+  historyWrap.querySelectorAll('.event-toggle').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const body = document.getElementById('eventBody'+btn.dataset.idx);
+      const isOpen = body.style.display !== 'none';
+      body.style.display = isOpen ? 'none' : 'block';
+      btn.classList.toggle('open', !isOpen);
+    });
+  });
+  historyWrap.querySelectorAll('.edit-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=> openEditForm(Number(btn.dataset.idx)));
+  });
+}
+
+function openEditForm(idx){
+  const ev = EVENTS[idx];
+  const body = document.getElementById('eventBody'+idx);
+  const toggle = document.querySelector(`.event-toggle[data-idx="${idx}"]`);
+  body.style.display = 'block';
+  toggle.classList.add('open');
+  const sortedMembers = [...MEMBERS].sort((a,b)=>a.localeCompare(b));
+
+  body.innerHTML = `
+    <input type="text" id="editName${idx}" value="${escapeHtml(ev.name)}" placeholder="Event name">
+    <input type="date" id="editDate${idx}" value="${ev.date}">
+    <div class="member-grid">
+      ${sortedMembers.map(name=>`
+        <label class="member-row edit-row">
+          <span>${escapeHtml(name)}</span>
+          <input type="checkbox" data-name="${escapeHtml(name)}" ${ev.present.includes(name)?'checked':''}>
+        </label>
+      `).join('')}
+    </div>
+    <div class="edit-actions">
+      <button class="btn small" id="saveEdit${idx}">Save changes</button>
+      <button class="btn ghost small" id="cancelEdit${idx}">Cancel</button>
+    </div>
+  `;
+
+  document.getElementById('saveEdit'+idx).addEventListener('click', ()=>{
+    const newName = document.getElementById('editName'+idx).value.trim() || 'Untitled Event';
+    const newDate = document.getElementById('editDate'+idx).value || ev.date;
+    const checked = [...body.querySelectorAll('input[type=checkbox]:checked')].map(cb=>cb.dataset.name);
+    EVENTS[idx] = { name:newName, date:newDate, present:checked };
+    persist();
+    renderRoster();
+    renderHistory();
+  });
+  document.getElementById('cancelEdit'+idx).addEventListener('click', renderHistory);
+}
+
+// ---------- export ----------
+document.getElementById('exportBtn').addEventListener('click', ()=>{
+  if(EVENTS.length===0){ return; }
+  const sortedMembers = [...MEMBERS].sort((a,b)=>a.localeCompare(b));
+  let csv = 'Member,' + EVENTS.map(e=>`"${e.name} (${e.date})"`).join(',') + ',Total\n';
+  sortedMembers.forEach(name=>{
+    let total=0;
+    const row = EVENTS.map(ev=>{
+      const there = ev.present.includes(name);
+      if(there) total++;
+      return there ? '1' : '0';
+    });
+    csv += `"${name}",${row.join(',')},${total}\n`;
+  });
+  const blob = new Blob([csv], {type:'text/csv'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'unkso-attendance.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+});
+
+function escapeHtml(s){
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+load();
+</script>
+</body>
+</html>
