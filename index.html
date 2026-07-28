@@ -190,7 +190,8 @@
   }
   .chevron{transition:transform .15s; font-size:11px; color:var(--olive-mid);}
   .event-toggle.open .chevron{transform:rotate(90deg);}
-  .edit-btn{margin:8px 10px; flex-shrink:0;}
+  .edit-btn{margin:8px 0 8px 10px; flex-shrink:0;}
+  .delete-btn{margin:8px 10px 8px 6px; flex-shrink:0;}
   .event-body{padding:12px 14px 14px; border-top:1px solid var(--khaki);}
   .member-grid{
     display:grid; grid-template-columns:repeat(auto-fill, minmax(160px, 1fr)); gap:6px 14px;
@@ -275,12 +276,9 @@
         <input type="file" id="fileInput" accept="image/*" style="display:none">
       </div>
 
-      <div class="preview-wrap" id="previewWrap" style="display:none;">
-        <div class="preview-actions">
-          <button class="btn" id="readBtn">Read names from screenshot</button>
-          <button class="btn ghost icon-only" id="removeImgBtn" title="Remove screenshot" aria-label="Remove screenshot">&#10005;</button>
-        </div>
-        <img id="previewImg" alt="Screenshot preview">
+      <div class="preview-actions" id="previewActions" style="display:none;">
+        <button class="btn" id="readBtn">Read names from screenshot</button>
+        <button class="btn ghost icon-only" id="removeImgBtn" title="Remove screenshot" aria-label="Remove screenshot">&#10005;</button>
       </div>
 
       <div class="status-line" id="statusLine"></div>
@@ -298,6 +296,11 @@
 
       <div style="margin-top:16px;">
         <button class="btn" id="commitBtn" style="display:none;">Log this event's attendance</button>
+      </div>
+
+      <div class="preview-wrap" id="previewWrap" style="display:none;">
+        <p style="font-size:11px; color:var(--olive-mid); margin:0 0 8px;">Screenshot (for reference / double-checking)</p>
+        <img id="previewImg" alt="Screenshot preview">
       </div>
     </div>
   </div>
@@ -341,6 +344,7 @@ const rosterCount = document.getElementById('rosterCount');
 const dropzone = document.getElementById('dropzone');
 const fileInput = document.getElementById('fileInput');
 const previewWrap = document.getElementById('previewWrap');
+const previewActions = document.getElementById('previewActions');
 const previewImg = document.getElementById('previewImg');
 const readBtn = document.getElementById('readBtn');
 const statusLine = document.getElementById('statusLine');
@@ -590,6 +594,8 @@ function handleFile(file){
   reader.onload = () => {
     currentImageBase64 = reader.result.split(',')[1];
     previewImg.src = reader.result;
+    dropzone.style.display = 'none';
+    previewActions.style.display = 'flex';
     previewWrap.style.display = 'block';
     clearMatchSections();
     commitBtn.style.display = 'none';
@@ -602,6 +608,8 @@ function handleFile(file){
 document.getElementById('removeImgBtn').addEventListener('click', ()=>{
   currentImageBase64 = null;
   previewImg.src = '';
+  dropzone.style.display = 'block';
+  previewActions.style.display = 'none';
   previewWrap.style.display = 'none';
   fileInput.value = '';
   clearMatchSections();
@@ -759,6 +767,8 @@ commitBtn.addEventListener('click', ()=>{
 
   // reset the entry form
   nameInput.value=''; dateInput.value='';
+  dropzone.style.display = 'block';
+  previewActions.style.display = 'none';
   previewWrap.style.display='none';
   clearMatchSections();
   commitBtn.style.display='none';
@@ -794,6 +804,7 @@ function eventCardHTML(ev, idx){
         <span class="event-count">${ev.present.length}/${sortedMembers.length} present</span>
       </button>
       <button class="btn ghost small edit-btn" data-idx="${idx}">Edit</button>
+      <button class="btn ghost small icon-only delete-btn" data-idx="${idx}" title="Delete event" aria-label="Delete event">&#10005;</button>
     </div>
     <div class="event-body" id="eventBody${idx}" style="display:none;">
       <div class="member-grid">${rows}</div>
@@ -812,6 +823,17 @@ function attachHistoryHandlers(){
   });
   historyWrap.querySelectorAll('.edit-btn').forEach(btn=>{
     btn.addEventListener('click', ()=> openEditForm(Number(btn.dataset.idx)));
+  });
+  historyWrap.querySelectorAll('.delete-btn').forEach(btn=>{
+    btn.addEventListener('click', async ()=>{
+      const idx = Number(btn.dataset.idx);
+      const ev = EVENTS[idx];
+      if(!confirm(`Delete "${ev.name}" (${ev.date})? This cannot be undone.`)) return;
+      EVENTS.splice(idx, 1);
+      await persist();
+      renderRoster();
+      renderHistory();
+    });
   });
 }
 
