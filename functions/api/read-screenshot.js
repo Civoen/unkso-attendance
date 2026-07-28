@@ -50,7 +50,14 @@ export async function onRequestPost({ request, env }) {
       prompt: PROMPT,
       image: imageBytes
     });
-    return new Response(JSON.stringify({ text: result.response || result.description || '' }), {
+    let text = result.response ?? result.description ?? '';
+    if (typeof text !== 'string') {
+      // The model occasionally returns something structured instead of plain text —
+      // stringify it so the client always gets a string to work with, and can still
+      // attempt to pull a JSON array out of it.
+      text = JSON.stringify(text);
+    }
+    return new Response(JSON.stringify({ text }), {
       headers: { 'Content-Type': 'application/json' }
     });
   } catch (err) {

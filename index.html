@@ -628,7 +628,7 @@ readBtn.addEventListener('click', async ()=>{
     if(!response.ok){
       throw new Error(data.error || 'Request failed');
     }
-    const textBlock = data.text || '';
+    const textBlock = typeof data.text === 'string' ? data.text : JSON.stringify(data.text || '');
     let names;
     // Try strict parsing first (fenced or plain JSON), then fall back to pulling the
     // first [...] array out of the reply — smaller open models tend to add a bit of
