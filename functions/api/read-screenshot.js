@@ -7,6 +7,19 @@ Rules:
 
 Respond with ONLY a JSON array of the resulting names, nothing else, no markdown fences. Example: ["Vega","Ironsight"]`;
 
+// This model's schema wants the image as a raw array of byte values (0-255), not a
+// base64 string or data URI, so the base64 the browser sends has to be decoded first.
+function base64ToByteArray(base64OrDataUri) {
+  const commaIdx = base64OrDataUri.indexOf(',');
+  const raw = commaIdx > -1 ? base64OrDataUri.slice(commaIdx + 1) : base64OrDataUri;
+  const binary = atob(raw);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  return Array.from(bytes);
+}
+
 export async function onRequestPost({ request, env }) {
   if (!env.AI) {
     return new Response(JSON.stringify({
@@ -31,11 +44,13 @@ export async function onRequestPost({ request, env }) {
   }
 
   try {
+    const imageBytes = base64ToByteArray(body.image);
+    // This model expects "prompt" (not "messages") when an image is attached.
     const result = await env.AI.run('@cf/meta/llama-3.2-11b-vision-instruct', {
-      messages: [{ role: 'user', content: PROMPT }],
-      image: body.image
+      prompt: PROMPT,
+      image: imageBytes
     });
-    return new Response(JSON.stringify({ text: result.response || '' }), {
+    return new Response(JSON.stringify({ text: result.response || result.description || '' }), {
       headers: { 'Content-Type': 'application/json' }
     });
   } catch (err) {

@@ -41,10 +41,18 @@ account or API key, unlike Anthropic's API.
 1. In the Pages project: **Settings > Functions > AI bindings > Add binding**.
    - Variable name: `AI` (must match exactly — the function references `env.AI`)
    - Add it for both Production and Preview, then redeploy.
-2. **One-time model approval:** the first time this runs, Cloudflare needs you
-   to accept Meta's license for the Llama 3.2 Vision model. Go to **Workers &
-   Pages > AI > Models**, find `llama-3.2-11b-vision-instruct`, and accept its
-   terms. This is a one-time click, not a recurring cost.
+2. **One-time model license acceptance:** the first time this model is called,
+   Cloudflare requires your account to explicitly agree to Meta's license by
+   sending the model a one-off message. Easiest way — no terminal needed:
+   - Cloudflare dashboard **> Workers & Pages > AI > Playground**
+   - Select model `llama-3.2-11b-vision-instruct`
+   - Send the message `agree`
+
+   That registers your account's acceptance and unblocks all future calls.
+   (Alternative via curl if you prefer:
+   `curl https://api.cloudflare.com/client/v4/accounts/YOUR_ACCOUNT_ID/ai/run/@cf/meta/llama-3.2-11b-vision-instruct -X POST -H "Authorization: Bearer YOUR_API_TOKEN" -d '{ "prompt": "agree" }'`
+   — account ID is on the dashboard sidebar, API token comes from
+   My Profile > API Tokens with "Workers AI" edit permission.)
 
 ## 6. That's it
 

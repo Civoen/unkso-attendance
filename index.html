@@ -249,6 +249,7 @@
       <input type="text" id="newMember" placeholder="Add member name...">
       <button class="btn ghost small" id="addMemberBtn" style="width:100%">+ Add to roster</button>
       <ul class="roster-list" id="rosterList" style="margin-top:12px;"></ul>
+      <div class="status-line" id="rosterStatus"></div>
     </div>
   </div>
 
@@ -403,20 +404,29 @@ async function persist(){
     try{
       await apiPost('members', MEMBERS);
       await apiPost('events', EVENTS);
-      return;
+      return true;
     }catch(e){ /* fall through to preview storage below */ }
   }
   try{
     await window.storage.set('members:' + CURRENT_COMPANY, JSON.stringify(MEMBERS), true);
     await window.storage.set('events:' + CURRENT_COMPANY, JSON.stringify(EVENTS), true);
-  }catch(e){ /* no storage available at all; nothing more we can do */ }
+    return true;
+  }catch(e){ return false; /* no storage available at all */ }
 }
 
 async function load(){
   try{
-    MEMBERS = await apiGet('members');
+    const membersRaw = await apiGet('members');
     EVENTS = await apiGet('events');
     usingSharedApi = true;
+    if(membersRaw === null){
+      // Nobody has ever saved a roster for this company on the shared backend yet —
+      // seed the default once and persist it, so it's durable from here on.
+      MEMBERS = [...DEFAULT_ROSTERS[CURRENT_COMPANY]];
+      await persist();
+    }else{
+      MEMBERS = membersRaw;
+    }
   }catch(apiErr){
     usingSharedApi = false;
     try{
@@ -434,6 +444,14 @@ async function load(){
   renderHistory();
 }
 
+const rosterStatus = document.getElementById('rosterStatus');
+function showRosterStatus(ok){
+  rosterStatus.textContent = ok
+    ? `Saved — ${CURRENT_COMPANY} roster updated.`
+    : 'Could not save — check your connection and try again.';
+  rosterStatus.className = 'status-line' + (ok ? '' : ' err');
+}
+
 // ---------- roster ----------
 function renderRoster(){
   rosterCount.textContent = MEMBERS.length;
@@ -449,20 +467,22 @@ function renderRoster(){
     rosterList.appendChild(li);
   });
   rosterList.querySelectorAll('.remove-x').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
+    btn.addEventListener('click', async ()=>{
       MEMBERS = MEMBERS.filter(m=>m!==btn.dataset.name);
-      renderRoster(); renderHistory(); persist();
+      renderRoster(); renderHistory();
+      showRosterStatus(await persist());
     });
   });
 }
 
-document.getElementById('addMemberBtn').addEventListener('click', ()=>{
+document.getElementById('addMemberBtn').addEventListener('click', async ()=>{
   const input = document.getElementById('newMember');
   const val = input.value.trim();
   if(val && !MEMBERS.includes(val)){
     MEMBERS.push(val);
     input.value='';
-    renderRoster(); renderHistory(); persist();
+    renderRoster(); renderHistory();
+    showRosterStatus(await persist());
   }
 });
 document.getElementById('newMember').addEventListener('keydown', e=>{

@@ -9,7 +9,9 @@ function companyFrom(request) {
 export async function onRequestGet({ request, env }) {
   const company = companyFrom(request);
   const value = await env.ATTENDANCE_KV.get('members:' + company);
-  return new Response(value || '[]', {
+  // null means "nothing has ever been saved for this company" — distinct from an
+  // explicitly-saved empty roster ("[]") — so the client can seed a default only once.
+  return new Response(value === null ? 'null' : value, {
     headers: { 'Content-Type': 'application/json' }
   });
 }
