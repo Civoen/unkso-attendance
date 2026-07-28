@@ -135,11 +135,10 @@
     display:flex; align-items:center; justify-content:space-between;
     padding:7px 9px; border-radius:5px; font-size:13px;
     border-bottom:1px solid var(--khaki);
-    border-top:2px solid transparent;
   }
   .roster-list li:last-child{border-bottom:none;}
   .roster-list li.dragging{opacity:.4;}
-  .roster-list li.drag-over{border-top-color:var(--rust);}
+  .roster-list li.drag-over{box-shadow: inset 0 2px 0 0 var(--rust);}
   .roster-list .drag-row{display:flex; align-items:center; gap:8px;}
   .roster-list .drag-handle{
     cursor:grab; color:var(--olive-mid); font-size:13px; line-height:1;
@@ -187,6 +186,11 @@
   }
   .dogtag .conf{font-size:10px; letter-spacing:.06em;}
   .dogtag label{display:flex; align-items:center; gap:6px; font-size:11px; margin-top:2px;}
+  .dogtag.add-tile{
+    background:transparent; border:1px dashed var(--olive-mid); border-left:1px dashed var(--olive-mid);
+    justify-content:center; color:var(--olive-mid);
+  }
+  .dogtag.add-tile .btn{color:var(--olive); border-color:var(--olive-mid);}
 
   .empty{
     text-align:center; padding:30px 10px; color:var(--olive-mid); font-size:13px;
@@ -196,10 +200,10 @@
 
   .event-card{
     border:1px solid var(--khaki); border-radius:6px; margin-bottom:10px; overflow:hidden;
-    background:#fff; border-top:2px solid transparent;
+    background:#fff;
   }
   .event-card.dragging{opacity:.4;}
-  .event-card.drag-over{border-top-color:var(--rust);}
+  .event-card.drag-over{box-shadow: inset 0 2px 0 0 var(--rust);}
   .event-head{
     display:flex; align-items:stretch; background:var(--khaki-light);
   }
@@ -241,6 +245,8 @@
   .attendance-columns{
     display:grid; grid-template-columns:1fr 1fr; gap:18px;
   }
+  .attendance-columns.three-col{grid-template-columns:1fr 1fr 1fr;}
+  @media (max-width:640px){ .attendance-columns.three-col{grid-template-columns:1fr 1fr;} }
   @media (max-width:520px){ .attendance-columns{grid-template-columns:1fr;} }
   .attendance-col h4{
     font-size:10px; text-transform:uppercase; letter-spacing:.08em;
@@ -252,9 +258,14 @@
     border-radius:4px; padding:6px 10px; font-size:12px; margin-bottom:6px;
   }
   .attendance-chip.absent{border-left-color:var(--rust); opacity:.85;}
+  .attendance-chip.excused{border-left-color:var(--olive-mid);}
   .attendance-chip .glyph{font-weight:700; width:14px; text-align:center;}
   .attendance-chip.present .glyph{color:var(--ok);}
   .attendance-chip.absent .glyph{color:var(--rust-dark);}
+  .attendance-chip.excused .glyph{color:var(--olive-mid);}
+  .attendance-chip span:nth-child(2){flex:1;}
+  .excuse-toggle{display:flex; align-items:center; cursor:pointer;}
+  .excuse-checkbox{width:13px; height:13px; margin:0; cursor:pointer;}
 
   .company-wrap{position:relative;}
   .company-menu{
@@ -777,13 +788,11 @@ readBtn.addEventListener('click', async ()=>{
       .filter(m => m.confidence >= 30);
 
     if(currentMatches.length===0){
-      statusLine.textContent = 'No matches at or above 30% confidence — nothing to review.';
+      statusLine.textContent = 'No matches at or above 30% confidence. You can add members manually below.';
       statusLine.className = 'status-line err';
-      readBtn.disabled = false;
-      return;
+    }else{
+      statusLine.textContent = `Found ${currentMatches.length} name(s) at 30%+ confidence. Review the matches below, then log attendance.`;
     }
-
-    statusLine.textContent = `Found ${currentMatches.length} name(s) at 30%+ confidence. Review the matches below, then log attendance.`;
     renderTags();
     commitBtn.style.display = 'inline-flex';
   }catch(err){
@@ -820,7 +829,11 @@ function renderTags(){
     (isHigh ? tagRowHigh : tagRowLow).appendChild(div);
   });
 
-  highSection.style.display = tagRowHigh.children.length ? 'block' : 'none';
+  tagRowHigh.appendChild(buildAddMemberTile());
+
+  // The high-confidence section is always shown once a read has happened, since the
+  // "+ Add member" tile (for names the screenshot reader missed entirely) lives there.
+  highSection.style.display = 'block';
   lowSection.style.display = tagRowLow.children.length ? 'block' : 'none';
 
   document.getElementById('matchSections').querySelectorAll('select').forEach(sel=>{
@@ -833,6 +846,36 @@ function renderTags(){
       currentMatches[cb.dataset.idx].included = cb.checked;
     });
   });
+}
+
+function buildAddMemberTile(){
+  const wrap = document.createElement('div');
+  wrap.className = 'dogtag add-tile';
+  const used = new Set(currentMatches.filter(m=>m.match).map(m=>m.match));
+  const available = MEMBERS.filter(m=>!used.has(m));
+  if(available.length===0){
+    wrap.innerHTML = `<span style="font-size:11px;">Everyone on the roster is already listed above.</span>`;
+    return wrap;
+  }
+  wrap.innerHTML = `<button class="btn ghost small" style="width:100%;">+ Add member</button>`;
+  wrap.querySelector('button').addEventListener('click', ()=>{
+    wrap.innerHTML = `
+      <select id="manualAddSelect">
+        ${available.map(m=>`<option value="${escapeHtml(m)}">${escapeHtml(m)}</option>`).join('')}
+      </select>
+      <div style="display:flex; gap:6px; margin-top:6px;">
+        <button class="btn small" id="confirmAddBtn">Add</button>
+        <button class="btn ghost small" id="cancelAddBtn">Cancel</button>
+      </div>
+    `;
+    wrap.querySelector('#confirmAddBtn').addEventListener('click', ()=>{
+      const name = wrap.querySelector('#manualAddSelect').value;
+      currentMatches.push({ raw: name, match: name, confidence: 100, included: true });
+      renderTags();
+    });
+    wrap.querySelector('#cancelAddBtn').addEventListener('click', renderTags);
+  });
+  return wrap;
 }
 
 // ---------- commit attendance ----------
@@ -893,14 +936,40 @@ function renderHistory(){
   attachHistoryHandlers();
 }
 
-function eventCardHTML(ev, idx){
-  // Member order here follows the Roster page's own order, not alphabetical.
+function attendanceColumnsHTML(ev, idx){
   const rosterMembers = MEMBERS;
+  const excusedSet = new Set(ev.excused || []);
   const present = rosterMembers.filter(name => ev.present.includes(name));
-  const absent = rosterMembers.filter(name => !ev.present.includes(name));
-  const chip = (name, isPresent) => `<div class="attendance-chip ${isPresent?'present':'absent'}"><span class="glyph">${isPresent?'&#10003;':'X'}</span><span>${escapeHtml(name)}</span></div>`;
-  const presentHtml = present.length ? present.map(n=>chip(n,true)).join('') : '<div class="empty" style="padding:6px 0;">None</div>';
-  const absentHtml = absent.length ? absent.map(n=>chip(n,false)).join('') : '<div class="empty" style="padding:6px 0;">None</div>';
+  const absent = rosterMembers.filter(name => !ev.present.includes(name) && !excusedSet.has(name));
+  const excused = rosterMembers.filter(name => excusedSet.has(name) && !ev.present.includes(name));
+
+  const presentChip = name => `<div class="attendance-chip present"><span class="glyph">&#10003;</span><span>${escapeHtml(name)}</span></div>`;
+  const absentChip = name => `<div class="attendance-chip absent"><span class="glyph">X</span><span>${escapeHtml(name)}</span><label class="excuse-toggle" title="Mark excused"><input type="checkbox" class="excuse-checkbox" data-event-idx="${idx}" data-name="${escapeHtml(name)}"></label></div>`;
+  const excusedChip = name => `<div class="attendance-chip excused"><span class="glyph">&#9679;</span><span>${escapeHtml(name)}</span><label class="excuse-toggle" title="Unmark excused"><input type="checkbox" class="excuse-checkbox" data-event-idx="${idx}" data-name="${escapeHtml(name)}" checked></label></div>`;
+
+  const presentHtml = present.length ? present.map(presentChip).join('') : '<div class="empty" style="padding:6px 0;">None</div>';
+  const absentHtml = absent.length ? absent.map(absentChip).join('') : '<div class="empty" style="padding:6px 0;">None</div>';
+  const excusedHtml = excused.length ? excused.map(excusedChip).join('') : '<div class="empty" style="padding:6px 0;">None</div>';
+
+  return `
+    <div class="attendance-columns three-col">
+      <div class="attendance-col">
+        <h4>Present (${present.length})</h4>
+        ${presentHtml}
+      </div>
+      <div class="attendance-col">
+        <h4>Absent (${absent.length})</h4>
+        ${absentHtml}
+      </div>
+      <div class="attendance-col">
+        <h4>Excused (${excused.length})</h4>
+        ${excusedHtml}
+      </div>
+    </div>`;
+}
+
+function eventCardHTML(ev, idx){
+  const rosterMembers = MEMBERS;
   return `
   <div class="event-card" draggable="true" data-idx="${idx}">
     <div class="event-head">
@@ -915,22 +984,41 @@ function eventCardHTML(ev, idx){
       <button class="btn ghost small icon-only delete-btn" data-idx="${idx}" title="Delete event" aria-label="Delete event">&#10005;</button>
     </div>
     <div class="event-body" id="eventBody${idx}" style="display:none;">
-      <div class="attendance-columns">
-        <div class="attendance-col">
-          <h4>Present (${present.length})</h4>
-          ${presentHtml}
-        </div>
-        <div class="attendance-col">
-          <h4>Absent (${absent.length})</h4>
-          ${absentHtml}
-        </div>
-      </div>
+      ${attendanceColumnsHTML(ev, idx)}
     </div>
   </div>`;
 }
 
+async function toggleExcused(idx, name, isExcused){
+  const ev = EVENTS[idx];
+  if(!ev) return;
+  ev.excused = ev.excused || [];
+  if(isExcused){
+    if(!ev.excused.includes(name)) ev.excused.push(name);
+  }else{
+    ev.excused = ev.excused.filter(n => n !== name);
+  }
+  await persist();
+  // Refresh just this card's columns in place, so checking a box doesn't collapse
+  // the card the person is actively looking at (a full renderHistory() would).
+  const bodyEl = document.getElementById('eventBody'+idx);
+  if(bodyEl){
+    bodyEl.innerHTML = attendanceColumnsHTML(ev, idx);
+    attachExcuseCheckboxHandlers(bodyEl);
+  }
+}
+
+function attachExcuseCheckboxHandlers(scopeEl){
+  scopeEl.querySelectorAll('.excuse-checkbox').forEach(cb=>{
+    cb.addEventListener('change', ()=>{
+      toggleExcused(Number(cb.dataset.eventIdx), cb.dataset.name, cb.checked);
+    });
+  });
+}
+
 let eventDragSrcIdx = null;
 function attachHistoryHandlers(){
+  attachExcuseCheckboxHandlers(historyWrap);
   historyWrap.querySelectorAll('.event-toggle').forEach(btn=>{
     btn.addEventListener('click', ()=>{
       const body = document.getElementById('eventBody'+btn.dataset.idx);
