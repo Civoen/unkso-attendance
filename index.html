@@ -551,23 +551,13 @@ readBtn.addEventListener('click', async ()=>{
     const response = await fetch("/api/read-screenshot", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: "claude-sonnet-5",
-        max_tokens: 1000,
-        messages: [{
-          role: "user",
-          content: [
-            { type: "image", source: { type: "base64", media_type: "image/png", data: currentImageBase64 } },
-            { type: "text", text: "This is a screenshot of a Discord channel (voice member list, chat log, or reaction list). Identify every distinct person's visible username or display name.\n\nRules:\n1. Skip any entry that is a bot or system indicator rather than a person, such as one starting with \"[RECORDING]\".\n2. Names are formatted as \"RANK.Name\" (a rank abbreviation, a period, then the actual name) — return only the part AFTER the period. For example \"SGT.Vega\" should be returned as \"Vega\", and \"CPL.Ironsight\" as \"Ironsight\". If an entry has no period, return it as-is.\n3. Some names have a clan/team tag appended in the format \"=TAG=\", e.g. \"Weezey=US=\" — strip that off too, so it becomes \"Weezey\".\n\nRespond with ONLY a JSON array of the resulting names, nothing else, no markdown fences. Example: [\"Vega\",\"Ironsight\"]" }
-          ]
-        }]
-      })
+      body: JSON.stringify({ image: "data:image/png;base64," + currentImageBase64 })
     });
     const data = await response.json();
     if(!response.ok){
-      throw new Error(data.error && data.error.message ? data.error.message : (data.error || 'Request failed'));
+      throw new Error(data.error || 'Request failed');
     }
-    const textBlock = (data.content || []).map(b=>b.text || '').join('');
+    const textBlock = data.text || '';
     let names;
     try{
       names = JSON.parse(textBlock.trim().replace(/^```json|```$/g,'').trim());

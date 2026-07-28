@@ -1,33 +1,47 @@
+const PROMPT = `This is a screenshot of a Discord channel (voice member list, chat log, or reaction list). Identify every distinct person's visible username or display name.
+
+Rules:
+1. Skip any entry that is a bot or system indicator rather than a person, such as one starting with "[RECORDING]".
+2. Names are formatted as "RANK.Name" (a rank abbreviation, a period, then the actual name) — return only the part AFTER the period. For example "SGT.Vega" should be returned as "Vega", and "CPL.Ironsight" as "Ironsight". If an entry has no period, return it as-is.
+3. Some names have a clan/team tag appended in the format "=TAG=", e.g. "Weezey=US=" — strip that off too, so it becomes "Weezey".
+
+Respond with ONLY a JSON array of the resulting names, nothing else, no markdown fences. Example: ["Vega","Ironsight"]`;
+
 export async function onRequestPost({ request, env }) {
-  if (!env.ANTHROPIC_API_KEY) {
+  if (!env.AI) {
     return new Response(JSON.stringify({
-      error: 'ANTHROPIC_API_KEY is not configured on this Pages project. See README.md.'
+      error: 'Workers AI binding (AI) is not configured on this Pages project. See README.md.'
     }), { status: 500, headers: { 'Content-Type': 'application/json' } });
   }
 
   let body;
   try {
-    body = await request.text();
+    body = await request.json();
   } catch (e) {
     return new Response(JSON.stringify({ error: 'Invalid request body' }), {
       status: 400,
       headers: { 'Content-Type': 'application/json' }
     });
   }
+  if (!body.image) {
+    return new Response(JSON.stringify({ error: 'Missing image' }), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
 
-  const anthropicRes = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': env.ANTHROPIC_API_KEY,
-      'anthropic-version': '2023-06-01'
-    },
-    body
-  });
-
-  const data = await anthropicRes.text();
-  return new Response(data, {
-    status: anthropicRes.status,
-    headers: { 'Content-Type': 'application/json' }
-  });
+  try {
+    const result = await env.AI.run('@cf/meta/llama-3.2-11b-vision-instruct', {
+      messages: [{ role: 'user', content: PROMPT }],
+      image: body.image
+    });
+    return new Response(JSON.stringify({ text: result.response || '' }), {
+      headers: { 'Content-Type': 'application/json' }
+    });
+  } catch (err) {
+    return new Response(JSON.stringify({ error: err.message || 'Workers AI request failed' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
 }

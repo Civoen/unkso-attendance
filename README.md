@@ -31,25 +31,27 @@ binding**.
 Add this binding for both the **Production** and **Preview** environments, then
 redeploy (bindings only take effect on the next deploy).
 
-## 5. Add your Anthropic API key
+## 5. Add the free Workers AI binding (for screenshot reading)
 
-Screenshot reading (`/functions/api/read-screenshot.js`) calls Anthropic's API
-on the server, using your own key — the browser never sees it.
+Screenshot reading (`/functions/api/read-screenshot.js`) uses **Cloudflare
+Workers AI** — a vision model that runs on Cloudflare's own infrastructure.
+This is free (10,000 "neurons" per day, no credit card) and needs no external
+account or API key, unlike Anthropic's API.
 
-1. Get a key from https://console.anthropic.com (Settings > API keys). This is
-   a separate account/billing setup from a claude.ai subscription — API usage
-   is billed per token, not covered by a Pro/Max plan.
-2. In the Pages project: **Settings > Environment variables > Add variable**.
-   - Variable name: `ANTHROPIC_API_KEY`
-   - Value: your key
-   - Type: **Secret** (encrypted, not visible again after saving)
+1. In the Pages project: **Settings > Functions > AI bindings > Add binding**.
+   - Variable name: `AI` (must match exactly — the function references `env.AI`)
    - Add it for both Production and Preview, then redeploy.
+2. **One-time model approval:** the first time this runs, Cloudflare needs you
+   to accept Meta's license for the Llama 3.2 Vision model. Go to **Workers &
+   Pages > AI > Models**, find `llama-3.2-11b-vision-instruct`, and accept its
+   terms. This is a one-time click, not a recurring cost.
 
 ## 6. That's it
 
 Once deployed, the site's `load()`/`persist()` calls hit `/api/members` and
 `/api/events` automatically, backed by that KV namespace, and screenshot
-reads go through `/api/read-screenshot`. No further config needed.
+reads go through `/api/read-screenshot` using Workers AI. No further config
+needed, and no billing to set up.
 
 ## Things worth knowing
 
@@ -73,8 +75,15 @@ reads go through `/api/read-screenshot`. No further config needed.
 - **CSV export was removed** when the header's Export button was replaced with
   the company switcher. Let me know if you'd like it back somewhere else (e.g.
   a small button on the Attendance History page).
-- **Screenshot reading calls Anthropic's API from a server-side function**,
-  using the `ANTHROPIC_API_KEY` secret from step 5 — this costs a small amount
-  per screenshot read (Claude API is pay-per-token). It's separate from the
-  in-chat preview version, which only worked because Anthropic's own sandbox
-  proxied that call for you; a deployed site has to bring its own key.
+- **Screenshot reading is free**, running on Cloudflare Workers AI's daily
+  neuron allowance rather than a paid API. 10,000 neurons/day resets every day
+  at 00:00 UTC and comfortably covers casual, occasional screenshot reads for
+  a small group. If you ever outgrow it, Workers AI's paid rate is far cheaper
+  per call than Anthropic's API, so it's a good fallback rather than a wall.
+- **Accuracy trade-off:** Llama 3.2 Vision is a solid, well-supported free
+  model, but it's a smaller/lighter model than Claude's vision — expect it to
+  need a bit more review in the 30–54% match section, especially on cluttered
+  or low-contrast screenshots. If it's consistently underperforming on your
+  screenshots, Workers AI also offers `@cf/meta/llama-3.2-90b-vision-instruct`
+  (larger, more accurate, costs more neurons per call) as a drop-in swap in
+  `read-screenshot.js`.
