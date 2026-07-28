@@ -7,12 +7,14 @@
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
 <style>
   :root{
-    --olive-dark:#33361f;
+    --header-bg:#181818;
+    --nav-bg:#1D2126;
+    --nav-active-bg:#14171b;
+    --body-bg:#21262C;
     --olive:#4c5230;
     --olive-mid:#6b7245;
     --khaki:#cbb994;
     --khaki-light:#e9e0c8;
-    --cream:#f2ecda;
     --rust:#c1592e;
     --rust-dark:#98431f;
     --ink:#211f16;
@@ -21,7 +23,7 @@
   *{box-sizing:border-box;}
   body{
     margin:0;
-    background:var(--cream);
+    background:var(--body-bg);
     color:var(--ink);
     font-family:'Inter',system-ui,sans-serif;
     -webkit-font-smoothing:antialiased;
@@ -30,7 +32,7 @@
   .mono{font-family:'JetBrains Mono',monospace;}
 
   header{
-    background:var(--olive-dark);
+    background:var(--header-bg);
     color:var(--khaki-light);
     padding:18px 28px;
     display:flex;
@@ -38,19 +40,11 @@
     justify-content:space-between;
     border-bottom:4px solid var(--rust);
   }
-  header .brand{display:flex; align-items:center; gap:12px;}
-  header .brand .patch{
-    width:34px;height:34px;border-radius:4px;
-    background:var(--rust);
-    display:flex;align-items:center;justify-content:center;
-    font-family:'Oswald',sans-serif;font-weight:700;color:var(--olive-dark);
-    transform:rotate(-3deg);
-  }
   header h1{font-size:20px; margin:0; font-weight:600;}
   header .sub{font-size:11px; opacity:.65; letter-spacing:.12em; margin-top:2px;}
 
   nav.pagenav{
-    background:var(--olive);
+    background:var(--nav-bg);
     display:flex; gap:2px;
     padding:0 28px;
   }
@@ -64,7 +58,7 @@
   }
   nav.pagenav button:hover{opacity:1;}
   nav.pagenav button.active{
-    opacity:1; border-bottom-color:var(--rust); background:var(--olive-dark);
+    opacity:1; border-bottom-color:var(--rust); background:var(--nav-active-bg);
   }
 
   main{max-width:900px; margin:0 auto; padding:28px 20px 80px;}
@@ -79,7 +73,7 @@
     margin-bottom:20px;
   }
   .panel h2{
-    font-size:13px; margin:0 0 14px; color:var(--olive-dark);
+    font-size:13px; margin:0 0 14px; color:#33361f;
     display:flex; align-items:center; gap:8px;
   }
   .panel h2 .tag{
@@ -106,10 +100,11 @@
   .btn:hover{background:var(--rust-dark);}
   .btn:disabled{background:#b8ac8c; cursor:not-allowed;}
   .btn.ghost{
-    background:transparent; color:var(--olive-dark); border:1px solid var(--olive-mid);
+    background:transparent; color:var(--olive); border:1px solid var(--olive-mid);
   }
   .btn.ghost:hover{background:var(--khaki);}
   .btn.small{padding:5px 10px; font-size:11px;}
+  .btn.icon-only{padding:9px 11px;}
 
   .roster-list{list-style:none; margin:0; padding:0; max-height:460px; overflow-y:auto;}
   .roster-list li{
@@ -130,21 +125,22 @@
     border-radius:8px;
     padding:30px 16px;
     text-align:center;
-    background:var(--cream);
+    background:var(--khaki-light);
     cursor:pointer;
     transition:border-color .15s, background .15s;
   }
-  .dropzone.drag{border-color:var(--rust); background:var(--khaki-light);}
+  .dropzone.drag{border-color:var(--rust); background:var(--khaki);}
   .dropzone .icon{font-size:28px; margin-bottom:6px;}
-  .dropzone p{margin:2px 0; font-size:13px; color:var(--olive-dark);}
+  .dropzone p{margin:2px 0; font-size:13px; color:#33361f;}
   .dropzone .hint{font-size:11px; color:var(--olive-mid);}
 
   .preview-wrap{margin-top:14px;}
-  .preview-wrap img{max-width:100%; border-radius:6px; border:1px solid var(--khaki);}
+  .preview-wrap .preview-actions{display:flex; gap:8px; margin-bottom:10px;}
+  .preview-wrap img{max-width:100%; border-radius:6px; border:1px solid var(--khaki); display:block;}
 
   .tag-row{display:flex; flex-wrap:wrap; gap:8px; margin-top:14px;}
   .dogtag{
-    background:var(--olive-dark); color:var(--khaki-light);
+    background:#33361f; color:var(--khaki-light);
     border-radius:5px; padding:8px 10px; font-size:12px;
     display:flex; flex-direction:column; gap:4px; min-width:170px;
     border-left:4px solid var(--rust);
@@ -200,22 +196,43 @@
   .edit-row input[type=checkbox]{width:auto; margin:0;}
   .edit-actions{display:flex; gap:8px; margin-top:12px;}
 
+  .company-wrap{position:relative;}
+  .company-menu{
+    position:absolute; top:calc(100% + 6px); right:0;
+    background:#1D2126; border:1px solid var(--khaki); border-radius:6px;
+    overflow:hidden; min-width:130px; z-index:20;
+    box-shadow:0 6px 18px rgba(0,0,0,.35);
+  }
+  .company-menu button{
+    display:block; width:100%; text-align:left; background:none; border:none;
+    color:var(--khaki-light); padding:9px 14px; font-size:13px; cursor:pointer;
+    font-family:'Inter';
+  }
+  .company-menu button:hover{background:var(--olive);}
+  .company-menu button.current{color:var(--rust); font-weight:600;}
+
   .footer-note{
-    font-size:11px; color:var(--olive-mid); text-align:center; margin-top:30px; line-height:1.6;
+    font-size:11px; color:var(--khaki); text-align:center; margin-top:30px; line-height:1.6;
   }
 </style>
 </head>
 <body>
 
 <header>
-  <div class="brand">
-    <div class="patch display">U</div>
-    <div>
-      <h1 class="display">UNKSO Attendance</h1>
-      <div class="sub">Attendance Ledger</div>
+  <div>
+    <h1 class="display">UNKSO Attendance</h1>
+    <div class="sub">Attendance Ledger</div>
+  </div>
+  <div class="company-wrap" id="companyWrap">
+    <button class="btn" id="companyBtn">
+      <span id="companyLabel">Bravo</span> <span aria-hidden="true">&#9662;</span>
+    </button>
+    <div class="company-menu" id="companyMenu" style="display:none;">
+      <button data-company="Bravo">Bravo</button>
+      <button data-company="Charlie">Charlie</button>
+      <button data-company="Delta">Delta</button>
     </div>
   </div>
-  <button class="btn" id="exportBtn">Export CSV</button>
 </header>
 
 <nav class="pagenav">
@@ -249,21 +266,22 @@
       </div>
 
       <div class="preview-wrap" id="previewWrap" style="display:none;">
+        <div class="preview-actions">
+          <button class="btn" id="readBtn">Read names from screenshot</button>
+          <button class="btn ghost icon-only" id="removeImgBtn" title="Remove screenshot" aria-label="Remove screenshot">&#10005;</button>
+        </div>
         <img id="previewImg" alt="Screenshot preview">
       </div>
 
-      <div style="margin-top:12px; display:flex; gap:8px;">
-        <button class="btn" id="readBtn" disabled>Read names from screenshot</button>
-      </div>
       <div class="status-line" id="statusLine"></div>
 
       <div id="matchSections">
         <div id="highSection" style="display:none;">
-          <h3 style="font-size:12px; margin:14px 0 6px; color:var(--olive-dark);">55%+ match</h3>
+          <h3 style="font-size:12px; margin:14px 0 6px; color:var(--khaki);">55%+ match</h3>
           <div class="tag-row" id="tagRowHigh"></div>
         </div>
         <div id="lowSection" style="display:none;">
-          <h3 style="font-size:12px; margin:14px 0 6px; color:var(--olive-dark);">30&ndash;54% match &mdash; review before including</h3>
+          <h3 style="font-size:12px; margin:14px 0 6px; color:var(--khaki);">30&ndash;54% match &mdash; review before including</h3>
           <div class="tag-row" id="tagRowLow"></div>
         </div>
       </div>
@@ -282,12 +300,26 @@
   </div>
 
   <div class="footer-note" id="footerNote">
-    Roster and attendance history are shared &mdash; anyone with access to this site can see, add, or edit them.<br>
-    There's no login or per-person permissions, so treat the URL itself as the access control.
+    Roster and attendance history are shared per company &mdash; anyone with access to this site can see, add, or
+    edit them for whichever company they've selected.<br>
+    Your company selection (top right) is local to this browser only.
   </div>
 </main>
 
 <script>
+const DEFAULT_ROSTERS = {
+  Bravo: ['Vega','Ironsight','Prowler','Ashwood','Blackfin','Nightjar'],
+  Charlie: [],
+  Delta: []
+};
+const COMPANIES = ['Bravo','Charlie','Delta'];
+
+let CURRENT_COMPANY = 'Bravo';
+try{
+  const saved = localStorage.getItem('unksoCompany');
+  if(saved && COMPANIES.includes(saved)) CURRENT_COMPANY = saved;
+}catch(e){ /* localStorage unavailable (e.g. sandboxed preview) — default to Bravo */ }
+
 let MEMBERS = [];
 let EVENTS = []; // {name, date, present: [memberName,...]}
 let currentMatches = []; // working review state for the screenshot currently open
@@ -304,7 +336,7 @@ const readBtn = document.getElementById('readBtn');
 const statusLine = document.getElementById('statusLine');
 const commitBtn = document.getElementById('commitBtn');
 const historyWrap = document.getElementById('historyWrap');
-const footerNote = document.getElementById('footerNote');
+const companyLabel = document.getElementById('companyLabel');
 
 // ---------- page nav ----------
 document.querySelectorAll('nav.pagenav button').forEach(btn=>{
@@ -316,20 +348,49 @@ document.querySelectorAll('nav.pagenav button').forEach(btn=>{
   });
 });
 
+// ---------- company switcher ----------
+// The chosen company is stored in this browser's localStorage only — it's a personal
+// display preference, not shared data, so switching it here never affects what other
+// visitors see when they load the site.
+companyLabel.textContent = CURRENT_COMPANY;
+document.getElementById('companyBtn').addEventListener('click', ()=>{
+  const menu = document.getElementById('companyMenu');
+  menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+  renderCompanyMenu();
+});
+function renderCompanyMenu(){
+  document.querySelectorAll('#companyMenu button').forEach(btn=>{
+    btn.classList.toggle('current', btn.dataset.company === CURRENT_COMPANY);
+  });
+}
+document.querySelectorAll('#companyMenu button').forEach(btn=>{
+  btn.addEventListener('click', async ()=>{
+    CURRENT_COMPANY = btn.dataset.company;
+    companyLabel.textContent = CURRENT_COMPANY;
+    document.getElementById('companyMenu').style.display = 'none';
+    try{ localStorage.setItem('unksoCompany', CURRENT_COMPANY); }catch(e){ /* preview-only fallback, ignore */ }
+    await load();
+  });
+});
+document.addEventListener('click', (e)=>{
+  const wrap = document.getElementById('companyWrap');
+  if(wrap && !wrap.contains(e.target)) document.getElementById('companyMenu').style.display = 'none';
+});
+
 // ---------- storage ----------
-// Primary path: this site's own /api/members and /api/events routes, backed by a
-// Cloudflare KV namespace (see the Pages Functions in /functions/api). This is what
-// makes attendance shared and visible to everyone who visits the deployed site.
+// Primary path: this site's own /api/members and /api/events routes (scoped by
+// ?company=), backed by a Cloudflare KV namespace (see /functions/api). This is what
+// makes each company's attendance shared and visible to everyone who selects it.
 // Fallback path: window.storage, which only works while previewing this file here in
-// chat (it does nothing once deployed) — it's there so the app is still testable before
-// you've wired up Cloudflare KV.
+// chat — it does nothing once deployed — so the app is still testable before Cloudflare
+// KV is wired up.
 async function apiGet(key){
-  const res = await fetch('/api/' + key);
+  const res = await fetch('/api/' + key + '?company=' + encodeURIComponent(CURRENT_COMPANY));
   if(!res.ok) throw new Error('api unavailable');
   return res.json();
 }
 async function apiPost(key, value){
-  const res = await fetch('/api/' + key, {
+  const res = await fetch('/api/' + key + '?company=' + encodeURIComponent(CURRENT_COMPANY), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(value)
@@ -346,8 +407,8 @@ async function persist(){
     }catch(e){ /* fall through to preview storage below */ }
   }
   try{
-    await window.storage.set('members', JSON.stringify(MEMBERS), true);
-    await window.storage.set('events', JSON.stringify(EVENTS), true);
+    await window.storage.set('members:' + CURRENT_COMPANY, JSON.stringify(MEMBERS), true);
+    await window.storage.set('events:' + CURRENT_COMPANY, JSON.stringify(EVENTS), true);
   }catch(e){ /* no storage available at all; nothing more we can do */ }
 }
 
@@ -359,13 +420,13 @@ async function load(){
   }catch(apiErr){
     usingSharedApi = false;
     try{
-      const m = await window.storage.get('members', true);
-      const e = await window.storage.get('events', true);
-      MEMBERS = m ? JSON.parse(m.value) : ['Vega','Ironsight','Prowler','Ashwood','Blackfin','Nightjar'];
+      const m = await window.storage.get('members:' + CURRENT_COMPANY, true);
+      const e = await window.storage.get('events:' + CURRENT_COMPANY, true);
+      MEMBERS = m ? JSON.parse(m.value) : [...DEFAULT_ROSTERS[CURRENT_COMPANY]];
       EVENTS = e ? JSON.parse(e.value) : [];
-      footerNote.innerHTML = 'Previewing with temporary shared storage (chat only) &mdash; deploy with the included Cloudflare Function + KV setup for real shared hosting.';
+      document.getElementById('footerNote').innerHTML = 'Previewing with temporary shared storage (chat only) &mdash; deploy with the included Cloudflare Function + KV setup for real shared hosting.';
     }catch(err){
-      MEMBERS = ['Vega','Ironsight','Prowler','Ashwood','Blackfin','Nightjar'];
+      MEMBERS = [...DEFAULT_ROSTERS[CURRENT_COMPANY]];
       EVENTS = [];
     }
   }
@@ -459,7 +520,6 @@ function handleFile(file){
     currentImageBase64 = reader.result.split(',')[1];
     previewImg.src = reader.result;
     previewWrap.style.display = 'block';
-    readBtn.disabled = false;
     clearMatchSections();
     commitBtn.style.display = 'none';
     statusLine.textContent = '';
@@ -467,6 +527,17 @@ function handleFile(file){
   };
   reader.readAsDataURL(file);
 }
+
+document.getElementById('removeImgBtn').addEventListener('click', ()=>{
+  currentImageBase64 = null;
+  previewImg.src = '';
+  previewWrap.style.display = 'none';
+  fileInput.value = '';
+  clearMatchSections();
+  commitBtn.style.display = 'none';
+  statusLine.textContent = '';
+  statusLine.className = 'status-line';
+});
 
 // ---------- read names via API ----------
 readBtn.addEventListener('click', async ()=>{
@@ -477,11 +548,11 @@ readBtn.addEventListener('click', async ()=>{
   clearMatchSections();
 
   try{
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
+    const response = await fetch("/api/read-screenshot", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "claude-sonnet-4-6",
+        model: "claude-sonnet-5",
         max_tokens: 1000,
         messages: [{
           role: "user",
@@ -493,6 +564,9 @@ readBtn.addEventListener('click', async ()=>{
       })
     });
     const data = await response.json();
+    if(!response.ok){
+      throw new Error(data.error && data.error.message ? data.error.message : (data.error || 'Request failed'));
+    }
     const textBlock = (data.content || []).map(b=>b.text || '').join('');
     let names;
     try{
@@ -617,7 +691,6 @@ commitBtn.addEventListener('click', ()=>{
   previewWrap.style.display='none';
   clearMatchSections();
   commitBtn.style.display='none';
-  readBtn.disabled = true;
   currentImageBase64 = null; currentMatches = [];
   statusLine.textContent = `Logged "${eventName}" with ${present.length} member(s) present.`;
   statusLine.className = 'status-line';
@@ -707,28 +780,6 @@ function openEditForm(idx){
   });
   document.getElementById('cancelEdit'+idx).addEventListener('click', renderHistory);
 }
-
-// ---------- export ----------
-document.getElementById('exportBtn').addEventListener('click', ()=>{
-  if(EVENTS.length===0){ return; }
-  const sortedMembers = [...MEMBERS].sort((a,b)=>a.localeCompare(b));
-  let csv = 'Member,' + EVENTS.map(e=>`"${e.name} (${e.date})"`).join(',') + ',Total\n';
-  sortedMembers.forEach(name=>{
-    let total=0;
-    const row = EVENTS.map(ev=>{
-      const there = ev.present.includes(name);
-      if(there) total++;
-      return there ? '1' : '0';
-    });
-    csv += `"${name}",${row.join(',')},${total}\n`;
-  });
-  const blob = new Blob([csv], {type:'text/csv'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = 'unkso-attendance.csv';
-  a.click();
-  URL.revokeObjectURL(url);
-});
 
 function escapeHtml(s){
   const d = document.createElement('div');
