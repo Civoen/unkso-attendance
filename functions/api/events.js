@@ -6,7 +6,14 @@ function companyFrom(request) {
   return VALID_COMPANIES.has(company) ? company : 'Bravo';
 }
 
+function missingBindingResponse() {
+  return new Response(JSON.stringify({
+    error: 'KV binding (ATTENDANCE_KV) is not configured on this Pages project/environment. See README.md.'
+  }), { status: 500, headers: { 'Content-Type': 'application/json' } });
+}
+
 export async function onRequestGet({ request, env }) {
+  if (!env.ATTENDANCE_KV) return missingBindingResponse();
   const company = companyFrom(request);
   const value = await env.ATTENDANCE_KV.get('events:' + company);
   return new Response(value || '[]', {
@@ -15,6 +22,7 @@ export async function onRequestGet({ request, env }) {
 }
 
 export async function onRequestPost({ request, env }) {
+  if (!env.ATTENDANCE_KV) return missingBindingResponse();
   const company = companyFrom(request);
   let body;
   try {

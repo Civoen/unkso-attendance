@@ -111,8 +111,17 @@
     display:flex; align-items:center; justify-content:space-between;
     padding:7px 9px; border-radius:5px; font-size:13px;
     border-bottom:1px solid var(--khaki);
+    border-top:2px solid transparent;
   }
   .roster-list li:last-child{border-bottom:none;}
+  .roster-list li.dragging{opacity:.4;}
+  .roster-list li.drag-over{border-top-color:var(--rust);}
+  .roster-list .drag-row{display:flex; align-items:center; gap:8px;}
+  .roster-list .drag-handle{
+    cursor:grab; color:var(--olive-mid); font-size:13px; line-height:1;
+    touch-action:none;
+  }
+  .roster-list .drag-handle:active{cursor:grabbing;}
   .roster-list .count{
     font-family:'JetBrains Mono'; font-size:11px; color:var(--olive-mid);
   }
@@ -456,10 +465,18 @@ function showRosterStatus(ok){
 function renderRoster(){
   rosterCount.textContent = MEMBERS.length;
   rosterList.innerHTML = '';
-  MEMBERS.sort((a,b)=>a.localeCompare(b)).forEach(name=>{
+  // Note: MEMBERS is no longer force-sorted alphabetically here — its array order is
+  // the roster's display order, so drag-and-drop reordering can actually stick.
+  MEMBERS.forEach((name, idx)=>{
     const count = EVENTS.filter(ev=>ev.present.includes(name)).length;
     const li = document.createElement('li');
-    li.innerHTML = `<span>${escapeHtml(name)}</span>
+    li.draggable = true;
+    li.dataset.idx = idx;
+    li.innerHTML = `
+      <span class="drag-row">
+        <span class="drag-handle" aria-hidden="true" title="Drag to reorder">&#9776;</span>
+        <span>${escapeHtml(name)}</span>
+      </span>
       <span style="display:flex;align-items:center;gap:8px;">
         <span class="count">${count}/${EVENTS.length}</span>
         <button class="remove-x" title="Remove from roster" data-name="${escapeHtml(name)}">&#10005;</button>
@@ -469,6 +486,40 @@ function renderRoster(){
   rosterList.querySelectorAll('.remove-x').forEach(btn=>{
     btn.addEventListener('click', async ()=>{
       MEMBERS = MEMBERS.filter(m=>m!==btn.dataset.name);
+      renderRoster(); renderHistory();
+      showRosterStatus(await persist());
+    });
+  });
+  attachRosterDragHandlers();
+}
+
+let dragSrcIdx = null;
+function attachRosterDragHandlers(){
+  const items = rosterList.querySelectorAll('li');
+  items.forEach(li=>{
+    li.addEventListener('dragstart', ()=>{
+      dragSrcIdx = Number(li.dataset.idx);
+      li.classList.add('dragging');
+    });
+    li.addEventListener('dragend', ()=>{
+      li.classList.remove('dragging');
+      items.forEach(x=>x.classList.remove('drag-over'));
+    });
+    li.addEventListener('dragover', (e)=>{
+      e.preventDefault();
+      li.classList.add('drag-over');
+    });
+    li.addEventListener('dragleave', ()=>{
+      li.classList.remove('drag-over');
+    });
+    li.addEventListener('drop', async (e)=>{
+      e.preventDefault();
+      li.classList.remove('drag-over');
+      const targetIdx = Number(li.dataset.idx);
+      if(dragSrcIdx === null || dragSrcIdx === targetIdx) return;
+      const moved = MEMBERS.splice(dragSrcIdx, 1)[0];
+      MEMBERS.splice(targetIdx, 0, moved);
+      dragSrcIdx = null;
       renderRoster(); renderHistory();
       showRosterStatus(await persist());
     });
@@ -579,9 +630,19 @@ readBtn.addEventListener('click', async ()=>{
     }
     const textBlock = data.text || '';
     let names;
+    // Try strict parsing first (fenced or plain JSON), then fall back to pulling the
+    // first [...] array out of the reply — smaller open models tend to add a bit of
+    // explanatory text around the array even when told not to.
+    const stripped = textBlock.trim().replace(/^```[a-zA-Z]*\n?/, '').replace(/```$/, '').trim();
     try{
-      names = JSON.parse(textBlock.trim().replace(/^```json|```$/g,'').trim());
+      names = JSON.parse(stripped);
     }catch(parseErr){
+      const match = textBlock.match(/\[[\s\S]*\]/);
+      if(match){
+        try{ names = JSON.parse(match[0]); }catch(parseErr2){ /* fall through */ }
+      }
+    }
+    if(!Array.isArray(names)){
       throw new Error('Could not parse a name list from the response.');
     }
     if(!Array.isArray(names) || names.length===0){
