@@ -30,4 +30,4 @@ above the version number in the sidebar):
 
 ## That's it.
 
-It's a simple, easy-to-use Attendance Tracker which aims to keep admin to a minimum whilst keeping track of your Company.
+It's a simple, easy-to-use Attendance Tracker which aims to keep admin to a minimum.
