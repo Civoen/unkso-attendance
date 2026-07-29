@@ -15,8 +15,8 @@
     --khaki-pale:#17191c;
     --khaki-card:#1f2226;
     --khaki-line:#2f3237;
-    --amber:#c8461c;
-    --amber-dark:#96350f;
+    --amber:#d05407;
+    --amber-dark:#d05407;
     --signal:#5f9c52;
     --alert:#c0392b;
     --ink:#e8e5de;
@@ -55,7 +55,7 @@
   .company-wrap{position:relative; margin-bottom:22px;}
   .company-pill{
     width:100%; display:flex; align-items:center; justify-content:space-between;
-    background:rgba(200,70,28,.1); border:1px solid rgba(200,70,28,.45);
+    background:rgba(208,84,7,.1); border:1px solid rgba(208,84,7,.45);
     border-radius:6px; padding:9px 11px; cursor:pointer; font-family:inherit; color:inherit;
   }
   .company-pill .label{font-family:'Oswald'; font-size:9px; letter-spacing:.16em; color:#9b9790; text-transform:uppercase; text-align:left;}
@@ -63,14 +63,14 @@
   .company-pill .chev{color:var(--amber); font-size:10px;}
   .company-menu{
     position:absolute; top:calc(100% + 6px); left:0; right:0;
-    background:var(--olive-deep); border:1px solid rgba(200,70,28,.35); border-radius:6px;
+    background:var(--olive-deep); border:1px solid rgba(208,84,7,.35); border-radius:6px;
     overflow:hidden; z-index:20; box-shadow:0 10px 24px rgba(0,0,0,.4);
   }
   .company-menu button{
     display:block; width:100%; text-align:left; background:none; border:none;
     color:#c8c4ba; padding:10px 12px; font-size:13px; cursor:pointer; font-family:'IBM Plex Sans';
   }
-  .company-menu button:hover{background:rgba(200,70,28,.12);}
+  .company-menu button:hover{background:rgba(208,84,7,.12);}
   .company-menu button.current{color:var(--amber); font-weight:600;}
 
   .nav{display:flex; flex-direction:column; gap:3px;}
@@ -81,7 +81,7 @@
     padding:11px 11px; border-radius:6px; border-left:3px solid transparent;
   }
   .nav button .ic{width:15px; text-align:center; opacity:.85; flex-shrink:0;}
-  .nav button.active{color:#f0ede6; background:rgba(200,70,28,.14); border-left-color:var(--amber);}
+  .nav button.active{color:#f0ede6; background:rgba(208,84,7,.14); border-left-color:var(--amber);}
   .nav button:hover{color:#f0ede6;}
 
   .how-it-works-btn{
@@ -162,7 +162,7 @@
   .stat-card .l{font-family:'Oswald'; font-size:9.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-soft); margin-top:5px;}
 
   /* ---------- form controls ---------- */
-  input[type=text], input[type=date]{
+  input[type=text], input[type=date], select.form-select{
     width:100%; padding:10px 12px; border:1px solid var(--khaki-line);
     border-radius:6px; background:#fff; font-family:'IBM Plex Sans'; font-size:13px;
     margin-bottom:8px; color:var(--ink-on-light);
@@ -170,6 +170,29 @@
   input:focus, select:focus, button:focus-visible{
     outline:2px solid var(--amber); outline-offset:1px;
   }
+  .two-col{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+  @media (max-width:520px){ .two-col{grid-template-columns:1fr;} }
+  .field-label{
+    display:block; font-family:'Oswald'; font-size:10.5px; letter-spacing:.1em;
+    text-transform:uppercase; color:var(--ink-soft); margin-bottom:6px;
+  }
+  .checklist-actions{display:flex; gap:8px; margin-bottom:10px;}
+  .checklist{
+    max-height:320px; overflow-y:auto; display:flex; flex-direction:column; gap:2px;
+  }
+  .checklist label{
+    display:flex; align-items:center; gap:10px; padding:7px 8px; border-radius:5px;
+    font-size:13px; color:var(--ink); cursor:pointer; border-bottom:1px solid var(--khaki-line);
+  }
+  .checklist label:last-child{border-bottom:none;}
+  .checklist input[type=checkbox]{width:15px; height:15px; margin:0; cursor:pointer; accent-color:var(--amber);}
+  .checklist .ev-date{font-family:'JetBrains Mono'; font-size:11px; color:var(--ink-soft); margin-left:auto;}
+  .report-textarea{
+    width:100%; font-family:'IBM Plex Sans'; font-size:13px; padding:12px;
+    border:1px solid var(--khaki-line); border-radius:6px; background:#fff;
+    color:var(--ink-on-light); resize:vertical;
+  }
+  .report-textarea.mono{font-family:'JetBrains Mono'; font-size:11.5px;}
   .btn{
     display:inline-flex; align-items:center; gap:6px;
     background:var(--amber); color:#fff; border:none;
@@ -189,7 +212,7 @@
   .add-row input{margin-bottom:0;}
   .roster-list{list-style:none; margin:0; padding:0; max-height:520px; overflow-y:auto;}
   .roster-list li{
-    display:grid; grid-template-columns:20px 32px 1fr 150px 26px; align-items:center; gap:12px;
+    display:grid; grid-template-columns:20px 1fr 150px 26px; align-items:center; gap:12px;
     padding:9px 4px; border-bottom:1px solid var(--khaki-line);
   }
   .roster-list li:last-child{border-bottom:none;}
@@ -199,11 +222,6 @@
     cursor:grab; color:var(--ink-soft); opacity:.55; font-size:13px; line-height:1; touch-action:none;
   }
   .roster-list .drag-handle:active{cursor:grabbing;}
-  .avatar{
-    width:32px; height:32px; border-radius:7px; display:flex; align-items:center; justify-content:center;
-    font-family:'Oswald'; font-weight:600; font-size:11px; color:#f0ede6;
-    background:linear-gradient(155deg, var(--olive-mid), var(--olive-deep));
-  }
   .rname{font-family:'IBM Plex Sans'; font-weight:500; font-size:13.5px; color:var(--ink);}
   .prog-wrap{display:flex; align-items:center; gap:9px;}
   .prog-track{flex:1; height:6px; border-radius:4px; background:var(--khaki-line); overflow:hidden;}
@@ -235,7 +253,7 @@
     margin-left:auto; width:16px; height:16px; border-radius:50%; border:2px solid var(--ink-soft);
     flex-shrink:0; position:relative;
   }
-  .choice-option.selected{border-color:var(--amber); background:linear-gradient(155deg,#fbeed9,#f7f1e2);}
+  .choice-option.selected{border-color:var(--amber); background:color-mix(in srgb, var(--amber) 12%, #fff);}
   .choice-option.selected .choice-radio{border-color:var(--amber);}
   .choice-option.selected .choice-radio::after{
     content:''; position:absolute; top:2px; left:2px; width:8px; height:8px;
@@ -248,8 +266,8 @@
     background:repeating-linear-gradient(135deg, rgba(92,102,64,.05) 0 10px, transparent 10px 20px);
     cursor:pointer; transition:border-color .15s, background .15s; position:relative;
   }
-  .dropzone.drag{border-color:var(--amber); background:#fbeed9;}
-  .dropzone.selected{border-color:var(--amber); box-shadow:0 0 0 2px rgba(200,70,28,.35); outline:none;}
+  .dropzone.drag{border-color:var(--amber); background:color-mix(in srgb, var(--amber) 12%, #fff);}
+  .dropzone.selected{border-color:var(--amber); box-shadow:0 0 0 2px rgba(208,84,7,.35); outline:none;}
   .dropzone .icon{font-size:26px; margin-bottom:6px; color:var(--olive-mid);}
   .dropzone p{margin:2px 0; font-size:13px; color:var(--ink);}
   .dropzone .hint{font-family:'Oswald'; font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-soft); margin-top:6px;}
@@ -379,11 +397,12 @@
       <button class="active" data-page="roster"><span class="ic">&#9776;</span>Roster</button>
       <button data-page="event"><span class="ic">&#65291;</span>New Event</button>
       <button data-page="attendance"><span class="ic">&#9638;</span>Attendance History</button>
+      <button data-page="report"><span class="ic">&#128196;</span>Generate Report</button>
     </nav>
 
     <button class="how-it-works-btn" id="howItWorksBtn"><span class="ic">&#10067;</span>How It Works</button>
 
-    <div class="sidebar-foot" id="footerNote">v.03. Unknown Soldiers. Created by Civoen.</div>
+    <div class="sidebar-foot" id="footerNote">v.04. Unknown Soldiers. Created by Civoen.</div>
   </aside>
 
   <div class="modal-overlay" id="howItWorksOverlay" style="display:none;">
@@ -491,15 +510,60 @@
         <div><span class="eyebrow" id="historyEyebrow">Bravo Company // Records</span><h1>ATTENDANCE HISTORY</h1></div>
       </div>
       <div id="historyWrap"><div class="card"><div class="empty">No events logged yet.</div></div></div>
+    </div>
+
+    <div class="page" id="page-report">
+      <div class="page-head">
+        <div><span class="eyebrow">Compile &amp; Share</span><h1>GENERATE REPORT</h1></div>
+      </div>
 
       <div class="card">
-        <h2>Report</h2>
-        <p style="font-size:12.5px; color:var(--ink-soft); margin:0 0 12px;">
-          Put together a plain-text attendance summary you can copy or email to someone outside this site.
-        </p>
+        <h2>Addressed</h2>
+        <div class="two-col">
+          <div>
+            <label class="field-label">From</label>
+            <select id="reportFrom" class="form-select"></select>
+          </div>
+          <div>
+            <label class="field-label">To</label>
+            <select id="reportTo" class="form-select"></select>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Members to include <span class="tag" id="reportMemberCount">0</span></h2>
+        <div class="checklist-actions">
+          <button class="btn ghost small" id="reportMembersAll">Select all</button>
+          <button class="btn ghost small" id="reportMembersNone">Select none</button>
+        </div>
+        <div class="checklist" id="reportMemberList"></div>
+      </div>
+
+      <div class="card">
+        <h2>Events to include <span class="tag" id="reportEventCount">0</span></h2>
+        <div class="checklist-actions">
+          <button class="btn ghost small" id="reportEventsAll">Select all</button>
+          <button class="btn ghost small" id="reportEventsNone">Select none</button>
+        </div>
+        <div class="checklist" id="reportEventList"></div>
+      </div>
+
+      <div class="card">
+        <h2>Promotions</h2>
+        <textarea id="reportPromotions" rows="4" placeholder="e.g. PVT.Vega promoted to CPL.Vega" class="report-textarea"></textarea>
+      </div>
+
+      <div class="card">
+        <h2>Awards</h2>
+        <textarea id="reportAwards" rows="4" placeholder="e.g. Ironsight — Marksmanship Ribbon" class="report-textarea"></textarea>
+      </div>
+
+      <div class="card">
+        <h2>Output</h2>
         <button class="btn" id="reportBtn">Generate Report</button>
         <div id="reportOutput" style="display:none; margin-top:16px;">
-          <textarea id="reportText" readonly rows="10" style="width:100%; font-family:'JetBrains Mono'; font-size:11.5px; padding:12px; border:1px solid var(--khaki-line); border-radius:6px; background:#fff; color:var(--ink-on-light); resize:vertical;"></textarea>
+          <textarea id="reportText" readonly rows="12" class="report-textarea mono"></textarea>
           <div style="display:flex; gap:8px; margin-top:10px;">
             <button class="btn ghost small" id="copyReportBtn">Copy to clipboard</button>
             <button class="btn ghost small" id="copyImageBtn">Copy Image</button>
@@ -567,6 +631,7 @@ document.querySelectorAll('nav.pagenav button').forEach(btn=>{
     document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
     btn.classList.add('active');
     document.getElementById('page-'+btn.dataset.page).classList.add('active');
+    if(btn.dataset.page === 'report') renderReportControls();
   });
 });
 
@@ -681,13 +746,6 @@ function showRosterStatus(ok){
   rosterStatus.className = 'status-line' + (ok ? '' : ' err');
 }
 
-function initials(name){
-  const trimmed = name.trim();
-  const parts = trimmed.split(/\s+/).filter(Boolean);
-  if(parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
-  return trimmed.slice(0,2).toUpperCase();
-}
-
 // ---------- roster ----------
 function renderRoster(){
   rosterCount.textContent = MEMBERS.length;
@@ -718,7 +776,6 @@ function renderRoster(){
     li.dataset.idx = idx;
     li.innerHTML = `
       <span class="drag-handle" aria-hidden="true" title="Drag to reorder">&#9776;</span>
-      <span class="avatar">${escapeHtml(initials(name))}</span>
       <span class="rname">${escapeHtml(name)}</span>
       <span class="prog-wrap">
         <span class="prog-track"><span class="prog-fill" style="width:${pct}%"></span></span>
@@ -1284,29 +1341,108 @@ function escapeHtml(s){
 }
 
 // ---------- report ----------
+function renderReportControls(){
+  const fromSel = document.getElementById('reportFrom');
+  const toSel = document.getElementById('reportTo');
+  const memberOpts = MEMBERS.map(name => `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`).join('');
+  fromSel.innerHTML = memberOpts || '<option value="">— no members on roster —</option>';
+  toSel.innerHTML = '<option value="">— unspecified —</option>' + memberOpts;
+
+  const memberList = document.getElementById('reportMemberList');
+  memberList.innerHTML = MEMBERS.length
+    ? MEMBERS.map(name => `
+        <label><input type="checkbox" class="report-member-cb" value="${escapeHtml(name)}" checked><span>${escapeHtml(name)}</span></label>
+      `).join('')
+    : '<div class="empty">No members on the roster.</div>';
+  memberList.querySelectorAll('.report-member-cb').forEach(cb => cb.addEventListener('change', updateReportMemberCount));
+  updateReportMemberCount();
+
+  const eventList = document.getElementById('reportEventList');
+  eventList.innerHTML = EVENTS.length
+    ? EVENTS.map((ev, idx) => `
+        <label><input type="checkbox" class="report-event-cb" data-idx="${idx}" checked><span>${escapeHtml(ev.name)}</span><span class="ev-date mono">${ev.date}</span></label>
+      `).join('')
+    : '<div class="empty">No events logged yet.</div>';
+  eventList.querySelectorAll('.report-event-cb').forEach(cb => cb.addEventListener('change', updateReportEventCount));
+  updateReportEventCount();
+
+  document.getElementById('reportOutput').style.display = 'none';
+  document.getElementById('reportStatus').textContent = '';
+}
+
+function updateReportMemberCount(){
+  document.getElementById('reportMemberCount').textContent = document.querySelectorAll('.report-member-cb:checked').length;
+}
+function updateReportEventCount(){
+  document.getElementById('reportEventCount').textContent = document.querySelectorAll('.report-event-cb:checked').length;
+}
+
+document.getElementById('reportMembersAll').addEventListener('click', ()=>{
+  document.querySelectorAll('.report-member-cb').forEach(cb => cb.checked = true);
+  updateReportMemberCount();
+});
+document.getElementById('reportMembersNone').addEventListener('click', ()=>{
+  document.querySelectorAll('.report-member-cb').forEach(cb => cb.checked = false);
+  updateReportMemberCount();
+});
+document.getElementById('reportEventsAll').addEventListener('click', ()=>{
+  document.querySelectorAll('.report-event-cb').forEach(cb => cb.checked = true);
+  updateReportEventCount();
+});
+document.getElementById('reportEventsNone').addEventListener('click', ()=>{
+  document.querySelectorAll('.report-event-cb').forEach(cb => cb.checked = false);
+  updateReportEventCount();
+});
+
+function getSelectedReportMembers(){
+  return [...document.querySelectorAll('.report-member-cb:checked')].map(cb => cb.value);
+}
+function getSelectedReportEvents(){
+  return [...document.querySelectorAll('.report-event-cb:checked')].map(cb => EVENTS[Number(cb.dataset.idx)]);
+}
+
 function buildReportText(){
   const today = new Date().toISOString().slice(0,10);
+  const selectedMembers = getSelectedReportMembers();
+  const selectedEvents = getSelectedReportEvents();
+  const from = document.getElementById('reportFrom').value;
+  const to = document.getElementById('reportTo').value;
+  const promotions = document.getElementById('reportPromotions').value.trim();
+  const awards = document.getElementById('reportAwards').value.trim();
+
   const lines = [];
   lines.push(`UNKSO Attendance Report — ${CURRENT_COMPANY} Company`);
   lines.push(`Generated: ${today}`);
+  if(from) lines.push(`From: ${from}`);
+  if(to) lines.push(`To: ${to}`);
   lines.push('');
-  lines.push(`Members: ${MEMBERS.length}    Events logged: ${EVENTS.length}`);
+  lines.push(`Members included: ${selectedMembers.length}    Events included: ${selectedEvents.length}`);
   lines.push('');
   lines.push('Per-member attendance:');
-  [...MEMBERS].forEach(name=>{
-    const count = EVENTS.filter(ev=>ev.present.includes(name)).length;
-    lines.push(`  ${name} — ${count}/${EVENTS.length}`);
-  });
+  if(selectedMembers.length===0){
+    lines.push('  None selected.');
+  }else{
+    selectedMembers.forEach(name=>{
+      const count = selectedEvents.filter(ev=>ev.present.includes(name)).length;
+      lines.push(`  ${name} — ${count}/${selectedEvents.length}`);
+    });
+  }
   lines.push('');
   lines.push('Events:');
-  if(EVENTS.length===0){
-    lines.push('  None logged yet.');
+  if(selectedEvents.length===0){
+    lines.push('  None selected.');
   }else{
-    EVENTS.forEach(ev=>{
+    selectedEvents.forEach(ev=>{
       const excusedCount = (ev.excused || []).length;
       lines.push(`  ${ev.name} — ${ev.present.length}/${MEMBERS.length} present${excusedCount ? `, ${excusedCount} excused` : ''}`);
     });
   }
+  lines.push('');
+  lines.push('Promotions:');
+  lines.push(promotions ? promotions.split('\n').map(l=>'  '+l).join('\n') : '  None.');
+  lines.push('');
+  lines.push('Awards:');
+  lines.push(awards ? awards.split('\n').map(l=>'  '+l).join('\n') : '  None.');
   return lines.join('\n');
 }
 
@@ -1337,12 +1473,17 @@ document.getElementById('copyReportBtn').addEventListener('click', async ()=>{
 async function buildReportCanvas(){
   await document.fonts.ready;
 
-  const members = [...MEMBERS];
-  const events = EVENTS;
+  const members = getSelectedReportMembers();
+  const events = getSelectedReportEvents();
+  const from = document.getElementById('reportFrom').value;
+  const to = document.getElementById('reportTo').value;
+  const promotionsLines = document.getElementById('reportPromotions').value.trim().split('\n').filter(Boolean);
+  const awardsLines = document.getElementById('reportAwards').value.trim().split('\n').filter(Boolean);
+
   const COL = {
     bg:      '#1f2226',
     line:    '#2f3237',
-    amber:   '#c8461c',
+    amber:   '#d05407',
     ink:     '#e8e5de',
     inkSoft: '#8c8983',
     signal:  '#5f9c52'
@@ -1351,11 +1492,14 @@ async function buildReportCanvas(){
   const width = 860;
   const padding = 36;
   const rowH = 26;
-  const headerH = 96;
-  const memberBlockH = 34 + members.length * rowH;
+  const smallRowH = 18;
+  const headerH = 96 + (from || to ? 18 : 0);
+  const memberBlockH = 34 + Math.max(members.length, 1) * rowH;
   const eventBlockH = 34 + Math.max(events.length, 1) * rowH;
+  const promoBlockH = 34 + Math.max(promotionsLines.length, 1) * smallRowH;
+  const awardBlockH = 34 + Math.max(awardsLines.length, 1) * smallRowH;
   const footerH = 46;
-  const height = padding * 2 + headerH + memberBlockH + eventBlockH + footerH;
+  const height = padding * 2 + headerH + memberBlockH + eventBlockH + promoBlockH + awardBlockH + footerH;
 
   const scale = 2; // sharper output for pasting/sharing
   const canvas = document.createElement('canvas');
@@ -1372,6 +1516,18 @@ async function buildReportCanvas(){
     ctx.arcTo(x, y + h, x, y, r);
     ctx.arcTo(x, y, x + w, y, r);
     ctx.closePath();
+  }
+  function sectionDivider(){
+    ctx.strokeStyle = COL.line;
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(padding, y); ctx.lineTo(width - padding, y); ctx.stroke();
+    y += 24;
+  }
+  function sectionHeading(text){
+    ctx.fillStyle = COL.amber;
+    ctx.font = "600 12px 'Oswald'";
+    ctx.fillText(text, padding, y);
+    y += 20;
   }
 
   // card background
@@ -1398,6 +1554,13 @@ async function buildReportCanvas(){
   ctx.font = "600 13px 'Oswald'";
   ctx.fillText(`${CURRENT_COMPANY.toUpperCase()} COMPANY`, padding + 132, y + 33);
 
+  if(from || to){
+    ctx.fillStyle = COL.inkSoft;
+    ctx.font = "400 11px 'IBM Plex Sans'";
+    const addrLine = [from ? `From: ${from}` : null, to ? `To: ${to}` : null].filter(Boolean).join('    ');
+    ctx.fillText(addrLine, padding + 132, y + 48);
+  }
+
   ctx.fillStyle = COL.inkSoft;
   ctx.font = "400 11px 'IBM Plex Sans'";
   ctx.textAlign = 'right';
@@ -1405,53 +1568,47 @@ async function buildReportCanvas(){
   ctx.textAlign = 'left';
 
   y += headerH;
-  ctx.strokeStyle = COL.line;
-  ctx.lineWidth = 1;
-  ctx.beginPath(); ctx.moveTo(padding, y); ctx.lineTo(width - padding, y); ctx.stroke();
-  y += 24;
+  sectionDivider();
 
-  ctx.fillStyle = COL.amber;
-  ctx.font = "600 12px 'Oswald'";
-  ctx.fillText(`MEMBERS (${members.length})`, padding, y);
-  y += 20;
-
-  members.forEach(name => {
-    const count = events.filter(ev => ev.present.includes(name)).length;
-    const pct = events.length ? count / events.length : 0;
-
-    ctx.fillStyle = COL.ink;
-    ctx.font = "400 13px 'IBM Plex Sans'";
-    ctx.fillText(name, padding, y);
-
-    const barW = 110, barX = width - padding - 160, barY = y - 9;
-    ctx.fillStyle = COL.line;
-    ctx.fillRect(barX, barY, barW, 6);
-    ctx.fillStyle = COL.signal;
-    ctx.fillRect(barX, barY, barW * pct, 6);
-
+  sectionHeading(`MEMBERS (${members.length})`);
+  if(members.length === 0){
     ctx.fillStyle = COL.inkSoft;
-    ctx.font = "500 11px 'JetBrains Mono'";
-    ctx.textAlign = 'right';
-    ctx.fillText(`${count}/${events.length}`, width - padding, y);
-    ctx.textAlign = 'left';
-
+    ctx.font = "400 13px 'IBM Plex Sans'";
+    ctx.fillText('None selected.', padding, y);
     y += rowH;
-  });
+  }else{
+    members.forEach(name => {
+      const count = events.filter(ev => ev.present.includes(name)).length;
+      const pct = events.length ? count / events.length : 0;
+
+      ctx.fillStyle = COL.ink;
+      ctx.font = "400 13px 'IBM Plex Sans'";
+      ctx.fillText(name, padding, y);
+
+      const barW = 110, barX = width - padding - 160, barY = y - 9;
+      ctx.fillStyle = COL.line;
+      ctx.fillRect(barX, barY, barW, 6);
+      ctx.fillStyle = COL.signal;
+      ctx.fillRect(barX, barY, barW * pct, 6);
+
+      ctx.fillStyle = COL.inkSoft;
+      ctx.font = "500 11px 'JetBrains Mono'";
+      ctx.textAlign = 'right';
+      ctx.fillText(`${count}/${events.length}`, width - padding, y);
+      ctx.textAlign = 'left';
+
+      y += rowH;
+    });
+  }
 
   y += 10;
-  ctx.strokeStyle = COL.line;
-  ctx.beginPath(); ctx.moveTo(padding, y); ctx.lineTo(width - padding, y); ctx.stroke();
-  y += 24;
+  sectionDivider();
 
-  ctx.fillStyle = COL.amber;
-  ctx.font = "600 12px 'Oswald'";
-  ctx.fillText(`EVENTS (${events.length})`, padding, y);
-  y += 20;
-
+  sectionHeading(`EVENTS (${events.length})`);
   if(events.length === 0){
     ctx.fillStyle = COL.inkSoft;
     ctx.font = "400 13px 'IBM Plex Sans'";
-    ctx.fillText('None logged yet.', padding, y);
+    ctx.fillText('None selected.', padding, y);
     y += rowH;
   }else{
     events.forEach(ev => {
@@ -1462,17 +1619,43 @@ async function buildReportCanvas(){
       ctx.fillStyle = COL.inkSoft;
       ctx.font = "500 11px 'JetBrains Mono'";
       ctx.textAlign = 'right';
-      ctx.fillText(`${ev.present.length}/${members.length} present`, width - padding, y);
+      ctx.fillText(`${ev.present.length}/${MEMBERS.length} present`, width - padding, y);
       ctx.textAlign = 'left';
 
       y += rowH;
     });
   }
 
-  y += 14;
-  ctx.strokeStyle = COL.line;
-  ctx.beginPath(); ctx.moveTo(padding, y); ctx.lineTo(width - padding, y); ctx.stroke();
-  y += 20;
+  y += 10;
+  sectionDivider();
+
+  sectionHeading('PROMOTIONS');
+  ctx.fillStyle = COL.ink;
+  ctx.font = "400 12.5px 'IBM Plex Sans'";
+  if(promotionsLines.length === 0){
+    ctx.fillStyle = COL.inkSoft;
+    ctx.fillText('None.', padding, y);
+    y += smallRowH;
+  }else{
+    promotionsLines.forEach(line => { ctx.fillText(line, padding, y); y += smallRowH; });
+  }
+
+  y += 6;
+  sectionDivider();
+
+  sectionHeading('AWARDS');
+  ctx.fillStyle = COL.ink;
+  ctx.font = "400 12.5px 'IBM Plex Sans'";
+  if(awardsLines.length === 0){
+    ctx.fillStyle = COL.inkSoft;
+    ctx.fillText('None.', padding, y);
+    y += smallRowH;
+  }else{
+    awardsLines.forEach(line => { ctx.fillText(line, padding, y); y += smallRowH; });
+  }
+
+  y += 8;
+  sectionDivider();
 
   ctx.fillStyle = COL.inkSoft;
   ctx.font = "400 10px 'JetBrains Mono'";
