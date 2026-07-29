@@ -108,7 +108,7 @@
     padding:10px 11px; border-radius:6px; margin-top:auto;
   }
   .how-it-works-btn:hover{color:#f0ede6; border-color:var(--amber);}
-  .how-it-works-btn .ic{width:15px; text-align:center; flex-shrink:0; color:var(--amber);}
+  .how-it-works-btn .ic{width:15px; text-align:center; flex-shrink:0; color:var(--amber); font-weight:800; font-size:14px;}
 
   .sidebar-foot{
     margin-top:14px; padding-top:14px; border-top:1px solid rgba(255,255,255,.08);
@@ -264,17 +264,18 @@
     width:30px; height:30px; border-radius:7px; display:flex; align-items:center; justify-content:center;
     background:var(--olive-mid); color:#f0ede6; font-size:14px; flex-shrink:0;
   }
-  .choice-option.selected .choice-icon{background:var(--amber); color:#fff;}
   .choice-label{font-family:'Gilroy'; font-weight:300; font-size:13.5px; letter-spacing:.02em;}
   .choice-radio{
     margin-left:auto; width:16px; height:16px; border-radius:50%; border:2px solid var(--ink-soft);
     flex-shrink:0; position:relative;
   }
-  .choice-option.selected{border-color:var(--amber); background:color-mix(in srgb, var(--amber) 12%, #fff);}
-  .choice-option.selected .choice-radio{border-color:var(--amber);}
+  .choice-option.selected{border-color:var(--amber); background:var(--amber); color:#fff;}
+  .choice-option.selected .choice-icon{background:rgba(255,255,255,.25); color:#fff;}
+  .choice-option.selected .choice-label{color:#fff;}
+  .choice-option.selected .choice-radio{border-color:#fff;}
   .choice-option.selected .choice-radio::after{
     content:''; position:absolute; top:2px; left:2px; width:8px; height:8px;
-    border-radius:50%; background:var(--amber);
+    border-radius:50%; background:#fff;
   }
 
   /* ---------- dropzone ---------- */
@@ -328,14 +329,7 @@
 
   /* ---------- event cards (attendance history) ---------- */
   .event-card{padding:0; overflow:hidden;}
-  .event-card.dragging{opacity:.4;}
-  .event-card.drag-over{box-shadow: inset 0 2px 0 0 var(--amber);}
   .event-head{display:flex; align-items:center; gap:4px; padding:6px 10px;}
-  .event-drag-handle{
-    display:flex; align-items:center; padding:8px 6px; cursor:grab; color:var(--ink-soft);
-    opacity:.55; font-size:13px; touch-action:none;
-  }
-  .event-drag-handle:active{cursor:grabbing;}
   .event-toggle{
     flex:1; text-align:left; background:transparent; border:none; cursor:pointer;
     padding:10px 8px; display:flex; align-items:center; gap:12px;
@@ -418,9 +412,9 @@
       <button data-page="statistics"><span class="ic"><svg viewBox="0 0 16 16" width="13" height="13" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect x="1" y="9" width="3.2" height="6" rx="0.5" fill="currentColor"/><rect x="6.4" y="5" width="3.2" height="10" rx="0.5" fill="currentColor"/><rect x="11.8" y="2" width="3.2" height="13" rx="0.5" fill="currentColor"/></svg></span>Statistics</button>
     </nav>
 
-    <button class="how-it-works-btn" id="howItWorksBtn"><span class="ic">&#10067;</span>How It Works</button>
+    <button class="how-it-works-btn" id="howItWorksBtn"><span class="ic">?</span>How It Works</button>
 
-    <div class="sidebar-foot" id="footerNote">v.10. Unknown Soldiers. Created by Civoen.</div>
+    <div class="sidebar-foot" id="footerNote">v.13. Unknown Soldiers. Created by Civoen.</div>
   </aside>
 
   <div class="modal-overlay" id="howItWorksOverlay" style="display:none;">
@@ -435,7 +429,7 @@
         <li><strong>Log a new event.</strong> On the New Event page, choose the event type and date, then drop in (or paste) a Discord screenshot of who attended.</li>
         <li><strong>Read &amp; review.</strong> Click "Read names from screenshot" — it'll match detected names against your roster. Names at 55%+ confidence are included automatically; 30&ndash;54% needs your review. Use "+ Add member" for anyone it missed entirely.</li>
         <li><strong>Log it.</strong> Once the matches look right, click "Log this event's attendance."</li>
-        <li><strong>Review history.</strong> On Attendance History, expand any event to see who was Present, Absent, or Excused. Check the box next to an absent name to mark them Excused. Edit or delete an event, or drag to reorder, at any time.</li>
+        <li><strong>Review history.</strong> Events are always listed most-recent-first. Expand any event to see who was Present, Absent, or Excused. Check the box next to an absent name to mark them Excused. Edit or delete an event at any time.</li>
         <li><strong>Generate a report.</strong> On Generate Report, set a From and To, tick which members and events to include, and add any Promotions or Awards. Then either copy the report as plain text, or use "Copy Image" to copy a site-styled image straight to your clipboard for pasting into Discord or elsewhere.</li>
         <li><strong>Check the Statistics.</strong> This page is read-only — it shows overall and per-event-type average attendance, your most and least active member, and total excused instances, all computed automatically from Attendance History.</li>
       </ol>
@@ -565,6 +559,7 @@
         <div class="checklist-actions">
           <button class="btn ghost small" id="reportEventsAll">Select all</button>
           <button class="btn ghost small" id="reportEventsNone">Select none</button>
+          <button class="btn ghost small" id="reportEventsRecentTwo">Recent Two</button>
         </div>
         <div class="checklist" id="reportEventList"></div>
       </div>
@@ -1187,7 +1182,12 @@ function renderHistory(){
     historyWrap.innerHTML = '<div class="card"><div class="empty">No events logged yet.</div></div>';
     return;
   }
-  historyWrap.innerHTML = EVENTS.map((ev, idx) => eventCardHTML(ev, idx)).join('');
+  // Always shown most-recent-first by date, regardless of logging order — this
+  // means events can no longer be manually drag-reordered (see eventCardHTML).
+  const ordered = EVENTS
+    .map((ev, idx) => ({ ev, idx }))
+    .sort((a, b) => b.ev.date.localeCompare(a.ev.date));
+  historyWrap.innerHTML = ordered.map(({ev, idx}) => eventCardHTML(ev, idx)).join('');
   attachHistoryHandlers();
 }
 
@@ -1226,9 +1226,8 @@ function attendanceColumnsHTML(ev, idx){
 function eventCardHTML(ev, idx){
   const rosterMembers = MEMBERS;
   return `
-  <div class="card event-card" draggable="true" data-idx="${idx}">
+  <div class="card event-card" data-idx="${idx}">
     <div class="event-head">
-      <span class="drag-handle event-drag-handle" aria-hidden="true" title="Drag to reorder">&#9776;</span>
       <button class="event-toggle" data-idx="${idx}">
         <span class="chevron">&#9656;</span>
         <span class="event-title">${escapeHtml(ev.name)}</span>
@@ -1271,7 +1270,6 @@ function attachExcuseCheckboxHandlers(scopeEl){
   });
 }
 
-let eventDragSrcIdx = null;
 function attachHistoryHandlers(){
   attachExcuseCheckboxHandlers(historyWrap);
   historyWrap.querySelectorAll('.event-toggle').forEach(btn=>{
@@ -1293,34 +1291,6 @@ function attachHistoryHandlers(){
       EVENTS.splice(idx, 1);
       await persist();
       renderRoster();
-      renderHistory();
-    });
-  });
-  historyWrap.querySelectorAll('.event-card').forEach(card=>{
-    card.addEventListener('dragstart', ()=>{
-      eventDragSrcIdx = Number(card.dataset.idx);
-      card.classList.add('dragging');
-    });
-    card.addEventListener('dragend', ()=>{
-      card.classList.remove('dragging');
-      historyWrap.querySelectorAll('.event-card').forEach(c=>c.classList.remove('drag-over'));
-    });
-    card.addEventListener('dragover', (e)=>{
-      e.preventDefault();
-      card.classList.add('drag-over');
-    });
-    card.addEventListener('dragleave', ()=>{
-      card.classList.remove('drag-over');
-    });
-    card.addEventListener('drop', async (e)=>{
-      e.preventDefault();
-      card.classList.remove('drag-over');
-      const targetIdx = Number(card.dataset.idx);
-      if(eventDragSrcIdx === null || eventDragSrcIdx === targetIdx) return;
-      const moved = EVENTS.splice(eventDragSrcIdx, 1)[0];
-      EVENTS.splice(targetIdx, 0, moved);
-      eventDragSrcIdx = null;
-      await persist();
       renderHistory();
     });
   });
@@ -1388,9 +1358,13 @@ function renderReportControls(){
   updateReportMemberCount();
 
   const eventList = document.getElementById('reportEventList');
+  const recentTwoIdx = new Set(getMostRecentEventIndices(2));
+  const orderedEvents = EVENTS
+    .map((ev, idx) => ({ ev, idx }))
+    .sort((a, b) => b.ev.date.localeCompare(a.ev.date));
   eventList.innerHTML = EVENTS.length
-    ? EVENTS.map((ev, idx) => `
-        <label><input type="checkbox" class="report-event-cb" data-idx="${idx}" checked><span>${escapeHtml(ev.name)}</span><span class="ev-date mono">${ev.date}</span></label>
+    ? orderedEvents.map(({ev, idx}) => `
+        <label><input type="checkbox" class="report-event-cb" data-idx="${idx}" ${recentTwoIdx.has(idx) ? 'checked' : ''}><span>${escapeHtml(ev.name)}</span><span class="ev-date mono">${ev.date}</span></label>
       `).join('')
     : '<div class="empty">No events logged yet.</div>';
   eventList.querySelectorAll('.report-event-cb').forEach(cb => cb.addEventListener('change', updateReportEventCount));
@@ -1398,6 +1372,15 @@ function renderReportControls(){
 
   document.getElementById('reportOutput').style.display = 'none';
   document.getElementById('reportStatus').textContent = '';
+}
+
+// Returns the EVENTS array indices of the n most recent events by date.
+function getMostRecentEventIndices(n){
+  return EVENTS
+    .map((ev, idx) => ({ ev, idx }))
+    .sort((a, b) => b.ev.date.localeCompare(a.ev.date))
+    .slice(0, n)
+    .map(x => x.idx);
 }
 
 function updateReportMemberCount(){
@@ -1421,6 +1404,13 @@ document.getElementById('reportEventsAll').addEventListener('click', ()=>{
 });
 document.getElementById('reportEventsNone').addEventListener('click', ()=>{
   document.querySelectorAll('.report-event-cb').forEach(cb => cb.checked = false);
+  updateReportEventCount();
+});
+document.getElementById('reportEventsRecentTwo').addEventListener('click', ()=>{
+  const recentTwoIdx = new Set(getMostRecentEventIndices(2));
+  document.querySelectorAll('.report-event-cb').forEach(cb => {
+    cb.checked = recentTwoIdx.has(Number(cb.dataset.idx));
+  });
   updateReportEventCount();
 });
 
@@ -1468,14 +1458,15 @@ function renderStatistics(){
     return { type, count: evs.length, avg };
   });
 
-  let mostActive = null, leastActive = null;
+  let mostActiveNames = '', leastActiveNames = '', maxCount = 0, minCount = 0;
   if(totalMembers && totalEvents){
     const counts = MEMBERS.map(name => ({
       name, count: EVENTS.filter(ev => ev.present.includes(name)).length
     }));
-    counts.sort((a,b) => b.count - a.count);
-    mostActive = counts[0];
-    leastActive = counts[counts.length - 1];
+    maxCount = Math.max(...counts.map(c => c.count));
+    minCount = Math.min(...counts.map(c => c.count));
+    mostActiveNames = counts.filter(c => c.count === maxCount).map(c => c.name).join(', ');
+    leastActiveNames = counts.filter(c => c.count === minCount).map(c => c.name).join(', ');
   }
 
   const totalExcused = EVENTS.reduce((acc,ev) => acc + (ev.excused ? ev.excused.length : 0), 0);
@@ -1500,8 +1491,8 @@ function renderStatistics(){
     <div class="card">
       <h2>Member Highlights</h2>
       ${totalEvents === 0 ? '<div class="empty">No events logged yet.</div>' : `
-        <div class="member-row"><span>Most active</span><span>${escapeHtml(mostActive.name)} — ${mostActive.count}/${totalEvents}</span></div>
-        <div class="member-row"><span>Least active</span><span>${escapeHtml(leastActive.name)} — ${leastActive.count}/${totalEvents}</span></div>
+        <div class="member-row"><span>Most active</span><span>${escapeHtml(mostActiveNames)} — ${maxCount}/${totalEvents}</span></div>
+        <div class="member-row"><span>Least active</span><span>${escapeHtml(leastActiveNames)} — ${minCount}/${totalEvents}</span></div>
       `}
     </div>
 
