@@ -8,19 +8,20 @@
 <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Stencil+Text:wght@700;800;900&family=Oswald:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --void:#14170f;
-    --olive-deep:#232819;
-    --olive-panel:#2c3220;
-    --olive-mid:#5c6640;
-    --khaki-pale:#ece3cd;
-    --khaki-card:#f7f1e2;
-    --khaki-line:#d9cca8;
-    --amber:#d38b34;
-    --amber-dark:#a8691f;
-    --signal:#5f8f47;
-    --alert:#a5432c;
-    --ink:#201d14;
-    --ink-soft:#5c5642;
+    --void:#0f1113;
+    --olive-deep:#1b1e22;
+    --olive-panel:#202327;
+    --olive-mid:#45484d;
+    --khaki-pale:#17191c;
+    --khaki-card:#1f2226;
+    --khaki-line:#2f3237;
+    --amber:#c8461c;
+    --amber-dark:#96350f;
+    --signal:#5f9c52;
+    --alert:#c0392b;
+    --ink:#e8e5de;
+    --ink-soft:#8c8983;
+    --ink-on-light:#201d14;
   }
   *{box-sizing:border-box;}
   html,body{margin:0; padding:0;}
@@ -38,13 +39,13 @@
   /* ---------- sidebar ---------- */
   .sidebar{
     background:linear-gradient(180deg,var(--void) 0%,var(--olive-deep) 100%);
-    color:#cfc7a8; padding:26px 18px; display:flex; flex-direction:column;
+    color:#c8c4ba; padding:26px 18px; display:flex; flex-direction:column;
     position:sticky; top:0; height:100vh; overflow-y:auto;
   }
   .brand{margin-bottom:22px;}
   .brand .mark{
     font-family:'Big Shoulders Stencil Text'; font-weight:900; font-size:26px;
-    letter-spacing:.02em; color:#f2ead0; line-height:.95; margin:0;
+    letter-spacing:.02em; color:#f0ede6; line-height:.95; margin:0;
   }
   .brand .sub{
     font-family:'Oswald'; font-weight:500; font-size:9.5px; letter-spacing:.26em;
@@ -54,42 +55,70 @@
   .company-wrap{position:relative; margin-bottom:22px;}
   .company-pill{
     width:100%; display:flex; align-items:center; justify-content:space-between;
-    background:rgba(211,139,52,.1); border:1px solid rgba(211,139,52,.45);
+    background:rgba(200,70,28,.1); border:1px solid rgba(200,70,28,.45);
     border-radius:6px; padding:9px 11px; cursor:pointer; font-family:inherit; color:inherit;
   }
-  .company-pill .label{font-family:'Oswald'; font-size:9px; letter-spacing:.16em; color:#a79f80; text-transform:uppercase; text-align:left;}
+  .company-pill .label{font-family:'Oswald'; font-size:9px; letter-spacing:.16em; color:#9b9790; text-transform:uppercase; text-align:left;}
   .company-pill .value{font-family:'Oswald'; font-size:14px; letter-spacing:.05em; color:var(--amber); font-weight:600; margin-top:2px; text-align:left;}
   .company-pill .chev{color:var(--amber); font-size:10px;}
   .company-menu{
     position:absolute; top:calc(100% + 6px); left:0; right:0;
-    background:var(--olive-deep); border:1px solid rgba(211,139,52,.35); border-radius:6px;
+    background:var(--olive-deep); border:1px solid rgba(200,70,28,.35); border-radius:6px;
     overflow:hidden; z-index:20; box-shadow:0 10px 24px rgba(0,0,0,.4);
   }
   .company-menu button{
     display:block; width:100%; text-align:left; background:none; border:none;
-    color:#cfc7a8; padding:10px 12px; font-size:13px; cursor:pointer; font-family:'IBM Plex Sans';
+    color:#c8c4ba; padding:10px 12px; font-size:13px; cursor:pointer; font-family:'IBM Plex Sans';
   }
-  .company-menu button:hover{background:rgba(211,139,52,.12);}
+  .company-menu button:hover{background:rgba(200,70,28,.12);}
   .company-menu button.current{color:var(--amber); font-weight:600;}
 
   .nav{display:flex; flex-direction:column; gap:3px;}
   .nav button{
     display:flex; align-items:center; gap:11px; width:100%; text-align:left;
     font-family:'Oswald'; font-size:12.5px; letter-spacing:.06em; text-transform:uppercase;
-    color:#9b9377; background:transparent; border:none; cursor:pointer;
+    color:#8f8b83; background:transparent; border:none; cursor:pointer;
     padding:11px 11px; border-radius:6px; border-left:3px solid transparent;
   }
   .nav button .ic{width:15px; text-align:center; opacity:.85; flex-shrink:0;}
-  .nav button.active{color:#f2ead0; background:rgba(211,139,52,.12); border-left-color:var(--amber);}
-  .nav button:hover{color:#e9e1c8;}
+  .nav button.active{color:#f0ede6; background:rgba(200,70,28,.14); border-left-color:var(--amber);}
+  .nav button:hover{color:#f0ede6;}
+
+  .how-it-works-btn{
+    display:flex; align-items:center; gap:11px; width:100%; text-align:left;
+    font-family:'Oswald'; font-size:12px; letter-spacing:.06em; text-transform:uppercase;
+    color:#8f8b83; background:transparent; border:1px solid rgba(255,255,255,.12); cursor:pointer;
+    padding:10px 11px; border-radius:6px; margin-top:auto;
+  }
+  .how-it-works-btn:hover{color:#f0ede6; border-color:var(--amber);}
+  .how-it-works-btn .ic{width:15px; text-align:center; flex-shrink:0;}
 
   .sidebar-foot{
-    margin-top:auto; padding-top:18px; border-top:1px solid rgba(255,255,255,.08);
-    font-size:10.5px; line-height:1.6; color:#726c56;
+    margin-top:14px; padding-top:14px; border-top:1px solid rgba(255,255,255,.08);
+    font-family:'JetBrains Mono'; font-size:10px; letter-spacing:.03em; color:#6b6862;
   }
 
+  .modal-overlay{
+    position:fixed; inset:0; background:rgba(20,23,15,.6); z-index:100;
+    display:flex; align-items:center; justify-content:center; padding:20px;
+  }
+  .modal{
+    background:var(--khaki-card); border-radius:10px; max-width:520px; width:100%;
+    max-height:80vh; overflow-y:auto; padding:22px 24px; box-shadow:0 20px 50px rgba(0,0,0,.4);
+  }
+  .modal-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;}
+  .modal-head h2{
+    font-family:'Big Shoulders Stencil Text'; font-weight:800; font-size:22px; margin:0; color:var(--ink);
+  }
+  .modal-close{
+    background:none; border:none; cursor:pointer; font-size:15px; color:var(--ink-soft); padding:4px;
+  }
+  .steps{margin:0; padding-left:20px; display:flex; flex-direction:column; gap:11px;}
+  .steps li{font-size:13px; line-height:1.5; color:var(--ink);}
+  .steps li strong{font-family:'Oswald'; letter-spacing:.02em;}
+
   /* ---------- main ---------- */
-  .main{padding:36px 40px 60px; max-width:980px;}
+  .main{padding:36px 48px 60px; max-width:none;}
   .page{display:none;}
   .page.active{display:block;}
   .page-head{display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:22px; gap:16px;}
@@ -109,20 +138,13 @@
     border-radius:10px; padding:20px 22px; margin-bottom:18px;
     box-shadow:0 1px 2px rgba(32,29,20,.04), 0 10px 24px -18px rgba(32,29,20,.35);
   }
-  .card::before, .card::after{
-    content:''; position:absolute; top:10px; width:6px; height:6px; border-radius:50%;
-    background:radial-gradient(circle at 35% 35%, #fff, var(--khaki-line) 70%);
-    box-shadow: inset 0 0 0 1px rgba(32,29,20,.15);
-  }
-  .card::before{left:10px;}
-  .card::after{right:10px;}
   .card h2{
     font-family:'Oswald'; font-weight:600; font-size:12.5px; letter-spacing:.09em;
     text-transform:uppercase; color:var(--ink-soft); margin:0 0 14px;
     display:flex; align-items:center; gap:10px;
   }
   .card h2 .tag{
-    background:var(--olive-mid); color:#f2ead0; font-size:10px; padding:2px 8px;
+    background:var(--olive-mid); color:#f0ede6; font-size:10px; padding:2px 8px;
     border-radius:10px; font-family:'JetBrains Mono';
   }
   .card h3{
@@ -143,20 +165,20 @@
   input[type=text], input[type=date]{
     width:100%; padding:10px 12px; border:1px solid var(--khaki-line);
     border-radius:6px; background:#fff; font-family:'IBM Plex Sans'; font-size:13px;
-    margin-bottom:8px; color:var(--ink);
+    margin-bottom:8px; color:var(--ink-on-light);
   }
   input:focus, select:focus, button:focus-visible{
     outline:2px solid var(--amber); outline-offset:1px;
   }
   .btn{
     display:inline-flex; align-items:center; gap:6px;
-    background:var(--amber); color:#241705; border:none;
+    background:var(--amber); color:#fff; border:none;
     padding:10px 18px; border-radius:6px; font-weight:600; font-size:12.5px;
     cursor:pointer; transition:background .15s; font-family:'Oswald';
     letter-spacing:.05em; text-transform:uppercase;
   }
-  .btn:hover{background:var(--amber-dark); color:#f2ead0;}
-  .btn:disabled{background:#cbbf9e; cursor:not-allowed; color:#7a7458;}
+  .btn:hover{background:var(--amber-dark); color:#fff;}
+  .btn:disabled{background:#3a3d42; cursor:not-allowed; color:#8c8983;}
   .btn.ghost{background:transparent; color:var(--ink-soft); border:1.5px solid var(--khaki-line);}
   .btn.ghost:hover{background:var(--khaki-line); color:var(--ink);}
   .btn.small{padding:6px 12px; font-size:11px;}
@@ -179,7 +201,7 @@
   .roster-list .drag-handle:active{cursor:grabbing;}
   .avatar{
     width:32px; height:32px; border-radius:7px; display:flex; align-items:center; justify-content:center;
-    font-family:'Oswald'; font-weight:600; font-size:11px; color:#f2ead0;
+    font-family:'Oswald'; font-weight:600; font-size:11px; color:#f0ede6;
     background:linear-gradient(155deg, var(--olive-mid), var(--olive-deep));
   }
   .rname{font-family:'IBM Plex Sans'; font-weight:500; font-size:13.5px; color:var(--ink);}
@@ -199,15 +221,15 @@
     border:1.5px solid var(--khaki-line); border-radius:8px;
     padding:12px 14px; cursor:pointer; flex:1; min-width:150px;
     background:#fff; transition:border-color .15s, background .15s;
-    font-size:13px; color:var(--ink); position:relative;
+    font-size:13px; color:var(--ink-on-light); position:relative;
   }
   .choice-option:hover{border-color:var(--olive-mid);}
   .choice-option input[type=radio]{position:absolute; opacity:0; width:0; height:0; margin:0;}
   .choice-icon{
     width:30px; height:30px; border-radius:7px; display:flex; align-items:center; justify-content:center;
-    background:var(--olive-mid); color:#f2ead0; font-size:14px; flex-shrink:0;
+    background:var(--olive-mid); color:#f0ede6; font-size:14px; flex-shrink:0;
   }
-  .choice-option.selected .choice-icon{background:var(--amber); color:#241705;}
+  .choice-option.selected .choice-icon{background:var(--amber); color:#fff;}
   .choice-label{font-family:'Oswald'; font-weight:500; font-size:13.5px; letter-spacing:.02em;}
   .choice-radio{
     margin-left:auto; width:16px; height:16px; border-radius:50%; border:2px solid var(--ink-soft);
@@ -226,13 +248,8 @@
     background:repeating-linear-gradient(135deg, rgba(92,102,64,.05) 0 10px, transparent 10px 20px);
     cursor:pointer; transition:border-color .15s, background .15s; position:relative;
   }
-  .dropzone::before, .dropzone::after{
-    content:''; position:absolute; top:10px; width:6px; height:6px; border-radius:50%;
-    background:var(--olive-mid); opacity:.4;
-  }
-  .dropzone::before{left:10px;} .dropzone::after{right:10px;}
   .dropzone.drag{border-color:var(--amber); background:#fbeed9;}
-  .dropzone.selected{border-color:var(--amber); box-shadow:0 0 0 2px rgba(211,139,52,.35); outline:none;}
+  .dropzone.selected{border-color:var(--amber); box-shadow:0 0 0 2px rgba(200,70,28,.35); outline:none;}
   .dropzone .icon{font-size:26px; margin-bottom:6px; color:var(--olive-mid);}
   .dropzone p{margin:2px 0; font-size:13px; color:var(--ink);}
   .dropzone .hint{font-family:'Oswald'; font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-soft); margin-top:6px;}
@@ -246,7 +263,7 @@
   .tag-row{display:flex; flex-wrap:wrap; gap:10px; margin-top:12px;}
   .dogtag{
     position:relative;
-    background:linear-gradient(160deg, var(--olive-deep), var(--void)); color:#e9e1c8;
+    background:linear-gradient(160deg, var(--olive-deep), var(--void)); color:#eeeae2;
     border-radius:8px; padding:12px 12px; font-size:12px;
     display:flex; flex-direction:column; gap:5px; min-width:180px;
     border-left:4px solid var(--amber);
@@ -260,7 +277,7 @@
   .dogtag.matched .stamp{border-color:var(--signal); color:var(--signal);}
   .dogtag .raw{font-family:'JetBrains Mono'; font-size:10.5px; opacity:.65; padding-right:44px;}
   .dogtag select{
-    background:#e9e1c8; color:var(--ink); border:none;
+    background:#eeeae2; color:var(--ink-on-light); border:none;
     border-radius:4px; font-size:12px; padding:4px 6px; font-family:'IBM Plex Sans';
   }
   .dogtag label{display:flex; align-items:center; gap:6px; font-size:11px; margin-top:2px; opacity:.9;}
@@ -293,7 +310,7 @@
   .event-title{font-family:'Oswald'; font-weight:600; font-size:14.5px; letter-spacing:.02em; flex:1;}
   .event-date{font-family:'JetBrains Mono'; font-size:11px; color:var(--ink-soft);}
   .event-count{
-    font-family:'JetBrains Mono'; font-size:10.5px; background:var(--olive-mid); color:#f2ead0;
+    font-family:'JetBrains Mono'; font-size:10.5px; background:var(--olive-mid); color:#f0ede6;
     padding:3px 9px; border-radius:10px;
   }
   .chevron{transition:transform .15s; font-size:11px; color:var(--ink-soft);}
@@ -321,7 +338,7 @@
   }
   .attendance-chip{
     display:flex; align-items:center; gap:8px;
-    background:#fff; border-left:3px solid var(--signal);
+    background:#fff; border-left:3px solid var(--signal); color:var(--ink-on-light);
     border-radius:5px; padding:7px 10px; font-size:12px; margin-bottom:6px;
   }
   .attendance-chip.absent{border-left-color:var(--alert); opacity:.9;}
@@ -364,11 +381,27 @@
       <button data-page="attendance"><span class="ic">&#9638;</span>Attendance History</button>
     </nav>
 
-    <div class="sidebar-foot" id="footerNote">
-      Roster &amp; attendance history are shared per company &mdash; anyone with access can view or edit them.<br>
-      Your company selection here is local to this browser only.
-    </div>
+    <button class="how-it-works-btn" id="howItWorksBtn"><span class="ic">&#10067;</span>How It Works</button>
+
+    <div class="sidebar-foot" id="footerNote">v.03. Unknown Soldiers. Created by Civoen.</div>
   </aside>
+
+  <div class="modal-overlay" id="howItWorksOverlay" style="display:none;">
+    <div class="modal">
+      <div class="modal-head">
+        <h2>How It Works</h2>
+        <button class="modal-close" id="howItWorksClose" aria-label="Close">&#10005;</button>
+      </div>
+      <ol class="steps">
+        <li><strong>Pick your company.</strong> Use the company switcher at the top of the sidebar (Bravo, Charlie, or Delta). Each has its own roster and event history.</li>
+        <li><strong>Keep the Roster current.</strong> Add or remove members on the Roster page. Drag the grip handle to reorder.</li>
+        <li><strong>Log a new event.</strong> On the New Event page, choose the event type and date, then drop in (or paste) a Discord screenshot of who attended.</li>
+        <li><strong>Read &amp; review.</strong> Click "Read names from screenshot" — it'll match detected names against your roster. Names at 55%+ confidence are included automatically; 30&ndash;54% needs your review. Use "+ Add member" for anyone it missed entirely.</li>
+        <li><strong>Log it.</strong> Once the matches look right, click "Log this event's attendance."</li>
+        <li><strong>Review history.</strong> On Attendance History, expand any event to see who was Present, Absent, or Excused. Check the box next to an absent name to mark them Excused. Edit or delete an event, or drag to reorder, at any time.</li>
+      </ol>
+    </div>
+  </div>
 
   <main class="main">
 
@@ -458,6 +491,22 @@
         <div><span class="eyebrow" id="historyEyebrow">Bravo Company // Records</span><h1>ATTENDANCE HISTORY</h1></div>
       </div>
       <div id="historyWrap"><div class="card"><div class="empty">No events logged yet.</div></div></div>
+
+      <div class="card">
+        <h2>Report</h2>
+        <p style="font-size:12.5px; color:var(--ink-soft); margin:0 0 12px;">
+          Put together a plain-text attendance summary you can copy or email to someone outside this site.
+        </p>
+        <button class="btn" id="reportBtn">Generate Report</button>
+        <div id="reportOutput" style="display:none; margin-top:16px;">
+          <textarea id="reportText" readonly rows="10" style="width:100%; font-family:'JetBrains Mono'; font-size:11.5px; padding:12px; border:1px solid var(--khaki-line); border-radius:6px; background:#fff; color:var(--ink-on-light); resize:vertical;"></textarea>
+          <div style="display:flex; gap:8px; margin-top:10px;">
+            <button class="btn ghost small" id="copyReportBtn">Copy to clipboard</button>
+            <button class="btn ghost small" id="copyImageBtn">Copy Image</button>
+          </div>
+          <div class="status-line" id="reportStatus"></div>
+        </div>
+      </div>
     </div>
 
   </main>
@@ -495,6 +544,21 @@ const statusLine = document.getElementById('statusLine');
 const commitBtn = document.getElementById('commitBtn');
 const historyWrap = document.getElementById('historyWrap');
 const companyLabel = document.getElementById('companyLabel');
+
+// ---------- how it works modal ----------
+const howItWorksOverlay = document.getElementById('howItWorksOverlay');
+document.getElementById('howItWorksBtn').addEventListener('click', ()=>{
+  howItWorksOverlay.style.display = 'flex';
+});
+document.getElementById('howItWorksClose').addEventListener('click', ()=>{
+  howItWorksOverlay.style.display = 'none';
+});
+howItWorksOverlay.addEventListener('click', (e)=>{
+  if(e.target === howItWorksOverlay) howItWorksOverlay.style.display = 'none';
+});
+document.addEventListener('keydown', (e)=>{
+  if(e.key === 'Escape') howItWorksOverlay.style.display = 'none';
+});
 
 // ---------- page nav ----------
 document.querySelectorAll('nav.pagenav button').forEach(btn=>{
@@ -1218,6 +1282,230 @@ function escapeHtml(s){
   d.textContent = s;
   return d.innerHTML;
 }
+
+// ---------- report ----------
+function buildReportText(){
+  const today = new Date().toISOString().slice(0,10);
+  const lines = [];
+  lines.push(`UNKSO Attendance Report — ${CURRENT_COMPANY} Company`);
+  lines.push(`Generated: ${today}`);
+  lines.push('');
+  lines.push(`Members: ${MEMBERS.length}    Events logged: ${EVENTS.length}`);
+  lines.push('');
+  lines.push('Per-member attendance:');
+  [...MEMBERS].forEach(name=>{
+    const count = EVENTS.filter(ev=>ev.present.includes(name)).length;
+    lines.push(`  ${name} — ${count}/${EVENTS.length}`);
+  });
+  lines.push('');
+  lines.push('Events:');
+  if(EVENTS.length===0){
+    lines.push('  None logged yet.');
+  }else{
+    EVENTS.forEach(ev=>{
+      const excusedCount = (ev.excused || []).length;
+      lines.push(`  ${ev.name} — ${ev.present.length}/${MEMBERS.length} present${excusedCount ? `, ${excusedCount} excused` : ''}`);
+    });
+  }
+  return lines.join('\n');
+}
+
+const reportBtn = document.getElementById('reportBtn');
+const reportOutput = document.getElementById('reportOutput');
+const reportText = document.getElementById('reportText');
+const reportStatus = document.getElementById('reportStatus');
+
+reportBtn.addEventListener('click', ()=>{
+  reportText.value = buildReportText();
+  reportOutput.style.display = 'block';
+  reportStatus.textContent = '';
+});
+
+document.getElementById('copyReportBtn').addEventListener('click', async ()=>{
+  try{
+    await navigator.clipboard.writeText(reportText.value);
+    reportStatus.textContent = 'Copied to clipboard.';
+    reportStatus.className = 'status-line';
+  }catch(e){
+    reportText.select();
+    reportStatus.textContent = 'Could not auto-copy — text is selected, use Cmd/Ctrl+C.';
+    reportStatus.className = 'status-line err';
+  }
+});
+
+// ---------- report image (canvas, styled like the site) ----------
+async function buildReportCanvas(){
+  await document.fonts.ready;
+
+  const members = [...MEMBERS];
+  const events = EVENTS;
+  const COL = {
+    bg:      '#1f2226',
+    line:    '#2f3237',
+    amber:   '#c8461c',
+    ink:     '#e8e5de',
+    inkSoft: '#8c8983',
+    signal:  '#5f9c52'
+  };
+
+  const width = 860;
+  const padding = 36;
+  const rowH = 26;
+  const headerH = 96;
+  const memberBlockH = 34 + members.length * rowH;
+  const eventBlockH = 34 + Math.max(events.length, 1) * rowH;
+  const footerH = 46;
+  const height = padding * 2 + headerH + memberBlockH + eventBlockH + footerH;
+
+  const scale = 2; // sharper output for pasting/sharing
+  const canvas = document.createElement('canvas');
+  canvas.width = width * scale;
+  canvas.height = height * scale;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(scale, scale);
+
+  function roundRect(x, y, w, h, r){
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+
+  // card background
+  roundRect(0, 0, width, height, 14);
+  ctx.fillStyle = COL.bg;
+  ctx.fill();
+
+  // top accent bar
+  ctx.fillStyle = COL.amber;
+  ctx.fillRect(0, 0, width, 6);
+
+  let y = padding;
+
+  ctx.fillStyle = COL.amber;
+  ctx.font = "800 30px 'Big Shoulders Stencil Text'";
+  ctx.textBaseline = 'alphabetic';
+  ctx.fillText('UNKSO', padding, y + 26);
+
+  ctx.fillStyle = COL.inkSoft;
+  ctx.font = "500 10.5px 'Oswald'";
+  ctx.fillText('ATTENDANCE REPORT', padding + 132, y + 16);
+
+  ctx.fillStyle = COL.ink;
+  ctx.font = "600 13px 'Oswald'";
+  ctx.fillText(`${CURRENT_COMPANY.toUpperCase()} COMPANY`, padding + 132, y + 33);
+
+  ctx.fillStyle = COL.inkSoft;
+  ctx.font = "400 11px 'IBM Plex Sans'";
+  ctx.textAlign = 'right';
+  ctx.fillText('Generated ' + new Date().toISOString().slice(0,10), width - padding, y + 16);
+  ctx.textAlign = 'left';
+
+  y += headerH;
+  ctx.strokeStyle = COL.line;
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(padding, y); ctx.lineTo(width - padding, y); ctx.stroke();
+  y += 24;
+
+  ctx.fillStyle = COL.amber;
+  ctx.font = "600 12px 'Oswald'";
+  ctx.fillText(`MEMBERS (${members.length})`, padding, y);
+  y += 20;
+
+  members.forEach(name => {
+    const count = events.filter(ev => ev.present.includes(name)).length;
+    const pct = events.length ? count / events.length : 0;
+
+    ctx.fillStyle = COL.ink;
+    ctx.font = "400 13px 'IBM Plex Sans'";
+    ctx.fillText(name, padding, y);
+
+    const barW = 110, barX = width - padding - 160, barY = y - 9;
+    ctx.fillStyle = COL.line;
+    ctx.fillRect(barX, barY, barW, 6);
+    ctx.fillStyle = COL.signal;
+    ctx.fillRect(barX, barY, barW * pct, 6);
+
+    ctx.fillStyle = COL.inkSoft;
+    ctx.font = "500 11px 'JetBrains Mono'";
+    ctx.textAlign = 'right';
+    ctx.fillText(`${count}/${events.length}`, width - padding, y);
+    ctx.textAlign = 'left';
+
+    y += rowH;
+  });
+
+  y += 10;
+  ctx.strokeStyle = COL.line;
+  ctx.beginPath(); ctx.moveTo(padding, y); ctx.lineTo(width - padding, y); ctx.stroke();
+  y += 24;
+
+  ctx.fillStyle = COL.amber;
+  ctx.font = "600 12px 'Oswald'";
+  ctx.fillText(`EVENTS (${events.length})`, padding, y);
+  y += 20;
+
+  if(events.length === 0){
+    ctx.fillStyle = COL.inkSoft;
+    ctx.font = "400 13px 'IBM Plex Sans'";
+    ctx.fillText('None logged yet.', padding, y);
+    y += rowH;
+  }else{
+    events.forEach(ev => {
+      ctx.fillStyle = COL.ink;
+      ctx.font = "400 13px 'IBM Plex Sans'";
+      ctx.fillText(ev.name, padding, y);
+
+      ctx.fillStyle = COL.inkSoft;
+      ctx.font = "500 11px 'JetBrains Mono'";
+      ctx.textAlign = 'right';
+      ctx.fillText(`${ev.present.length}/${members.length} present`, width - padding, y);
+      ctx.textAlign = 'left';
+
+      y += rowH;
+    });
+  }
+
+  y += 14;
+  ctx.strokeStyle = COL.line;
+  ctx.beginPath(); ctx.moveTo(padding, y); ctx.lineTo(width - padding, y); ctx.stroke();
+  y += 20;
+
+  ctx.fillStyle = COL.inkSoft;
+  ctx.font = "400 10px 'JetBrains Mono'";
+  ctx.fillText('Unknown Soldiers — Created by Civoen', padding, y);
+
+  return canvas;
+}
+
+document.getElementById('copyImageBtn').addEventListener('click', async ()=>{
+  reportStatus.textContent = 'Generating image…';
+  reportStatus.className = 'status-line';
+  try{
+    const canvas = await buildReportCanvas();
+    canvas.toBlob(async (blob) => {
+      if(!blob){
+        reportStatus.textContent = 'Could not generate the image.';
+        reportStatus.className = 'status-line err';
+        return;
+      }
+      try{
+        await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+        reportStatus.textContent = 'Report image copied to clipboard — paste it anywhere (Discord, email, etc.).';
+        reportStatus.className = 'status-line';
+      }catch(err){
+        reportStatus.textContent = 'Could not copy the image — your browser may not support image clipboard access. Try "Copy to clipboard" (text) instead.';
+        reportStatus.className = 'status-line err';
+      }
+    }, 'image/png');
+  }catch(err){
+    reportStatus.textContent = 'Could not generate the report image: ' + err.message;
+    reportStatus.className = 'status-line err';
+  }
+});
 
 load();
 </script>
