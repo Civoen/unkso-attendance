@@ -108,7 +108,7 @@
     padding:10px 11px; border-radius:6px; margin-top:auto;
   }
   .how-it-works-btn:hover{color:#f0ede6; border-color:var(--amber);}
-  .how-it-works-btn .ic{width:15px; text-align:center; flex-shrink:0;}
+  .how-it-works-btn .ic{width:15px; text-align:center; flex-shrink:0; color:var(--amber);}
 
   .sidebar-foot{
     margin-top:14px; padding-top:14px; border-top:1px solid rgba(255,255,255,.08);
@@ -415,11 +415,12 @@
       <button data-page="event"><span class="ic">&#65291;</span>New Event</button>
       <button data-page="attendance"><span class="ic">&#9638;</span>Attendance History</button>
       <button data-page="report"><span class="ic">&#128196;</span>Generate Report</button>
+      <button data-page="statistics"><span class="ic">&#128202;</span>Statistics</button>
     </nav>
 
     <button class="how-it-works-btn" id="howItWorksBtn"><span class="ic">&#10067;</span>How It Works</button>
 
-    <div class="sidebar-foot" id="footerNote">v.06. Unknown Soldiers. Created by Civoen.</div>
+    <div class="sidebar-foot" id="footerNote">v.07. Unknown Soldiers. Created by Civoen.</div>
   </aside>
 
   <div class="modal-overlay" id="howItWorksOverlay" style="display:none;">
@@ -590,6 +591,13 @@
       </div>
     </div>
 
+    <div class="page" id="page-statistics">
+      <div class="page-head">
+        <div><span class="eyebrow" id="statsEyebrow">Bravo Company // Insights</span><h1>STATISTICS</h1></div>
+      </div>
+      <div id="statsWrap"></div>
+    </div>
+
   </main>
 </div>
 
@@ -649,6 +657,7 @@ document.querySelectorAll('nav.pagenav button').forEach(btn=>{
     btn.classList.add('active');
     document.getElementById('page-'+btn.dataset.page).classList.add('active');
     if(btn.dataset.page === 'report') renderReportControls();
+    if(btn.dataset.page === 'statistics') renderStatistics();
   });
 });
 
@@ -659,8 +668,10 @@ document.querySelectorAll('nav.pagenav button').forEach(btn=>{
 function updateCompanyEyebrows(){
   const rosterEyebrow = document.getElementById('rosterEyebrow');
   const historyEyebrow = document.getElementById('historyEyebrow');
+  const statsEyebrow = document.getElementById('statsEyebrow');
   if(rosterEyebrow) rosterEyebrow.textContent = `${CURRENT_COMPANY} Company // Personnel`;
   if(historyEyebrow) historyEyebrow.textContent = `${CURRENT_COMPANY} Company // Records`;
+  if(statsEyebrow) statsEyebrow.textContent = `${CURRENT_COMPANY} Company // Insights`;
 }
 companyLabel.textContent = CURRENT_COMPANY;
 updateCompanyEyebrows();
@@ -1416,6 +1427,87 @@ function getSelectedReportMembers(){
 }
 function getSelectedReportEvents(){
   return [...document.querySelectorAll('.report-event-cb:checked')].map(cb => EVENTS[Number(cb.dataset.idx)]);
+}
+
+// ---------- statistics ----------
+// Events are named "{Type} - {DDMONYY}" (e.g. "General Meeting - 25JUL26"), so the
+// part before " - " is used as the event type for grouping. Manually-edited names
+// without that separator just get grouped under their own full name.
+function eventTypeOf(ev){
+  const parts = ev.name.split(' - ');
+  return parts.length > 1 ? parts[0] : ev.name;
+}
+
+function renderStatistics(){
+  const wrap = document.getElementById('statsWrap');
+  if(!wrap) return;
+
+  const totalMembers = MEMBERS.length;
+  const totalEvents = EVENTS.length;
+
+  let overallAvg = 0;
+  if(totalMembers && totalEvents){
+    const sum = MEMBERS.reduce((acc,name)=> acc + EVENTS.filter(ev=>ev.present.includes(name)).length, 0);
+    overallAvg = Math.round((sum / (totalMembers * totalEvents)) * 100);
+  }
+
+  const byType = {};
+  EVENTS.forEach(ev=>{
+    const type = eventTypeOf(ev);
+    (byType[type] = byType[type] || []).push(ev);
+  });
+  const typeRows = Object.keys(byType).sort().map(type=>{
+    const evs = byType[type];
+    let avg = 0;
+    if(totalMembers && evs.length){
+      const sum = evs.reduce((acc,ev)=> acc + ev.present.length, 0);
+      avg = Math.round((sum / (totalMembers * evs.length)) * 100);
+    }
+    return { type, count: evs.length, avg };
+  });
+
+  let mostActive = null, leastActive = null;
+  if(totalMembers && totalEvents){
+    const counts = MEMBERS.map(name => ({
+      name, count: EVENTS.filter(ev => ev.present.includes(name)).length
+    }));
+    counts.sort((a,b) => b.count - a.count);
+    mostActive = counts[0];
+    leastActive = counts[counts.length - 1];
+  }
+
+  const totalExcused = EVENTS.reduce((acc,ev) => acc + (ev.excused ? ev.excused.length : 0), 0);
+
+  wrap.innerHTML = `
+    <div class="stat-row">
+      <div class="stat-card"><div class="n">${totalMembers}</div><div class="l">Members</div></div>
+      <div class="stat-card"><div class="n">${totalEvents}</div><div class="l">Events logged</div></div>
+      <div class="stat-card"><div class="n">${overallAvg}%</div><div class="l">Overall avg. attendance</div></div>
+    </div>
+
+    <div class="card">
+      <h2>Average Attendance by Event Type</h2>
+      ${typeRows.length ? typeRows.map(r => `
+        <div class="member-row">
+          <span>${escapeHtml(r.type)} <span class="mono" style="color:var(--ink-soft); font-size:11px;">(${r.count} logged)</span></span>
+          <span class="mono">${r.avg}%</span>
+        </div>
+      `).join('') : '<div class="empty">No events logged yet.</div>'}
+    </div>
+
+    <div class="card">
+      <h2>Member Highlights</h2>
+      ${totalEvents === 0 ? '<div class="empty">No events logged yet.</div>' : `
+        <div class="member-row"><span>Most active</span><span>${escapeHtml(mostActive.name)} — ${mostActive.count}/${totalEvents}</span></div>
+        <div class="member-row"><span>Least active</span><span>${escapeHtml(leastActive.name)} — ${leastActive.count}/${totalEvents}</span></div>
+      `}
+    </div>
+
+    <div class="card">
+      <h2>Excused</h2>
+      <div class="member-row"><span>Total excused instances</span><span class="mono">${totalExcused}</span></div>
+    </div>
+  `;
 }
 
 function buildReportText(){
