@@ -97,7 +97,7 @@
     color:#8f8b83; background:transparent; border:none; cursor:pointer;
     padding:11px 11px; border-radius:6px; border-left:3px solid transparent;
   }
-  .nav button .ic{width:15px; text-align:center; opacity:.85; flex-shrink:0;}
+  .nav button .ic{width:15px; text-align:center; opacity:.85; flex-shrink:0; display:inline-flex; align-items:center; justify-content:center;}
   .nav button.active{color:#f0ede6; background:rgba(208,84,7,.14); border-left-color:var(--amber);}
   .nav button:hover{color:#f0ede6;}
 
@@ -242,7 +242,7 @@
   .rname{font-family:'IBM Plex Sans'; font-weight:500; font-size:13.5px; color:var(--ink);}
   .prog-wrap{display:flex; align-items:center; gap:9px;}
   .prog-track{flex:1; height:6px; border-radius:4px; background:var(--khaki-line); overflow:hidden;}
-  .prog-fill{height:100%; border-radius:4px; background:linear-gradient(90deg, var(--signal), #7cb160);}
+  .prog-fill{display:block; height:100%; border-radius:4px; background:linear-gradient(90deg, var(--signal), #7cb160);}
   .prog-frac{font-size:10.5px; color:var(--ink-soft); width:32px; text-align:right;}
   .remove-x{
     background:none; border:none; color:var(--alert); cursor:pointer; font-size:13px; padding:0 4px; opacity:.75;
@@ -415,12 +415,12 @@
       <button data-page="event"><span class="ic">&#65291;</span>New Event</button>
       <button data-page="attendance"><span class="ic">&#9638;</span>Attendance History</button>
       <button data-page="report"><span class="ic">&#128196;</span>Generate Report</button>
-      <button data-page="statistics"><span class="ic">&#128202;</span>Statistics</button>
+      <button data-page="statistics"><span class="ic"><svg viewBox="0 0 16 16" width="13" height="13" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect x="1" y="9" width="3.2" height="6" rx="0.5" fill="currentColor"/><rect x="6.4" y="5" width="3.2" height="10" rx="0.5" fill="currentColor"/><rect x="11.8" y="2" width="3.2" height="13" rx="0.5" fill="currentColor"/></svg></span>Statistics</button>
     </nav>
 
     <button class="how-it-works-btn" id="howItWorksBtn"><span class="ic">&#10067;</span>How It Works</button>
 
-    <div class="sidebar-foot" id="footerNote">v.07. Unknown Soldiers. Created by Civoen.</div>
+    <div class="sidebar-foot" id="footerNote">v.09. Unknown Soldiers. Created by Civoen.</div>
   </aside>
 
   <div class="modal-overlay" id="howItWorksOverlay" style="display:none;">
