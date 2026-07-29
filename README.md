@@ -5,10 +5,19 @@ and `/functions/api/events.js`) that read and write a Cloudflare KV namespace. T
 KV namespace is what makes the roster and attendance history shared: everyone who
 visits the deployed URL sees and edits the same data.
 
+Headers and sub-headers use two local Gilroy font files (`fonts/Gilroy-ExtraBold.otf`
+and `fonts/Gilroy-Light.otf`) referenced by relative path from `index.html` — make
+sure the `fonts/` folder is committed and deployed alongside `index.html`, or those
+elements will fall back to the browser's default font.
+
+The favicon (`icons/`) works the same way — it's a set of local image files
+referenced by relative path, so that folder needs to be committed too.
+
 ## 1. Push this to GitHub
 
-Commit `index.html`, the `functions/` folder, and this README to a repo, keeping
-the folder structure exactly as-is — Cloudflare Pages auto-detects `/functions`.
+Commit `index.html`, the `functions/` folder, the `fonts/` folder, the `icons/`
+folder, and this README to a repo, keeping the folder structure exactly as-is —
+Cloudflare Pages auto-detects `/functions`.
 
 ## 2. Create a KV namespace
 

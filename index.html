@@ -3,10 +3,27 @@
 <head>
 <meta charset="UTF-8" />
 <title>UNKSO Attendance</title>
+<link rel="icon" href="icons/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Stencil+Text:wght@700;800;900&family=Oswald:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
 <style>
+@font-face{
+  font-family:'Gilroy';
+  src:url('fonts/Gilroy-ExtraBold.otf') format('opentype');
+  font-weight:800;
+  font-display:swap;
+}
+@font-face{
+  font-family:'Gilroy';
+  src:url('fonts/Gilroy-Light.otf') format('opentype');
+  font-weight:300;
+  font-display:swap;
+}
   :root{
     --void:#0f1113;
     --olive-deep:#1b1e22;
@@ -44,11 +61,11 @@
   }
   .brand{margin-bottom:22px;}
   .brand .mark{
-    font-family:'Big Shoulders Stencil Text'; font-weight:900; font-size:26px;
+    font-family:'Gilroy'; font-weight:800; font-size:26px;
     letter-spacing:.02em; color:#f0ede6; line-height:.95; margin:0;
   }
   .brand .sub{
-    font-family:'Oswald'; font-weight:500; font-size:9.5px; letter-spacing:.26em;
+    font-family:'Gilroy'; font-weight:300; font-size:9.5px; letter-spacing:.26em;
     color:var(--amber); text-transform:uppercase; margin-top:5px;
   }
 
@@ -58,8 +75,8 @@
     background:rgba(208,84,7,.1); border:1px solid rgba(208,84,7,.45);
     border-radius:6px; padding:9px 11px; cursor:pointer; font-family:inherit; color:inherit;
   }
-  .company-pill .label{font-family:'Oswald'; font-size:9px; letter-spacing:.16em; color:#9b9790; text-transform:uppercase; text-align:left;}
-  .company-pill .value{font-family:'Oswald'; font-size:14px; letter-spacing:.05em; color:var(--amber); font-weight:600; margin-top:2px; text-align:left;}
+  .company-pill .label{font-family:'Gilroy'; font-size:9px; letter-spacing:.16em; color:#9b9790; text-transform:uppercase; text-align:left;}
+  .company-pill .value{font-family:'Gilroy'; font-size:14px; letter-spacing:.05em; color:var(--amber); font-weight:300; margin-top:2px; text-align:left;}
   .company-pill .chev{color:var(--amber); font-size:10px;}
   .company-menu{
     position:absolute; top:calc(100% + 6px); left:0; right:0;
@@ -76,7 +93,7 @@
   .nav{display:flex; flex-direction:column; gap:3px;}
   .nav button{
     display:flex; align-items:center; gap:11px; width:100%; text-align:left;
-    font-family:'Oswald'; font-size:12.5px; letter-spacing:.06em; text-transform:uppercase;
+    font-family:'Gilroy'; font-size:12.5px; letter-spacing:.06em; text-transform:uppercase;
     color:#8f8b83; background:transparent; border:none; cursor:pointer;
     padding:11px 11px; border-radius:6px; border-left:3px solid transparent;
   }
@@ -86,7 +103,7 @@
 
   .how-it-works-btn{
     display:flex; align-items:center; gap:11px; width:100%; text-align:left;
-    font-family:'Oswald'; font-size:12px; letter-spacing:.06em; text-transform:uppercase;
+    font-family:'Gilroy'; font-size:12px; letter-spacing:.06em; text-transform:uppercase;
     color:#8f8b83; background:transparent; border:1px solid rgba(255,255,255,.12); cursor:pointer;
     padding:10px 11px; border-radius:6px; margin-top:auto;
   }
@@ -108,14 +125,14 @@
   }
   .modal-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;}
   .modal-head h2{
-    font-family:'Big Shoulders Stencil Text'; font-weight:800; font-size:22px; margin:0; color:var(--ink);
+    font-family:'Gilroy'; font-weight:800; font-size:22px; margin:0; color:var(--ink);
   }
   .modal-close{
     background:none; border:none; cursor:pointer; font-size:15px; color:var(--ink-soft); padding:4px;
   }
   .steps{margin:0; padding-left:20px; display:flex; flex-direction:column; gap:11px;}
   .steps li{font-size:13px; line-height:1.5; color:var(--ink);}
-  .steps li strong{font-family:'Oswald'; letter-spacing:.02em;}
+  .steps li strong{font-family:'Gilroy'; letter-spacing:.02em;}
 
   /* ---------- main ---------- */
   .main{padding:36px 48px 60px; max-width:none;}
@@ -123,11 +140,11 @@
   .page.active{display:block;}
   .page-head{display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:22px; gap:16px;}
   .page-head .eyebrow{
-    font-family:'Oswald'; font-size:10.5px; letter-spacing:.2em; color:var(--amber-dark);
+    font-family:'Gilroy'; font-size:10.5px; letter-spacing:.2em; color:var(--amber-dark);
     text-transform:uppercase; margin-bottom:6px; display:block;
   }
   .page-head h1{
-    font-family:'Big Shoulders Stencil Text'; font-weight:800; font-size:32px;
+    font-family:'Gilroy'; font-weight:800; font-size:32px;
     letter-spacing:.01em; margin:0; color:var(--ink);
   }
 
@@ -139,7 +156,7 @@
     box-shadow:0 1px 2px rgba(32,29,20,.04), 0 10px 24px -18px rgba(32,29,20,.35);
   }
   .card h2{
-    font-family:'Oswald'; font-weight:600; font-size:12.5px; letter-spacing:.09em;
+    font-family:'Gilroy'; font-weight:300; font-size:12.5px; letter-spacing:.09em;
     text-transform:uppercase; color:var(--ink-soft); margin:0 0 14px;
     display:flex; align-items:center; gap:10px;
   }
@@ -148,7 +165,7 @@
     border-radius:10px; font-family:'JetBrains Mono';
   }
   .card h3{
-    font-family:'Oswald'; font-size:11px; letter-spacing:.14em; text-transform:uppercase;
+    font-family:'Gilroy'; font-size:11px; letter-spacing:.14em; text-transform:uppercase;
     color:var(--amber-dark); margin:18px 0 10px;
   }
 
@@ -158,8 +175,8 @@
     background:var(--khaki-card); border:1px solid var(--khaki-line); border-radius:10px;
     padding:14px 16px;
   }
-  .stat-card .n{font-family:'Big Shoulders Stencil Text'; font-weight:800; font-size:26px; color:var(--ink); line-height:1;}
-  .stat-card .l{font-family:'Oswald'; font-size:9.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-soft); margin-top:5px;}
+  .stat-card .n{font-family:'Gilroy'; font-weight:800; font-size:26px; color:var(--ink); line-height:1;}
+  .stat-card .l{font-family:'Gilroy'; font-size:9.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-soft); margin-top:5px;}
 
   /* ---------- form controls ---------- */
   input[type=text], input[type=date], select.form-select{
@@ -173,7 +190,7 @@
   .two-col{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
   @media (max-width:520px){ .two-col{grid-template-columns:1fr;} }
   .field-label{
-    display:block; font-family:'Oswald'; font-size:10.5px; letter-spacing:.1em;
+    display:block; font-family:'Gilroy'; font-size:10.5px; letter-spacing:.1em;
     text-transform:uppercase; color:var(--ink-soft); margin-bottom:6px;
   }
   .checklist-actions{display:flex; gap:8px; margin-bottom:10px;}
@@ -197,7 +214,7 @@
     display:inline-flex; align-items:center; gap:6px;
     background:var(--amber); color:#fff; border:none;
     padding:10px 18px; border-radius:6px; font-weight:600; font-size:12.5px;
-    cursor:pointer; transition:background .15s; font-family:'Oswald';
+    cursor:pointer; transition:background .15s; font-family:'Gilroy';
     letter-spacing:.05em; text-transform:uppercase;
   }
   .btn:hover{background:var(--amber-dark); color:#fff;}
@@ -248,7 +265,7 @@
     background:var(--olive-mid); color:#f0ede6; font-size:14px; flex-shrink:0;
   }
   .choice-option.selected .choice-icon{background:var(--amber); color:#fff;}
-  .choice-label{font-family:'Oswald'; font-weight:500; font-size:13.5px; letter-spacing:.02em;}
+  .choice-label{font-family:'Gilroy'; font-weight:300; font-size:13.5px; letter-spacing:.02em;}
   .choice-radio{
     margin-left:auto; width:16px; height:16px; border-radius:50%; border:2px solid var(--ink-soft);
     flex-shrink:0; position:relative;
@@ -270,7 +287,7 @@
   .dropzone.selected{border-color:var(--amber); box-shadow:0 0 0 2px rgba(208,84,7,.35); outline:none;}
   .dropzone .icon{font-size:26px; margin-bottom:6px; color:var(--olive-mid);}
   .dropzone p{margin:2px 0; font-size:13px; color:var(--ink);}
-  .dropzone .hint{font-family:'Oswald'; font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-soft); margin-top:6px;}
+  .dropzone .hint{font-family:'Gilroy'; font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-soft); margin-top:6px;}
 
   .preview-wrap{margin-top:14px;}
   .preview-wrap .preview-actions{display:flex; gap:8px; margin-bottom:10px;}
@@ -288,7 +305,7 @@
   }
   .dogtag.matched{border-left-color:var(--signal);}
   .dogtag .stamp{
-    position:absolute; top:9px; right:9px; font-family:'Oswald'; font-size:9px; font-weight:600;
+    position:absolute; top:9px; right:9px; font-family:'Gilroy'; font-size:9px; font-weight:300;
     letter-spacing:.04em; padding:2px 7px; border-radius:3px; transform:rotate(3deg);
     border:1px solid var(--amber); color:var(--amber);
   }
@@ -325,7 +342,7 @@
     font-family:'IBM Plex Sans'; font-size:13px; color:var(--ink); border-radius:6px;
   }
   .event-toggle:hover{background:var(--khaki-line);}
-  .event-title{font-family:'Oswald'; font-weight:600; font-size:14.5px; letter-spacing:.02em; flex:1;}
+  .event-title{font-family:'Gilroy'; font-weight:300; font-size:14.5px; letter-spacing:.02em; flex:1;}
   .event-date{font-family:'JetBrains Mono'; font-size:11px; color:var(--ink-soft);}
   .event-count{
     font-family:'JetBrains Mono'; font-size:10.5px; background:var(--olive-mid); color:#f0ede6;
@@ -351,7 +368,7 @@
   @media (max-width:640px){ .attendance-columns.three-col{grid-template-columns:1fr 1fr;} }
   @media (max-width:520px){ .attendance-columns{grid-template-columns:1fr;} }
   .attendance-col h4{
-    font-family:'Oswald'; font-size:10px; text-transform:uppercase; letter-spacing:.14em;
+    font-family:'Gilroy'; font-size:10px; text-transform:uppercase; letter-spacing:.14em;
     color:var(--ink-soft); margin:0 0 9px;
   }
   .attendance-chip{
@@ -402,7 +419,7 @@
 
     <button class="how-it-works-btn" id="howItWorksBtn"><span class="ic">&#10067;</span>How It Works</button>
 
-    <div class="sidebar-foot" id="footerNote">v.04. Unknown Soldiers. Created by Civoen.</div>
+    <div class="sidebar-foot" id="footerNote">v.06. Unknown Soldiers. Created by Civoen.</div>
   </aside>
 
   <div class="modal-overlay" id="howItWorksOverlay" style="display:none;">
@@ -499,7 +516,7 @@
         </div>
 
         <div class="preview-wrap" id="previewWrap" style="display:none;">
-          <p style="font-family:'Oswald'; font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-soft); margin:0 0 8px;">Screenshot (for reference / double-checking)</p>
+          <p style="font-family:'Gilroy'; font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-soft); margin:0 0 8px;">Screenshot (for reference / double-checking)</p>
           <img id="previewImg" alt="Screenshot preview">
         </div>
       </div>
@@ -1525,7 +1542,7 @@ async function buildReportCanvas(){
   }
   function sectionHeading(text){
     ctx.fillStyle = COL.amber;
-    ctx.font = "600 12px 'Oswald'";
+    ctx.font = "300 12px 'Gilroy'";
     ctx.fillText(text, padding, y);
     y += 20;
   }
@@ -1542,16 +1559,16 @@ async function buildReportCanvas(){
   let y = padding;
 
   ctx.fillStyle = COL.amber;
-  ctx.font = "800 30px 'Big Shoulders Stencil Text'";
+  ctx.font = "800 30px 'Gilroy'";
   ctx.textBaseline = 'alphabetic';
   ctx.fillText('UNKSO', padding, y + 26);
 
   ctx.fillStyle = COL.inkSoft;
-  ctx.font = "500 10.5px 'Oswald'";
+  ctx.font = "300 10.5px 'Gilroy'";
   ctx.fillText('ATTENDANCE REPORT', padding + 132, y + 16);
 
   ctx.fillStyle = COL.ink;
-  ctx.font = "600 13px 'Oswald'";
+  ctx.font = "300 13px 'Gilroy'";
   ctx.fillText(`${CURRENT_COMPANY.toUpperCase()} COMPANY`, padding + 132, y + 33);
 
   if(from || to){
