@@ -30,4 +30,4 @@ above the version number in the sidebar):
 
 ## That's it.
 
-It's a simple, easy-to-use attendance tracker designed to cut down on admin times.
+It's a simple, easy-to-use attendance tracker designed to cut down on admin work.
