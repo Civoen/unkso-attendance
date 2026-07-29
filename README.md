@@ -13,31 +13,33 @@ elements will fall back to the browser's default font.
 The favicon (`icons/`) works the same way — it's a set of local image files
 referenced by relative path, so that folder needs to be committed too.
 
-## Site pages
+## How it works
 
-The sidebar has five tabs:
+This mirrors the "How It Works" popup inside the site itself (click the button
+above the version number in the sidebar):
 
-- **Roster** — add, remove, and drag-reorder members for the currently selected
-  company.
-- **New Event** — pick an event type and date, then drop in (or paste) a Discord
-  screenshot; the site reads attendee names off it and lets you review/log them.
-- **Attendance History** — every logged event, expandable into Present / Absent /
-  Excused columns, with edit, delete, and drag-to-reorder.
-- **Generate Report** — builds a shareable summary rather than editing live data:
-  - Pick a **From** and **To** (populated from the roster)
-  - Checkboxes to choose which **members** to include, and which **events** to include
-  - Free-text **Promotions** and **Awards** boxes (4+ lines each) for anything not
-    captured elsewhere
-  - **Generate Report** compiles all of the above, then either **Copy to
-    clipboard** (plain text) or **Copy Image** (renders the report onto a canvas
-    styled like the site and copies it to the clipboard as an actual PNG — paste
-    it straight into Discord, email, anywhere that accepts a pasted image)
-- **Statistics** — read-only insights computed from Attendance History:
-  - Member count, events logged, and overall average attendance
-  - Average attendance broken down **by event type** (General Meeting, FTX, or
-    any other type name that appears in your logged events)
-  - Most-active and least-active member by raw attendance count
-  - Total excused instances across all events
+1. **Pick your company.** Use the company switcher at the top of the sidebar
+   (Bravo, Charlie, or Delta). Each has its own roster and event history.
+2. **Keep the Roster current.** Add or remove members on the Roster page. Drag
+   the grip handle to reorder.
+3. **Log a new event.** On the New Event page, choose the event type and date,
+   then drop in (or paste) a Discord screenshot of who attended.
+4. **Read & review.** Click "Read names from screenshot" — it'll match
+   detected names against your roster. Names at 55%+ confidence are included
+   automatically; 30–54% needs your review. Use "+ Add member" for anyone it
+   missed entirely.
+5. **Log it.** Once the matches look right, click "Log this event's attendance."
+6. **Review history.** On Attendance History, expand any event to see who was
+   Present, Absent, or Excused. Check the box next to an absent name to mark
+   them Excused. Edit or delete an event, or drag to reorder, at any time.
+7. **Generate a report.** On Generate Report, set a From and To, tick which
+   members and events to include, and add any Promotions or Awards. Then
+   either copy the report as plain text, or use "Copy Image" to copy a
+   site-styled image straight to your clipboard for pasting into Discord or
+   elsewhere.
+8. **Check the Statistics.** This page is read-only — it shows overall and
+   per-event-type average attendance, your most and least active member, and
+   total excused instances, all computed automatically from Attendance History.
 
 ## 1. Push this to GitHub
 
