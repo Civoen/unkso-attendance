@@ -196,6 +196,13 @@
   input:focus, select:focus, button:focus-visible{
     outline:2px solid var(--amber); outline-offset:1px;
   }
+  .duplicate-warning{
+    width:100%; padding:10px 12px; margin-bottom:8px;
+    border:1px solid rgba(208,84,7,.45); border-radius:6px;
+    background:rgba(208,84,7,.1); color:var(--amber);
+    font-family:'IBM Plex Sans'; font-size:12.5px; font-weight:500;
+    display:flex; align-items:center; gap:8px;
+  }
   .two-col{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
   @media (max-width:520px){ .two-col{grid-template-columns:1fr;} }
   .field-label{
@@ -213,6 +220,11 @@
   .checklist label:last-child{border-bottom:none;}
   .checklist input[type=checkbox]{width:15px; height:15px; margin:0; cursor:pointer; accent-color:var(--amber);}
   .checklist .ev-date{font-family:'JetBrains Mono'; font-size:11px; color:var(--ink-soft); margin-left:auto;}
+  #reportMemberList{
+    display:grid; grid-template-columns:repeat(3, 1fr); gap:2px 16px;
+  }
+  @media (max-width:760px){ #reportMemberList{grid-template-columns:repeat(2, 1fr);} }
+  @media (max-width:480px){ #reportMemberList{grid-template-columns:1fr;} }
   .report-textarea{
     width:100%; font-family:'IBM Plex Sans'; font-size:13px; padding:12px;
     border:1px solid var(--khaki-line); border-radius:6px; background:#fff;
@@ -423,7 +435,7 @@
 
     <button class="how-it-works-btn" id="howItWorksBtn"><span class="ic">?</span>How It Works</button>
 
-    <div class="sidebar-foot" id="footerNote">v.17. Unknown Soldiers. Created by Civoen.</div>
+    <div class="sidebar-foot" id="footerNote">v.20. Unknown Soldiers. Created by Civoen.</div>
   </aside>
 
   <div class="modal-overlay" id="howItWorksOverlay" style="display:none;">
@@ -491,7 +503,7 @@
           </label>
         </div>
         <input type="date" id="eventDate">
-        <div class="status-line err" id="duplicateEventWarning" style="display:none;">This event has already been recorded this week</div>
+        <div class="duplicate-warning" id="duplicateEventWarning" style="display:none;">&#9888; This event has already been recorded this week</div>
 
         <div class="dropzone" id="dropzone" tabindex="0">
           <div class="icon">&#128203;</div>
@@ -933,7 +945,7 @@ function checkDuplicateEventWarning(){
     return evDate >= cutoff && evDate <= effective;
   });
 
-  warning.style.display = hasRecent ? 'block' : 'none';
+  warning.style.display = hasRecent ? 'flex' : 'none';
 }
 
 // ---------- upload ----------
