@@ -134,6 +134,21 @@
   .steps li{font-size:13px; line-height:1.5; color:var(--ink);}
   .steps li strong{font-family:'Gilroy'; letter-spacing:.02em;}
 
+  .toast{
+    position:fixed; bottom:24px; left:50%; transform:translateX(-50%); z-index:200;
+    background:var(--olive-deep); color:#f0ede6; border:1px solid rgba(208,84,7,.4);
+    border-radius:8px; padding:12px 14px; display:flex; align-items:center; gap:14px;
+    font-family:'IBM Plex Sans'; font-size:13px; box-shadow:0 10px 30px rgba(0,0,0,.4);
+  }
+
+  .rname.clickable{cursor:pointer; text-decoration:underline; text-decoration-color:transparent; transition:text-decoration-color .15s;}
+  .rname.clickable:hover{text-decoration-color:var(--amber);}
+  .member-detail-stats{display:flex; gap:14px; margin-bottom:16px;}
+  .member-detail-stats .stat-card{flex:1; padding:12px 14px;}
+  .member-detail-list{display:flex; flex-direction:column; gap:2px; max-height:320px; overflow-y:auto;}
+  .member-detail-list .member-row{border-bottom:1px solid var(--khaki-line); padding:8px 2px;}
+  .member-detail-list .member-row:last-child{border-bottom:none;}
+
   /* ---------- main ---------- */
   .main{padding:36px 48px 60px; max-width:none;}
   .page{display:none;}
@@ -264,6 +279,8 @@
   .prog-wrap{display:flex; align-items:center; gap:9px;}
   .prog-track{flex:1; height:6px; border-radius:4px; background:var(--khaki-line); overflow:hidden;}
   .prog-fill{display:block; height:100%; border-radius:4px; background:linear-gradient(90deg, var(--signal), #7cb160);}
+  .prog-fill.inactive{background:var(--amber);}
+  .prog-frac.inactive-label{color:var(--amber);}
   .prog-frac{font-size:10.5px; color:var(--ink-soft); width:32px; text-align:right;}
   .remove-x{
     background:none; border:none; color:var(--alert); cursor:pointer; font-size:13px; padding:0 4px; opacity:.75;
@@ -435,7 +452,7 @@
 
     <button class="how-it-works-btn" id="howItWorksBtn"><span class="ic">?</span>How It Works</button>
 
-    <div class="sidebar-foot" id="footerNote">v.20. Unknown Soldiers. Created by Civoen.</div>
+    <div class="sidebar-foot" id="footerNote">v.23. Unknown Soldiers. Created by Civoen.</div>
   </aside>
 
   <div class="modal-overlay" id="howItWorksOverlay" style="display:none;">
@@ -446,13 +463,13 @@
       </div>
       <ol class="steps">
         <li><strong>Pick your company.</strong> Use the company switcher at the top of the sidebar (Bravo, Charlie, or Delta). Each has its own roster and event history.</li>
-        <li><strong>Keep the Roster current.</strong> Add or remove members on the Roster page. Drag the grip handle to reorder.</li>
+        <li><strong>Keep the Roster current.</strong> Add or remove members on the Roster page (removals can be undone for a few seconds via the toast that appears). Drag the grip handle to reorder, or use the search box to find someone quickly. Click a name to see their full attendance history. A member's bar turns orange if they've missed the last 3 events in a row.</li>
         <li><strong>Log a new event.</strong> On the New Event page, choose the event type and date, then drop in (or paste) a Discord screenshot of who attended.</li>
         <li><strong>Read &amp; review.</strong> Click "Read names from screenshot" — it'll match detected names against your roster. Names at 55%+ confidence are included automatically; 30&ndash;54% needs your review. Use "+ Add member" for anyone it missed entirely.</li>
         <li><strong>Log it.</strong> Once the matches look right, click "Log this event's attendance."</li>
-        <li><strong>Review history.</strong> Events are always listed most-recent-first. Expand any event to see who was Present, Absent, or Excused. Check the box next to an absent name to mark them Excused. Edit or delete an event at any time.</li>
-        <li><strong>Generate a report.</strong> On Generate Report, set a From and To, tick which members and events to include, and add any Promotions or Awards. Then either copy the report as plain text, or use "Copy Image" to copy a site-styled image straight to your clipboard for pasting into Discord or elsewhere.</li>
-        <li><strong>Check the Statistics.</strong> This page is read-only — it shows overall and per-event-type average attendance, your most and least active member, and total excused instances, all computed automatically from Attendance History.</li>
+        <li><strong>Review history.</strong> Events are always listed most-recent-first, and you can search by name or date. Expand any event to see who was Present, Absent, or Excused. Check the box next to an absent name to mark them Excused. Edit or delete an event at any time (deletions can be undone for a few seconds via the toast that appears).</li>
+        <li><strong>Generate a report.</strong> On Generate Report, set a From and To, tick which members and events to include, and add any Promotions or Awards. The date range and a Needs Attention list (anyone missing from the last 3 events) are worked out automatically. Then either copy the report as plain text, or use "Copy Image" to copy a site-styled image — trend chart and all — straight to your clipboard for pasting into Discord or elsewhere.</li>
+        <li><strong>Check the Statistics.</strong> This page is read-only — it shows an attendance trend chart over time, overall and per-event-type average attendance, your most and least active member, and total excused instances, all computed automatically from Attendance History.</li>
       </ol>
     </div>
   </div>
@@ -476,6 +493,7 @@
           <input type="text" id="newMember" placeholder="Add member name...">
           <button class="btn" id="addMemberBtn">+ Add</button>
         </div>
+        <input type="text" id="rosterSearch" placeholder="Search members...">
         <ul class="roster-list" id="rosterList"></ul>
         <div class="status-line" id="rosterStatus"></div>
       </div>
@@ -545,6 +563,7 @@
       <div class="page-head">
         <div><span class="eyebrow" id="historyEyebrow">Bravo Company // Records</span><h1>ATTENDANCE HISTORY</h1></div>
       </div>
+      <input type="text" id="historySearch" placeholder="Search events (name or date)..." style="margin-bottom:14px;">
       <div id="historyWrap"><div class="card"><div class="empty">No events logged yet.</div></div></div>
     </div>
 
@@ -584,6 +603,7 @@
           <button class="btn ghost small" id="reportEventsRecentTwo">Recent Two</button>
         </div>
         <div class="checklist" id="reportEventList"></div>
+        <div class="status-line" id="reportDateRange" style="margin-top:8px;"></div>
       </div>
 
       <div class="card">
@@ -618,6 +638,21 @@
     </div>
 
   </main>
+</div>
+
+<div class="toast" id="undoToast" style="display:none;">
+  <span id="undoToastMsg"></span>
+  <button class="btn small" id="undoBtn">Undo</button>
+</div>
+
+<div class="modal-overlay" id="memberDetailOverlay" style="display:none;">
+  <div class="modal">
+    <div class="modal-head">
+      <h2 id="memberDetailName">Member</h2>
+      <button class="modal-close" id="memberDetailClose" aria-label="Close">&#10005;</button>
+    </div>
+    <div id="memberDetailBody"></div>
+  </div>
 </div>
 
 <script>
@@ -794,7 +829,96 @@ function showRosterStatus(ok){
   rosterStatus.className = 'status-line' + (ok ? '' : ' err');
 }
 
+// ---------- delete with undo ----------
+// Deletion is optimistic: the item disappears from the UI immediately and a toast
+// offers Undo for a few seconds. Nothing is persisted to shared storage until that
+// window expires without Undo being pressed — so an undo is genuinely free, not just
+// a visual revert of something already saved.
+let pendingUndo = null;
+
+function showUndoToast(message){
+  document.getElementById('undoToastMsg').textContent = message;
+  document.getElementById('undoToast').style.display = 'flex';
+}
+function hideUndoToast(){
+  document.getElementById('undoToast').style.display = 'none';
+}
+function finalizePendingUndo(){
+  if(!pendingUndo) return;
+  clearTimeout(pendingUndo.timer);
+  persist();
+  pendingUndo = null;
+  hideUndoToast();
+}
+function deleteWithUndo({label, remove, restore, afterChange}){
+  // If something else is already pending undo, finalize (persist) it first rather
+  // than letting two pending deletes overlap.
+  finalizePendingUndo();
+  remove();
+  afterChange();
+  showUndoToast(`Deleted "${label}".`);
+  pendingUndo = {
+    restore, afterChange,
+    timer: setTimeout(finalizePendingUndo, 7000)
+  };
+}
+document.getElementById('undoBtn').addEventListener('click', ()=>{
+  if(!pendingUndo) return;
+  clearTimeout(pendingUndo.timer);
+  pendingUndo.restore();
+  pendingUndo.afterChange();
+  pendingUndo = null;
+  hideUndoToast();
+});
+
+// ---------- member detail ----------
+function openMemberDetail(name){
+  const overlay = document.getElementById('memberDetailOverlay');
+  document.getElementById('memberDetailName').textContent = name;
+  const body = document.getElementById('memberDetailBody');
+
+  const count = EVENTS.filter(ev => ev.present.includes(name)).length;
+  const pct = EVENTS.length ? Math.round((count / EVENTS.length) * 100) : 0;
+  const recentThreeIdx = getMostRecentEventIndices(3);
+  const isInactive = EVENTS.length >= 3 && !recentThreeIdx.some(i => EVENTS[i].present.includes(name));
+
+  const ordered = EVENTS
+    .map((ev, idx) => ({ev, idx}))
+    .sort((a,b) => b.ev.date.localeCompare(a.ev.date));
+
+  const rows = ordered.map(({ev}) => {
+    const present = ev.present.includes(name);
+    const excused = !present && (ev.excused || []).includes(name);
+    const statusHtml = present
+      ? `<span style="color:var(--signal); font-weight:700;">&#10003; Present</span>`
+      : excused
+        ? `<span style="color:var(--amber); font-weight:700;">&#9679; Excused</span>`
+        : `<span style="color:var(--alert); font-weight:700;">X Absent</span>`;
+    return `<div class="member-row"><span>${escapeHtml(ev.name)} <span class="mono" style="color:var(--ink-soft); font-size:11px;">(${ev.date})</span></span><span>${statusHtml}</span></div>`;
+  }).join('');
+
+  body.innerHTML = `
+    <div class="member-detail-stats">
+      <div class="stat-card"><div class="n">${count}/${EVENTS.length}</div><div class="l">Events attended</div></div>
+      <div class="stat-card"><div class="n">${pct}%</div><div class="l">Attendance rate</div></div>
+    </div>
+    ${isInactive ? `<div class="duplicate-warning" style="display:flex; margin-bottom:14px;">&#9888; No attendance in the last 3 events</div>` : ''}
+    <div class="member-detail-list">
+      ${EVENTS.length ? rows : '<div class="empty">No events logged yet.</div>'}
+    </div>
+  `;
+  overlay.style.display = 'flex';
+}
+document.getElementById('memberDetailClose').addEventListener('click', ()=>{
+  document.getElementById('memberDetailOverlay').style.display = 'none';
+});
+document.getElementById('memberDetailOverlay').addEventListener('click', (e)=>{
+  if(e.target.id === 'memberDetailOverlay') e.target.style.display = 'none';
+});
+
 // ---------- roster ----------
+let ROSTER_SEARCH = '';
+
 function renderRoster(){
   rosterCount.textContent = MEMBERS.length;
 
@@ -813,31 +937,54 @@ function renderRoster(){
     statAvg.textContent = avgPct + '%';
   }
 
+  // Inactivity flag: no attendance in any of the 3 most recent events. Only applies
+  // once there's enough history logged (3+ events) so brand-new companies don't get
+  // everyone flagged on day one.
+  const recentThreeIdx = getMostRecentEventIndices(3);
+  const hasEnoughHistory = EVENTS.length >= 3;
+
   rosterList.innerHTML = '';
   // Note: MEMBERS is no longer force-sorted alphabetically here — its array order is
   // the roster's display order, so drag-and-drop reordering can actually stick.
+  const searchTerm = ROSTER_SEARCH.trim().toLowerCase();
+  let shown = 0;
   MEMBERS.forEach((name, idx)=>{
+    if(searchTerm && !name.toLowerCase().includes(searchTerm)) return;
+    shown++;
     const count = EVENTS.filter(ev=>ev.present.includes(name)).length;
     const pct = EVENTS.length ? Math.round((count / EVENTS.length) * 100) : 0;
+    const isInactive = hasEnoughHistory && !recentThreeIdx.some(i => EVENTS[i].present.includes(name));
     const li = document.createElement('li');
     li.draggable = true;
     li.dataset.idx = idx;
     li.innerHTML = `
       <span class="drag-handle" aria-hidden="true" title="Drag to reorder">&#9776;</span>
-      <span class="rname">${escapeHtml(name)}</span>
+      <span class="rname clickable" data-name="${escapeHtml(name)}" title="View member details">${escapeHtml(name)}</span>
       <span class="prog-wrap">
-        <span class="prog-track"><span class="prog-fill" style="width:${pct}%"></span></span>
-        <span class="prog-frac mono">${count}/${EVENTS.length}</span>
+        <span class="prog-track"><span class="prog-fill${isInactive?' inactive':''}" style="width:${pct}%" ${isInactive?'title="No attendance in the last 3 events"':''}></span></span>
+        <span class="prog-frac mono${isInactive?' inactive-label':''}">${count}/${EVENTS.length}</span>
       </span>
       <button class="remove-x" title="Remove from roster" data-name="${escapeHtml(name)}">&#10005;</button>`;
     rosterList.appendChild(li);
   });
+  if(searchTerm && shown === 0){
+    rosterList.innerHTML = `<div class="empty">No members match "${escapeHtml(ROSTER_SEARCH)}".</div>`;
+  }
   rosterList.querySelectorAll('.remove-x').forEach(btn=>{
-    btn.addEventListener('click', async ()=>{
-      MEMBERS = MEMBERS.filter(m=>m!==btn.dataset.name);
-      renderRoster(); renderHistory();
-      showRosterStatus(await persist());
+    btn.addEventListener('click', ()=>{
+      const name = btn.dataset.name;
+      const idx = MEMBERS.indexOf(name);
+      if(idx === -1) return;
+      deleteWithUndo({
+        label: name,
+        remove: ()=>{ MEMBERS.splice(idx, 1); },
+        restore: ()=>{ MEMBERS.splice(idx, 0, name); },
+        afterChange: ()=>{ renderRoster(); renderHistory(); }
+      });
     });
+  });
+  rosterList.querySelectorAll('.rname.clickable').forEach(el=>{
+    el.addEventListener('click', ()=> openMemberDetail(el.dataset.name));
   });
   attachRosterDragHandlers();
 }
@@ -887,6 +1034,10 @@ document.getElementById('addMemberBtn').addEventListener('click', async ()=>{
 });
 document.getElementById('newMember').addEventListener('keydown', e=>{
   if(e.key === 'Enter') document.getElementById('addMemberBtn').click();
+});
+document.getElementById('rosterSearch').addEventListener('input', (e)=>{
+  ROSTER_SEARCH = e.target.value;
+  renderRoster();
 });
 
 // ---------- fuzzy match ----------
@@ -1226,6 +1377,8 @@ commitBtn.addEventListener('click', ()=>{
 });
 
 // ---------- history (collapsible per-event cards, with edit) ----------
+let HISTORY_SEARCH = '';
+
 function renderHistory(){
   if(EVENTS.length===0){
     historyWrap.innerHTML = '<div class="card"><div class="empty">No events logged yet.</div></div>';
@@ -1233,9 +1386,22 @@ function renderHistory(){
   }
   // Always shown most-recent-first by date, regardless of logging order — this
   // means events can no longer be manually drag-reordered (see eventCardHTML).
-  const ordered = EVENTS
+  let ordered = EVENTS
     .map((ev, idx) => ({ ev, idx }))
     .sort((a, b) => b.ev.date.localeCompare(a.ev.date));
+
+  const searchTerm = HISTORY_SEARCH.trim().toLowerCase();
+  if(searchTerm){
+    ordered = ordered.filter(({ev}) =>
+      ev.name.toLowerCase().includes(searchTerm) || ev.date.includes(searchTerm)
+    );
+  }
+
+  if(ordered.length === 0){
+    historyWrap.innerHTML = `<div class="card"><div class="empty">No events match "${escapeHtml(HISTORY_SEARCH)}".</div></div>`;
+    return;
+  }
+
   historyWrap.innerHTML = ordered.map(({ev, idx}) => eventCardHTML(ev, idx)).join('');
   attachHistoryHandlers();
 }
@@ -1333,14 +1499,16 @@ function attachHistoryHandlers(){
     btn.addEventListener('click', ()=> openEditForm(Number(btn.dataset.idx)));
   });
   historyWrap.querySelectorAll('.delete-btn').forEach(btn=>{
-    btn.addEventListener('click', async ()=>{
+    btn.addEventListener('click', ()=>{
       const idx = Number(btn.dataset.idx);
       const ev = EVENTS[idx];
-      if(!confirm(`Delete "${ev.name}" (${ev.date})? This cannot be undone.`)) return;
-      EVENTS.splice(idx, 1);
-      await persist();
-      renderRoster();
-      renderHistory();
+      if(!ev) return;
+      deleteWithUndo({
+        label: `${ev.name} (${ev.date})`,
+        remove: ()=>{ EVENTS.splice(idx, 1); },
+        restore: ()=>{ EVENTS.splice(idx, 0, ev); },
+        afterChange: ()=>{ renderRoster(); renderHistory(); }
+      });
     });
   });
 }
@@ -1432,11 +1600,24 @@ function getMostRecentEventIndices(n){
     .map(x => x.idx);
 }
 
+// Returns a formatted "earliest – latest" (or a single date) string for a set of
+// events, or null if there are none — shared by the live UI and both report outputs.
+function getSelectedEventDateRangeText(events){
+  if(events.length === 0) return null;
+  const dates = events.map(ev => ev.date).slice().sort();
+  const earliest = formatEventDateTag(dates[0]);
+  const latest = formatEventDateTag(dates[dates.length - 1]);
+  return earliest === latest ? earliest : `${earliest} \u2013 ${latest}`;
+}
+
 function updateReportMemberCount(){
   document.getElementById('reportMemberCount').textContent = document.querySelectorAll('.report-member-cb:checked').length;
 }
 function updateReportEventCount(){
-  document.getElementById('reportEventCount').textContent = document.querySelectorAll('.report-event-cb:checked').length;
+  const checked = getSelectedReportEvents();
+  document.getElementById('reportEventCount').textContent = checked.length;
+  const rangeText = getSelectedEventDateRangeText(checked);
+  document.getElementById('reportDateRange').textContent = rangeText ? `Covering ${rangeText}` : '';
 }
 
 document.getElementById('reportMembersAll').addEventListener('click', ()=>{
@@ -1477,6 +1658,67 @@ function getSelectedReportEvents(){
 function eventTypeOf(ev){
   const parts = ev.name.split(' - ');
   return parts.length > 1 ? parts[0] : ev.name;
+}
+
+function buildAttendanceTrendSVG(){
+  const totalMembers = MEMBERS.length;
+  const chronological = [...EVENTS].sort((a,b) => a.date.localeCompare(b.date));
+  const n = chronological.length;
+
+  if(n === 0 || totalMembers === 0){
+    return '<div class="empty">Not enough data yet — log a few events to see a trend.</div>';
+  }
+
+  const points = chronological.map(ev => ({
+    label: formatEventDateTag(ev.date),
+    fullLabel: `${ev.name} — ${ev.present.length}/${totalMembers}`,
+    pct: Math.round((ev.present.length / totalMembers) * 100)
+  }));
+
+  const width = 780, height = 220;
+  const padL = 38, padR = 16, padT = 16, padB = 36;
+  const chartW = width - padL - padR;
+  const chartH = height - padT - padB;
+
+  const xFor = i => n === 1 ? padL + chartW/2 : padL + (i * (chartW / (n-1)));
+  const yFor = pct => padT + (1 - pct/100) * chartH;
+
+  const gridLines = [0,25,50,75,100].map(pct => {
+    const y = yFor(pct).toFixed(1);
+    return `<line x1="${padL}" y1="${y}" x2="${width-padR}" y2="${y}" style="stroke:var(--khaki-line); stroke-width:1;" />
+      <text x="${padL-8}" y="${Number(y)+3.5}" text-anchor="end" font-size="10" font-family="JetBrains Mono" style="fill:var(--ink-soft);">${pct}%</text>`;
+  }).join('');
+
+  const linePoints = points.map((p,i) => `${xFor(i).toFixed(1)},${yFor(p.pct).toFixed(1)}`).join(' ');
+  const areaPath = `M${xFor(0).toFixed(1)},${yFor(0).toFixed(1)} ` +
+    points.map((p,i) => `L${xFor(i).toFixed(1)},${yFor(p.pct).toFixed(1)}`).join(' ') +
+    ` L${xFor(n-1).toFixed(1)},${yFor(0).toFixed(1)} Z`;
+
+  const labelStep = n > 8 ? Math.ceil(n/8) : 1;
+  const xLabels = points.map((p,i) => {
+    if(i % labelStep !== 0 && i !== n-1) return '';
+    return `<text x="${xFor(i).toFixed(1)}" y="${height-padB+18}" text-anchor="middle" font-size="10" font-family="JetBrains Mono" style="fill:var(--ink-soft);">${p.label}</text>`;
+  }).join('');
+
+  const dots = points.map((p,i) => `
+    <circle cx="${xFor(i).toFixed(1)}" cy="${yFor(p.pct).toFixed(1)}" r="4" style="fill:var(--amber); stroke:var(--khaki-card); stroke-width:2;">
+      <title>${escapeHtml(p.fullLabel)} — ${p.pct}%</title>
+    </circle>`).join('');
+
+  return `
+    <svg viewBox="0 0 ${width} ${height}" style="width:100%; height:auto; display:block;">
+      <defs>
+        <linearGradient id="trendFill" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" style="stop-color:var(--amber); stop-opacity:0.28;"/>
+          <stop offset="100%" style="stop-color:var(--amber); stop-opacity:0;"/>
+        </linearGradient>
+      </defs>
+      ${gridLines}
+      <path d="${areaPath}" style="fill:url(#trendFill);" />
+      <polyline points="${linePoints}" style="fill:none; stroke:var(--amber); stroke-width:2.5; stroke-linejoin:round; stroke-linecap:round;" />
+      ${dots}
+      ${xLabels}
+    </svg>`;
 }
 
 function renderStatistics(){
@@ -1533,6 +1775,11 @@ function renderStatistics(){
       <div class="stat-card"><div class="n">${overallAvg}%</div><div class="l">Overall avg. attendance</div></div>
     </div>
 
+    <div class="card">
+      <h2>Attendance Trend</h2>
+      ${buildAttendanceTrendSVG()}
+    </div>
+
     <div class="stats-grid">
       <div class="card">
         <h2>Average Attendance by Event Type</h2>
@@ -1572,6 +1819,15 @@ function renderStatistics(){
   `;
 }
 
+// Same "no attendance in the last 3 events" rule used on the Roster page, scoped to
+// whichever members are selected for the report. Only applies once there's enough
+// history (3+ events total) — see the equivalent note in renderRoster().
+function computeNeedsAttention(members){
+  if(EVENTS.length < 3) return [];
+  const recentThreeIdx = getMostRecentEventIndices(3);
+  return members.filter(name => !recentThreeIdx.some(i => EVENTS[i].present.includes(name)));
+}
+
 function buildReportText(){
   const today = new Date().toISOString().slice(0,10);
   const selectedMembers = getSelectedReportMembers();
@@ -1586,17 +1842,34 @@ function buildReportText(){
   lines.push(`Generated: ${today}`);
   if(from) lines.push(`From: ${from}`);
   if(to) lines.push(`To: ${to}`);
+  const rangeText = getSelectedEventDateRangeText(selectedEvents);
+  if(rangeText) lines.push(`Covering: ${rangeText}`);
   lines.push('');
   lines.push(`Members included: ${selectedMembers.length}    Events included: ${selectedEvents.length}`);
   lines.push('');
-  lines.push('Per-member attendance:');
+  lines.push('Per-member attendance (Attended/Absent/Excused):');
   if(selectedMembers.length===0){
     lines.push('  None selected.');
   }else{
     selectedMembers.forEach(name=>{
-      const count = selectedEvents.filter(ev=>ev.present.includes(name)).length;
-      lines.push(`  ${name} — ${count}/${selectedEvents.length}`);
+      let attended=0, absent=0, excused=0;
+      selectedEvents.forEach(ev=>{
+        if(ev.present.includes(name)) attended++;
+        else if((ev.excused || []).includes(name)) excused++;
+        else absent++;
+      });
+      lines.push(`  ${name} — ${attended}/${absent}/${excused}`);
     });
+  }
+  lines.push('');
+  lines.push('Needs Attention (no attendance in the last 3 events):');
+  const needsAttention = computeNeedsAttention(selectedMembers);
+  if(EVENTS.length < 3){
+    lines.push('  Not enough history yet (fewer than 3 events logged).');
+  }else if(needsAttention.length === 0){
+    lines.push('  None — everyone selected has attended recently.');
+  }else{
+    needsAttention.forEach(name => lines.push(`  ${name}`));
   }
   lines.push('');
   lines.push('Events:');
@@ -1650,6 +1923,8 @@ async function buildReportCanvas(){
   const to = document.getElementById('reportTo').value;
   const promotionsLines = document.getElementById('reportPromotions').value.trim().split('\n').filter(Boolean);
   const awardsLines = document.getElementById('reportAwards').value.trim().split('\n').filter(Boolean);
+  const rangeText = getSelectedEventDateRangeText(events);
+  const needsAttention = computeNeedsAttention(members);
 
   const COL = {
     bg:      '#1f2226',
@@ -1657,20 +1932,23 @@ async function buildReportCanvas(){
     amber:   '#d05407',
     ink:     '#e8e5de',
     inkSoft: '#8c8983',
-    signal:  '#5f9c52'
+    signal:  '#5f9c52',
+    alert:   '#c0392b'
   };
 
   const width = 900;
   const padding = 36;
   const rowH = 30;
   const smallRowH = 21;
-  const headerH = 104 + (from || to ? 20 : 0);
+  const headerH = 104 + (from || to || rangeText ? 20 : 0);
+  const trendH = events.length ? 150 : 0;
   const memberBlockH = 34 + Math.max(members.length, 1) * rowH;
+  const needsAttnBlockH = 34 + Math.max(needsAttention.length, 1) * smallRowH;
   const eventBlockH = 34 + Math.max(events.length, 1) * rowH;
   const promoBlockH = 34 + Math.max(promotionsLines.length, 1) * smallRowH;
   const awardBlockH = 34 + Math.max(awardsLines.length, 1) * smallRowH;
   const footerH = 46;
-  const height = padding * 2 + headerH + memberBlockH + eventBlockH + promoBlockH + awardBlockH + footerH;
+  const height = padding * 2 + headerH + trendH + memberBlockH + needsAttnBlockH + eventBlockH + promoBlockH + awardBlockH + footerH;
 
   const scale = 2; // sharper output for pasting/sharing
   const canvas = document.createElement('canvas');
@@ -1700,6 +1978,65 @@ async function buildReportCanvas(){
     ctx.fillText(text, padding, y);
     y += 20;
   }
+  // Mirrors the SVG trend chart on the Statistics page, redrawn with canvas 2D
+  // primitives (canvas can't render SVG directly).
+  function drawTrendChart(x, top, w, h, evs){
+    const chronological = [...evs].sort((a,b) => a.date.localeCompare(b.date));
+    const n = chronological.length;
+    if(n === 0 || MEMBERS.length === 0) return;
+    const padL = 30, padR = 6, padT = 4, padB = 20;
+    const chartW = w - padL - padR, chartH = h - padT - padB;
+    const xFor = i => n===1 ? x+padL+chartW/2 : x+padL+(i*(chartW/(n-1)));
+    const yFor = pct => top+padT+(1-pct/100)*chartH;
+
+    ctx.strokeStyle = COL.line; ctx.lineWidth = 1;
+    ctx.font = "400 9px 'JetBrains Mono'";
+    [0,50,100].forEach(pct=>{
+      const gy = yFor(pct);
+      ctx.beginPath(); ctx.moveTo(x+padL, gy); ctx.lineTo(x+w-padR, gy); ctx.stroke();
+      ctx.fillStyle = COL.inkSoft; ctx.textAlign='right';
+      ctx.fillText(pct+'%', x+padL-6, gy+3);
+      ctx.textAlign='left';
+    });
+
+    const points = chronological.map(ev => ({
+      date: ev.date, pct: Math.round((ev.present.length / MEMBERS.length) * 100)
+    }));
+
+    ctx.beginPath();
+    ctx.moveTo(xFor(0), yFor(0));
+    points.forEach((p,i) => ctx.lineTo(xFor(i), yFor(p.pct)));
+    ctx.lineTo(xFor(n-1), yFor(0));
+    ctx.closePath();
+    const grad = ctx.createLinearGradient(0, top+padT, 0, top+padT+chartH);
+    grad.addColorStop(0, 'rgba(208,84,7,0.28)');
+    grad.addColorStop(1, 'rgba(208,84,7,0)');
+    ctx.fillStyle = grad;
+    ctx.fill();
+
+    ctx.beginPath();
+    points.forEach((p,i)=>{
+      const px = xFor(i), py = yFor(p.pct);
+      if(i===0) ctx.moveTo(px,py); else ctx.lineTo(px,py);
+    });
+    ctx.strokeStyle = COL.amber; ctx.lineWidth = 2.5; ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+    ctx.stroke();
+
+    points.forEach((p,i)=>{
+      ctx.beginPath();
+      ctx.arc(xFor(i), yFor(p.pct), 3.5, 0, Math.PI*2);
+      ctx.fillStyle = COL.amber;
+      ctx.fill();
+    });
+
+    const labelStep = n > 6 ? Math.ceil(n/6) : 1;
+    ctx.font = "400 9px 'JetBrains Mono'"; ctx.fillStyle = COL.inkSoft; ctx.textAlign = 'center';
+    points.forEach((p,i)=>{
+      if(i % labelStep !== 0 && i !== n-1) return;
+      ctx.fillText(formatEventDateTag(p.date), xFor(i), top+h-4);
+    });
+    ctx.textAlign = 'left';
+  }
 
   // card background
   roundRect(0, 0, width, height, 14);
@@ -1725,10 +2062,10 @@ async function buildReportCanvas(){
   ctx.font = "300 15px 'Gilroy'";
   ctx.fillText(`${CURRENT_COMPANY.toUpperCase()} COMPANY`, padding + 132, y + 36);
 
-  if(from || to){
+  if(from || to || rangeText){
     ctx.fillStyle = COL.inkSoft;
     ctx.font = "400 12.5px 'IBM Plex Sans'";
-    const addrLine = [from ? `From: ${from}` : null, to ? `To: ${to}` : null].filter(Boolean).join('    ');
+    const addrLine = [from ? `From: ${from}` : null, to ? `To: ${to}` : null, rangeText ? `Covering: ${rangeText}` : null].filter(Boolean).join('    ');
     ctx.fillText(addrLine, padding + 132, y + 52);
   }
 
@@ -1739,9 +2076,17 @@ async function buildReportCanvas(){
   ctx.textAlign = 'left';
 
   y += headerH;
+
+  if(trendH){
+    sectionDivider();
+    sectionHeading('ATTENDANCE TREND');
+    drawTrendChart(padding, y, width - padding*2, trendH - 24, events);
+    y += trendH - 24;
+  }
+
   sectionDivider();
 
-  sectionHeading(`MEMBERS (${members.length})`);
+  sectionHeading(`MEMBERS (${members.length})  \u2014  Attended/Absent/Excused`);
   if(members.length === 0){
     ctx.fillStyle = COL.inkSoft;
     ctx.font = "400 15px 'IBM Plex Sans'";
@@ -1749,8 +2094,13 @@ async function buildReportCanvas(){
     y += rowH;
   }else{
     members.forEach(name => {
-      const count = events.filter(ev => ev.present.includes(name)).length;
-      const pct = events.length ? count / events.length : 0;
+      let attended=0, absent=0, excused=0;
+      events.forEach(ev => {
+        if(ev.present.includes(name)) attended++;
+        else if((ev.excused || []).includes(name)) excused++;
+        else absent++;
+      });
+      const total = events.length || 1;
 
       ctx.fillStyle = COL.ink;
       ctx.font = "400 15px 'IBM Plex Sans'";
@@ -1759,17 +2109,38 @@ async function buildReportCanvas(){
       const barW = 110, barX = width - padding - 175, barY = y - 10;
       ctx.fillStyle = COL.line;
       ctx.fillRect(barX, barY, barW, 6);
-      ctx.fillStyle = COL.signal;
-      ctx.fillRect(barX, barY, barW * pct, 6);
+      let segX = barX;
+      const attW = barW * (attended/total), absW = barW * (absent/total), excW = barW * (excused/total);
+      ctx.fillStyle = COL.signal; ctx.fillRect(segX, barY, attW, 6); segX += attW;
+      ctx.fillStyle = COL.alert;  ctx.fillRect(segX, barY, absW, 6); segX += absW;
+      ctx.fillStyle = COL.amber;  ctx.fillRect(segX, barY, excW, 6);
 
       ctx.fillStyle = COL.inkSoft;
       ctx.font = "500 12.5px 'JetBrains Mono'";
       ctx.textAlign = 'right';
-      ctx.fillText(`${count}/${events.length}`, width - padding, y);
+      ctx.fillText(`${attended}/${absent}/${excused}`, width - padding, y);
       ctx.textAlign = 'left';
 
       y += rowH;
     });
+  }
+
+  y += 10;
+  sectionDivider();
+
+  sectionHeading('NEEDS ATTENTION — no attendance in the last 3 events');
+  ctx.fillStyle = COL.ink;
+  ctx.font = "400 14px 'IBM Plex Sans'";
+  if(EVENTS.length < 3){
+    ctx.fillStyle = COL.inkSoft;
+    ctx.fillText('Not enough history yet (fewer than 3 events logged).', padding, y);
+    y += smallRowH;
+  }else if(needsAttention.length === 0){
+    ctx.fillStyle = COL.inkSoft;
+    ctx.fillText('None \u2014 everyone selected has attended recently.', padding, y);
+    y += smallRowH;
+  }else{
+    needsAttention.forEach(name => { ctx.fillText(name, padding, y); y += smallRowH; });
   }
 
   y += 10;
@@ -1859,6 +2230,11 @@ document.getElementById('copyImageBtn').addEventListener('click', async ()=>{
     reportStatus.textContent = 'Could not generate the report image: ' + err.message;
     reportStatus.className = 'status-line err';
   }
+});
+
+document.getElementById('historySearch').addEventListener('input', (e)=>{
+  HISTORY_SEARCH = e.target.value;
+  renderHistory();
 });
 
 load();
