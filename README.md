@@ -34,8 +34,8 @@ above the version number in the sidebar):
    members and events to include, and add any Promotions or Awards. The date
    range and a Needs Attention list (anyone missing from the last 3 events)
    are worked out automatically. Then either copy the report as plain text,
-   or use "Copy Image" to copy a site-styled image — trend chart and all —
-   straight to your clipboard for pasting into Discord or elsewhere.
+   or use "Copy Image" to copy a site-styled image — attendance trend numbers
+   and all — straight to your clipboard for pasting into Discord or elsewhere.
 
 8. **Check the Statistics.** This page is read-only — it shows an attendance
    trend chart over time (a separate line per event type), overall and
