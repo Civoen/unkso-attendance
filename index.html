@@ -452,7 +452,7 @@
 
     <button class="how-it-works-btn" id="howItWorksBtn"><span class="ic">?</span>How It Works</button>
 
-    <div class="sidebar-foot" id="footerNote">v.23. Unknown Soldiers. Created by Civoen.</div>
+    <div class="sidebar-foot" id="footerNote">v.24. Unknown Soldiers. Created by Civoen.</div>
   </aside>
 
   <div class="modal-overlay" id="howItWorksOverlay" style="display:none;">
@@ -469,7 +469,7 @@
         <li><strong>Log it.</strong> Once the matches look right, click "Log this event's attendance."</li>
         <li><strong>Review history.</strong> Events are always listed most-recent-first, and you can search by name or date. Expand any event to see who was Present, Absent, or Excused. Check the box next to an absent name to mark them Excused. Edit or delete an event at any time (deletions can be undone for a few seconds via the toast that appears).</li>
         <li><strong>Generate a report.</strong> On Generate Report, set a From and To, tick which members and events to include, and add any Promotions or Awards. The date range and a Needs Attention list (anyone missing from the last 3 events) are worked out automatically. Then either copy the report as plain text, or use "Copy Image" to copy a site-styled image — trend chart and all — straight to your clipboard for pasting into Discord or elsewhere.</li>
-        <li><strong>Check the Statistics.</strong> This page is read-only — it shows an attendance trend chart over time, overall and per-event-type average attendance, your most and least active member, and total excused instances, all computed automatically from Attendance History.</li>
+        <li><strong>Check the Statistics.</strong> This page is read-only — it shows an attendance trend chart over time (a separate line per event type), overall and per-event-type average attendance, your most and least active member, and total excused instances, all computed automatically from Attendance History.</li>
       </ol>
     </div>
   </div>
@@ -894,7 +894,7 @@ function openMemberDetail(name){
       : excused
         ? `<span style="color:var(--amber); font-weight:700;">&#9679; Excused</span>`
         : `<span style="color:var(--alert); font-weight:700;">X Absent</span>`;
-    return `<div class="member-row"><span>${escapeHtml(ev.name)} <span class="mono" style="color:var(--ink-soft); font-size:11px;">(${ev.date})</span></span><span>${statusHtml}</span></div>`;
+    return `<div class="member-row"><span>${escapeHtml(ev.name)} <span class="mono" style="color:var(--ink-soft); font-size:11px;">(${formatEventDateTag(ev.date)})</span></span><span>${statusHtml}</span></div>`;
   }).join('');
 
   body.innerHTML = `
@@ -1446,7 +1446,7 @@ function eventCardHTML(ev, idx){
       <button class="event-toggle" data-idx="${idx}">
         <span class="chevron">&#9656;</span>
         <span class="event-title">${escapeHtml(ev.name)}</span>
-        <span class="event-date mono">${ev.date}</span>
+        <span class="event-date mono">${formatEventDateTag(ev.date)}</span>
         <span class="event-count">${ev.present.length}/${rosterMembers.length} present</span>
       </button>
       <button class="btn ghost small icon-only edit-btn" data-idx="${idx}" title="Edit event" aria-label="Edit event">&#9998;</button>
@@ -1504,7 +1504,7 @@ function attachHistoryHandlers(){
       const ev = EVENTS[idx];
       if(!ev) return;
       deleteWithUndo({
-        label: `${ev.name} (${ev.date})`,
+        label: `${ev.name} (${formatEventDateTag(ev.date)})`,
         remove: ()=>{ EVENTS.splice(idx, 1); },
         restore: ()=>{ EVENTS.splice(idx, 0, ev); },
         afterChange: ()=>{ renderRoster(); renderHistory(); }
@@ -1581,7 +1581,7 @@ function renderReportControls(){
     .sort((a, b) => b.ev.date.localeCompare(a.ev.date));
   eventList.innerHTML = EVENTS.length
     ? orderedEvents.map(({ev, idx}) => `
-        <label><input type="checkbox" class="report-event-cb" data-idx="${idx}" ${recentTwoIdx.has(idx) ? 'checked' : ''}><span>${escapeHtml(ev.name)}</span><span class="ev-date mono">${ev.date}</span></label>
+        <label><input type="checkbox" class="report-event-cb" data-idx="${idx}" ${recentTwoIdx.has(idx) ? 'checked' : ''}><span>${escapeHtml(ev.name)}</span><span class="ev-date mono">${formatEventDateTag(ev.date)}</span></label>
       `).join('')
     : '<div class="empty">No events logged yet.</div>';
   eventList.querySelectorAll('.report-event-cb').forEach(cb => cb.addEventListener('change', updateReportEventCount));
@@ -1662,25 +1662,35 @@ function eventTypeOf(ev){
 
 function buildAttendanceTrendSVG(){
   const totalMembers = MEMBERS.length;
-  const chronological = [...EVENTS].sort((a,b) => a.date.localeCompare(b.date));
-  const n = chronological.length;
-
-  if(n === 0 || totalMembers === 0){
+  if(EVENTS.length === 0 || totalMembers === 0){
     return '<div class="empty">Not enough data yet — log a few events to see a trend.</div>';
   }
 
-  const points = chronological.map(ev => ({
-    label: formatEventDateTag(ev.date),
-    fullLabel: `${ev.name} — ${ev.present.length}/${totalMembers}`,
-    pct: Math.round((ev.present.length / totalMembers) * 100)
-  }));
+  // One line per event type (General Meeting, FTX, or whatever else appears in the
+  // data), positioned on a shared date-based x-axis so the lines line up correctly
+  // against real time rather than just event order.
+  const byType = {};
+  EVENTS.forEach(ev => {
+    const type = eventTypeOf(ev);
+    (byType[type] = byType[type] || []).push(ev);
+  });
+  const types = Object.keys(byType).sort();
 
-  const width = 780, height = 220;
-  const padL = 38, padR = 16, padT = 16, padB = 36;
+  const allDates = EVENTS.map(ev => ev.date).slice().sort();
+  const minDate = allDates[0], maxDate = allDates[allDates.length - 1];
+  const minTime = new Date(minDate + 'T00:00:00').getTime();
+  const maxTime = new Date(maxDate + 'T00:00:00').getTime();
+  const dateSpan = Math.max(maxTime - minTime, 1); // avoid divide-by-zero if all same date
+
+  const width = 780, height = 240;
+  const padL = 38, padR = 16, padT = 16, padB = 46;
   const chartW = width - padL - padR;
   const chartH = height - padT - padB;
 
-  const xFor = i => n === 1 ? padL + chartW/2 : padL + (i * (chartW / (n-1)));
+  const xForDate = dateStr => {
+    const t = new Date(dateStr + 'T00:00:00').getTime();
+    return padL + ((t - minTime) / dateSpan) * chartW;
+  };
   const yFor = pct => padT + (1 - pct/100) * chartH;
 
   const gridLines = [0,25,50,75,100].map(pct => {
@@ -1689,35 +1699,47 @@ function buildAttendanceTrendSVG(){
       <text x="${padL-8}" y="${Number(y)+3.5}" text-anchor="end" font-size="10" font-family="JetBrains Mono" style="fill:var(--ink-soft);">${pct}%</text>`;
   }).join('');
 
-  const linePoints = points.map((p,i) => `${xFor(i).toFixed(1)},${yFor(p.pct).toFixed(1)}`).join(' ');
-  const areaPath = `M${xFor(0).toFixed(1)},${yFor(0).toFixed(1)} ` +
-    points.map((p,i) => `L${xFor(i).toFixed(1)},${yFor(p.pct).toFixed(1)}`).join(' ') +
-    ` L${xFor(n-1).toFixed(1)},${yFor(0).toFixed(1)} Z`;
+  // Colors avoid introducing a second orange (site rule: #D05407 is the only orange)
+  // and avoid reusing the present/absent status colors, which could read as a
+  // good/bad judgement rather than a neutral category comparison.
+  const palette = ['var(--amber)', '#e8e5de', '#6b8fb0', '#b08fd6'];
 
-  const labelStep = n > 8 ? Math.ceil(n/8) : 1;
-  const xLabels = points.map((p,i) => {
-    if(i % labelStep !== 0 && i !== n-1) return '';
-    return `<text x="${xFor(i).toFixed(1)}" y="${height-padB+18}" text-anchor="middle" font-size="10" font-family="JetBrains Mono" style="fill:var(--ink-soft);">${p.label}</text>`;
-  }).join('');
+  let seriesSVG = '';
+  let legendSVG = '';
+  types.forEach((type, ti) => {
+    const color = palette[ti % palette.length];
+    const chronological = [...byType[type]].sort((a,b) => a.date.localeCompare(b.date));
+    const points = chronological.map(ev => ({
+      date: ev.date,
+      pct: Math.round((ev.present.length / totalMembers) * 100),
+      fullLabel: `${ev.name} — ${ev.present.length}/${totalMembers}`
+    }));
 
-  const dots = points.map((p,i) => `
-    <circle cx="${xFor(i).toFixed(1)}" cy="${yFor(p.pct).toFixed(1)}" r="4" style="fill:var(--amber); stroke:var(--khaki-card); stroke-width:2;">
-      <title>${escapeHtml(p.fullLabel)} — ${p.pct}%</title>
-    </circle>`).join('');
+    if(points.length === 1){
+      const px = xForDate(points[0].date).toFixed(1), py = yFor(points[0].pct).toFixed(1);
+      seriesSVG += `<circle cx="${px}" cy="${py}" r="4" style="fill:${color}; stroke:var(--khaki-card); stroke-width:2;"><title>${escapeHtml(points[0].fullLabel)} — ${points[0].pct}%</title></circle>`;
+    }else{
+      const linePoints = points.map(p => `${xForDate(p.date).toFixed(1)},${yFor(p.pct).toFixed(1)}`).join(' ');
+      seriesSVG += `<polyline points="${linePoints}" style="fill:none; stroke:${color}; stroke-width:2.5; stroke-linejoin:round; stroke-linecap:round;" />`;
+      seriesSVG += points.map(p => `<circle cx="${xForDate(p.date).toFixed(1)}" cy="${yFor(p.pct).toFixed(1)}" r="3.5" style="fill:${color}; stroke:var(--khaki-card); stroke-width:1.5;"><title>${escapeHtml(p.fullLabel)} — ${p.pct}%</title></circle>`).join('');
+    }
+
+    const legendX = padL + ti * 170;
+    const legendY = height - 12;
+    legendSVG += `<rect x="${legendX}" y="${legendY-9}" width="10" height="10" rx="2" style="fill:${color};" />
+      <text x="${legendX+16}" y="${legendY}" font-size="11" font-family="Gilroy" style="fill:var(--ink);">${escapeHtml(type)}</text>`;
+  });
+
+  const xLabels = `
+    <text x="${padL}" y="${padT+chartH+18}" text-anchor="start" font-size="10" font-family="JetBrains Mono" style="fill:var(--ink-soft);">${formatEventDateTag(minDate)}</text>
+    <text x="${width-padR}" y="${padT+chartH+18}" text-anchor="end" font-size="10" font-family="JetBrains Mono" style="fill:var(--ink-soft);">${formatEventDateTag(maxDate)}</text>`;
 
   return `
     <svg viewBox="0 0 ${width} ${height}" style="width:100%; height:auto; display:block;">
-      <defs>
-        <linearGradient id="trendFill" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" style="stop-color:var(--amber); stop-opacity:0.28;"/>
-          <stop offset="100%" style="stop-color:var(--amber); stop-opacity:0;"/>
-        </linearGradient>
-      </defs>
       ${gridLines}
-      <path d="${areaPath}" style="fill:url(#trendFill);" />
-      <polyline points="${linePoints}" style="fill:none; stroke:var(--amber); stroke-width:2.5; stroke-linejoin:round; stroke-linecap:round;" />
-      ${dots}
+      ${seriesSVG}
       ${xLabels}
+      ${legendSVG}
     </svg>`;
 }
 
@@ -1839,7 +1861,7 @@ function buildReportText(){
 
   const lines = [];
   lines.push(`UNKSO Attendance Report — ${CURRENT_COMPANY} Company`);
-  lines.push(`Generated: ${today}`);
+  lines.push(`Generated: ${formatEventDateTag(today)}`);
   if(from) lines.push(`From: ${from}`);
   if(to) lines.push(`To: ${to}`);
   const rangeText = getSelectedEventDateRangeText(selectedEvents);
@@ -1941,7 +1963,7 @@ async function buildReportCanvas(){
   const rowH = 30;
   const smallRowH = 21;
   const headerH = 104 + (from || to || rangeText ? 20 : 0);
-  const trendH = events.length ? 150 : 0;
+  const trendH = events.length ? 165 : 0;
   const memberBlockH = 34 + Math.max(members.length, 1) * rowH;
   const needsAttnBlockH = 34 + Math.max(needsAttention.length, 1) * smallRowH;
   const eventBlockH = 34 + Math.max(events.length, 1) * rowH;
@@ -1981,12 +2003,27 @@ async function buildReportCanvas(){
   // Mirrors the SVG trend chart on the Statistics page, redrawn with canvas 2D
   // primitives (canvas can't render SVG directly).
   function drawTrendChart(x, top, w, h, evs){
-    const chronological = [...evs].sort((a,b) => a.date.localeCompare(b.date));
-    const n = chronological.length;
-    if(n === 0 || MEMBERS.length === 0) return;
-    const padL = 30, padR = 6, padT = 4, padB = 20;
+    if(evs.length === 0 || MEMBERS.length === 0) return;
+
+    const byType = {};
+    evs.forEach(ev => {
+      const type = eventTypeOf(ev);
+      (byType[type] = byType[type] || []).push(ev);
+    });
+    const types = Object.keys(byType).sort();
+
+    const allDates = evs.map(ev => ev.date).slice().sort();
+    const minDate = allDates[0], maxDate = allDates[allDates.length-1];
+    const minTime = new Date(minDate+'T00:00:00').getTime();
+    const maxTime = new Date(maxDate+'T00:00:00').getTime();
+    const dateSpan = Math.max(maxTime - minTime, 1);
+
+    const padL = 30, padR = 6, padT = 4, padB = 34; // extra bottom space: date labels + legend row
     const chartW = w - padL - padR, chartH = h - padT - padB;
-    const xFor = i => n===1 ? x+padL+chartW/2 : x+padL+(i*(chartW/(n-1)));
+    const xForDate = dateStr => {
+      const t = new Date(dateStr+'T00:00:00').getTime();
+      return x+padL+((t-minTime)/dateSpan)*chartW;
+    };
     const yFor = pct => top+padT+(1-pct/100)*chartH;
 
     ctx.strokeStyle = COL.line; ctx.lineWidth = 1;
@@ -1999,42 +2036,52 @@ async function buildReportCanvas(){
       ctx.textAlign='left';
     });
 
-    const points = chronological.map(ev => ({
-      date: ev.date, pct: Math.round((ev.present.length / MEMBERS.length) * 100)
-    }));
+    // Same rule as the Statistics chart: no second orange, and avoid the
+    // present/absent status colors so this doesn't read as a good/bad judgement.
+    const palette = [COL.amber, COL.ink, '#6b8fb0', '#b08fd6'];
 
-    ctx.beginPath();
-    ctx.moveTo(xFor(0), yFor(0));
-    points.forEach((p,i) => ctx.lineTo(xFor(i), yFor(p.pct)));
-    ctx.lineTo(xFor(n-1), yFor(0));
-    ctx.closePath();
-    const grad = ctx.createLinearGradient(0, top+padT, 0, top+padT+chartH);
-    grad.addColorStop(0, 'rgba(208,84,7,0.28)');
-    grad.addColorStop(1, 'rgba(208,84,7,0)');
-    ctx.fillStyle = grad;
-    ctx.fill();
+    types.forEach((type, ti) => {
+      const color = palette[ti % palette.length];
+      const chronological = [...byType[type]].sort((a,b) => a.date.localeCompare(b.date));
+      const points = chronological.map(ev => ({
+        date: ev.date, pct: Math.round((ev.present.length / MEMBERS.length) * 100)
+      }));
 
-    ctx.beginPath();
-    points.forEach((p,i)=>{
-      const px = xFor(i), py = yFor(p.pct);
-      if(i===0) ctx.moveTo(px,py); else ctx.lineTo(px,py);
+      if(points.length === 1){
+        ctx.beginPath();
+        ctx.arc(xForDate(points[0].date), yFor(points[0].pct), 3.5, 0, Math.PI*2);
+        ctx.fillStyle = color;
+        ctx.fill();
+      }else{
+        ctx.beginPath();
+        points.forEach((p,i)=>{
+          const px = xForDate(p.date), py = yFor(p.pct);
+          if(i===0) ctx.moveTo(px,py); else ctx.lineTo(px,py);
+        });
+        ctx.strokeStyle = color; ctx.lineWidth = 2.5; ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+        ctx.stroke();
+        points.forEach(p=>{
+          ctx.beginPath();
+          ctx.arc(xForDate(p.date), yFor(p.pct), 3, 0, Math.PI*2);
+          ctx.fillStyle = color;
+          ctx.fill();
+        });
+      }
+
+      // legend swatch
+      const legendX = x + padL + ti * 150, legendY = top + h - 8;
+      ctx.fillStyle = color;
+      ctx.fillRect(legendX, legendY - 8, 9, 9);
+      ctx.fillStyle = COL.ink;
+      ctx.font = "300 11px 'Gilroy'";
+      ctx.fillText(type, legendX + 13, legendY);
     });
-    ctx.strokeStyle = COL.amber; ctx.lineWidth = 2.5; ctx.lineJoin = 'round'; ctx.lineCap = 'round';
-    ctx.stroke();
 
-    points.forEach((p,i)=>{
-      ctx.beginPath();
-      ctx.arc(xFor(i), yFor(p.pct), 3.5, 0, Math.PI*2);
-      ctx.fillStyle = COL.amber;
-      ctx.fill();
-    });
-
-    const labelStep = n > 6 ? Math.ceil(n/6) : 1;
-    ctx.font = "400 9px 'JetBrains Mono'"; ctx.fillStyle = COL.inkSoft; ctx.textAlign = 'center';
-    points.forEach((p,i)=>{
-      if(i % labelStep !== 0 && i !== n-1) return;
-      ctx.fillText(formatEventDateTag(p.date), xFor(i), top+h-4);
-    });
+    ctx.font = "400 9px 'JetBrains Mono'"; ctx.fillStyle = COL.inkSoft;
+    ctx.textAlign = 'left';
+    ctx.fillText(formatEventDateTag(minDate), x+padL, top+padT+chartH+14);
+    ctx.textAlign = 'right';
+    ctx.fillText(formatEventDateTag(maxDate), x+w-padR, top+padT+chartH+14);
     ctx.textAlign = 'left';
   }
 
@@ -2072,7 +2119,7 @@ async function buildReportCanvas(){
   ctx.fillStyle = COL.inkSoft;
   ctx.font = "400 12.5px 'IBM Plex Sans'";
   ctx.textAlign = 'right';
-  ctx.fillText('Generated ' + new Date().toISOString().slice(0,10), width - padding, y + 16);
+  ctx.fillText('Generated ' + formatEventDateTag(new Date().toISOString().slice(0,10)), width - padding, y + 16);
   ctx.textAlign = 'left';
 
   y += headerH;

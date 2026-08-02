@@ -38,9 +38,9 @@ above the version number in the sidebar):
    straight to your clipboard for pasting into Discord or elsewhere.
 
 8. **Check the Statistics.** This page is read-only — it shows an attendance
-   trend chart over time, overall and per-event-type average attendance, your
-   most and least active member, and total excused instances, all computed
-   automatically from Attendance History.
+   trend chart over time (a separate line per event type), overall and
+   per-event-type average attendance, your most and least active member, and
+   total excused instances, all computed automatically from Attendance History.
 
 ## That's it.
 
