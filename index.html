@@ -51,13 +51,24 @@
   .mono{font-family:'JetBrains Mono',monospace;}
 
   .app{display:grid; grid-template-columns:250px 1fr; min-height:100vh;}
-  @media (max-width:820px){ .app{grid-template-columns:1fr;} .sidebar{position:static;} }
 
   /* ---------- sidebar ---------- */
   .sidebar{
     background:linear-gradient(180deg,var(--void) 0%,var(--olive-deep) 100%);
     color:#c8c4ba; padding:26px 18px; display:flex; flex-direction:column;
     position:sticky; top:0; height:100vh; overflow-y:auto;
+  }
+  @media (max-width:820px){
+    .app{grid-template-columns:1fr;}
+    /* On mobile the sidebar stacks above the page content instead of sitting
+       beside it — it must NOT stay 100vh tall here, or navigation gets pushed
+       a full screen's height above whatever the person scrolls down to see,
+       with nothing indicating they'd need to scroll all the way back up to
+       reach it. This must be declared after the base .sidebar rule above:
+       CSS resolves equal-specificity rules by source order regardless of
+       whether a media query matches, so declaring it earlier in the file
+       silently loses to the rule below no matter the screen width. */
+    .sidebar{position:static; height:auto; max-height:none;}
   }
   .brand{margin-bottom:22px;}
   .brand .mark{
@@ -468,7 +479,7 @@
         <li><strong>Read &amp; review.</strong> Click "Read names from screenshot" — it'll match detected names against your roster. Names at 55%+ confidence are included automatically; 30&ndash;54% needs your review. Use "+ Add member" for anyone it missed entirely.</li>
         <li><strong>Log it.</strong> Once the matches look right, click "Log this event's attendance."</li>
         <li><strong>Review history.</strong> Events are always listed most-recent-first, and you can search by name or date. Expand any event to see who was Present, Absent, or Excused. Check the box next to an absent name to mark them Excused. Edit or delete an event at any time (deletions can be undone for a few seconds via the toast that appears).</li>
-        <li><strong>Generate a report.</strong> On Generate Report, set a From and To, tick which members and events to include, and add any Promotions or Awards. The date range and a Needs Attention list (anyone missing from the last 3 events) are worked out automatically. Then either copy the report as plain text, or use "Copy Image" to copy a site-styled image — attendance trend numbers and all — straight to your clipboard for pasting into Discord or elsewhere.</li>
+        <li><strong>Generate a report.</strong> On Generate Report, set a From and To, tick which members and events to include, and add any Promotions or Awards. The date range and a Needs Attention list (anyone missing from the last 3 events) are worked out automatically. Then either copy the report as plain text, or use "Copy Image" to copy a site-styled image — trend chart and all — straight to your clipboard for pasting into Discord or elsewhere.</li>
         <li><strong>Check the Statistics.</strong> This page is read-only — it shows an attendance trend chart over time (a separate line per event type), overall and per-event-type average attendance, your most and least active member, and total excused instances, all computed automatically from Attendance History.</li>
       </ol>
     </div>
@@ -1682,8 +1693,8 @@ function buildAttendanceTrendSVG(){
   const maxTime = new Date(maxDate + 'T00:00:00').getTime();
   const dateSpan = Math.max(maxTime - minTime, 1); // avoid divide-by-zero if all same date
 
-  const width = 780, height = 170;
-  const padL = 38, padR = 16, padT = 14, padB = 40;
+  const width = 780, height = 240;
+  const padL = 38, padR = 16, padT = 16, padB = 46;
   const chartW = width - padL - padR;
   const chartH = height - padT - padB;
 
@@ -1948,13 +1959,6 @@ async function buildReportCanvas(){
   const rangeText = getSelectedEventDateRangeText(events);
   const needsAttention = computeNeedsAttention(members);
 
-  const trendByType = {};
-  events.forEach(ev => {
-    const type = eventTypeOf(ev);
-    (trendByType[type] = trendByType[type] || []).push(ev);
-  });
-  const trendTypes = Object.keys(trendByType).sort();
-
   const COL = {
     bg:      '#1f2226',
     line:    '#2f3237',
@@ -1969,20 +1973,14 @@ async function buildReportCanvas(){
   const padding = 36;
   const rowH = 30;
   const smallRowH = 21;
-  // Every block below pairs a sectionDivider() (24px) with a sectionHeading() (20px)
-  // before its rows, so each budget is 44px of chrome plus its row content — not 34,
-  // which used to undercount by 10px per section and clip the bottom of the report.
   const headerH = 104 + (from || to || rangeText ? 20 : 0);
-  const trendH = trendTypes.length ? 44 + trendTypes.length * smallRowH : 0;
-  const memberBlockH = 44 + Math.max(members.length, 1) * rowH;
-  const needsAttnBlockH = 44 + Math.max(needsAttention.length, 1) * smallRowH;
-  const eventBlockH = 44 + Math.max(events.length, 1) * rowH;
-  const promoBlockH = 44 + Math.max(promotionsLines.length, 1) * smallRowH;
-  const awardBlockH = 44 + Math.max(awardsLines.length, 1) * smallRowH;
-  // Covers the inter-section spacer gaps (44px total: three 10px + one 6px + one 8px),
-  // the closing sectionDivider() before the footer line (24px), and clearance below
-  // the footer text's baseline so it isn't clipped at the canvas edge.
-  const footerH = 100;
+  const trendH = events.length ? 165 : 0;
+  const memberBlockH = 34 + Math.max(members.length, 1) * rowH;
+  const needsAttnBlockH = 34 + Math.max(needsAttention.length, 1) * smallRowH;
+  const eventBlockH = 34 + Math.max(events.length, 1) * rowH;
+  const promoBlockH = 34 + Math.max(promotionsLines.length, 1) * smallRowH;
+  const awardBlockH = 34 + Math.max(awardsLines.length, 1) * smallRowH;
+  const footerH = 46;
   const height = padding * 2 + headerH + trendH + memberBlockH + needsAttnBlockH + eventBlockH + promoBlockH + awardBlockH + footerH;
 
   const scale = 2; // sharper output for pasting/sharing
@@ -2013,26 +2011,89 @@ async function buildReportCanvas(){
     ctx.fillText(text, padding, y);
     y += 20;
   }
-  // Per-event-type average attendance, as plain numbers rather than a chart —
-  // one row per type, same list-row style as the MEMBERS/EVENTS sections below.
-  function drawTrendNumbers(types, byType){
-    types.forEach(type => {
-      const evs = byType[type];
-      const sum = evs.reduce((acc, ev) => acc + ev.present.length, 0);
-      const avg = MEMBERS.length ? Math.round((sum / (MEMBERS.length * evs.length)) * 100) : 0;
+  // Mirrors the SVG trend chart on the Statistics page, redrawn with canvas 2D
+  // primitives (canvas can't render SVG directly).
+  function drawTrendChart(x, top, w, h, evs){
+    if(evs.length === 0 || MEMBERS.length === 0) return;
 
-      ctx.fillStyle = COL.ink;
-      ctx.font = "400 14px 'IBM Plex Sans'";
-      ctx.fillText(type, padding, y);
-
-      ctx.fillStyle = COL.inkSoft;
-      ctx.font = "500 12.5px 'JetBrains Mono'";
-      ctx.textAlign = 'right';
-      ctx.fillText(`${avg}% avg  —  ${evs.length} logged`, width - padding, y);
-      ctx.textAlign = 'left';
-
-      y += smallRowH;
+    const byType = {};
+    evs.forEach(ev => {
+      const type = eventTypeOf(ev);
+      (byType[type] = byType[type] || []).push(ev);
     });
+    const types = Object.keys(byType).sort();
+
+    const allDates = evs.map(ev => ev.date).slice().sort();
+    const minDate = allDates[0], maxDate = allDates[allDates.length-1];
+    const minTime = new Date(minDate+'T00:00:00').getTime();
+    const maxTime = new Date(maxDate+'T00:00:00').getTime();
+    const dateSpan = Math.max(maxTime - minTime, 1);
+
+    const padL = 30, padR = 6, padT = 4, padB = 34; // extra bottom space: date labels + legend row
+    const chartW = w - padL - padR, chartH = h - padT - padB;
+    const xForDate = dateStr => {
+      const t = new Date(dateStr+'T00:00:00').getTime();
+      return x+padL+((t-minTime)/dateSpan)*chartW;
+    };
+    const yFor = pct => top+padT+(1-pct/100)*chartH;
+
+    ctx.strokeStyle = COL.line; ctx.lineWidth = 1;
+    ctx.font = "400 9px 'JetBrains Mono'";
+    [0,50,100].forEach(pct=>{
+      const gy = yFor(pct);
+      ctx.beginPath(); ctx.moveTo(x+padL, gy); ctx.lineTo(x+w-padR, gy); ctx.stroke();
+      ctx.fillStyle = COL.inkSoft; ctx.textAlign='right';
+      ctx.fillText(pct+'%', x+padL-6, gy+3);
+      ctx.textAlign='left';
+    });
+
+    // Same rule as the Statistics chart: no second orange, and avoid the
+    // present/absent status colors so this doesn't read as a good/bad judgement.
+    const palette = [COL.amber, COL.ink, '#6b8fb0', '#b08fd6'];
+
+    types.forEach((type, ti) => {
+      const color = palette[ti % palette.length];
+      const chronological = [...byType[type]].sort((a,b) => a.date.localeCompare(b.date));
+      const points = chronological.map(ev => ({
+        date: ev.date, pct: Math.round((ev.present.length / MEMBERS.length) * 100)
+      }));
+
+      if(points.length === 1){
+        ctx.beginPath();
+        ctx.arc(xForDate(points[0].date), yFor(points[0].pct), 3.5, 0, Math.PI*2);
+        ctx.fillStyle = color;
+        ctx.fill();
+      }else{
+        ctx.beginPath();
+        points.forEach((p,i)=>{
+          const px = xForDate(p.date), py = yFor(p.pct);
+          if(i===0) ctx.moveTo(px,py); else ctx.lineTo(px,py);
+        });
+        ctx.strokeStyle = color; ctx.lineWidth = 2.5; ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+        ctx.stroke();
+        points.forEach(p=>{
+          ctx.beginPath();
+          ctx.arc(xForDate(p.date), yFor(p.pct), 3, 0, Math.PI*2);
+          ctx.fillStyle = color;
+          ctx.fill();
+        });
+      }
+
+      // legend swatch
+      const legendX = x + padL + ti * 150, legendY = top + h - 8;
+      ctx.fillStyle = color;
+      ctx.fillRect(legendX, legendY - 8, 9, 9);
+      ctx.fillStyle = COL.ink;
+      ctx.font = "300 11px 'Gilroy'";
+      ctx.fillText(type, legendX + 13, legendY);
+    });
+
+    ctx.font = "400 9px 'JetBrains Mono'"; ctx.fillStyle = COL.inkSoft;
+    ctx.textAlign = 'left';
+    ctx.fillText(formatEventDateTag(minDate), x+padL, top+padT+chartH+14);
+    ctx.textAlign = 'right';
+    ctx.fillText(formatEventDateTag(maxDate), x+w-padR, top+padT+chartH+14);
+    ctx.textAlign = 'left';
   }
 
   // card background
@@ -2077,7 +2138,8 @@ async function buildReportCanvas(){
   if(trendH){
     sectionDivider();
     sectionHeading('ATTENDANCE TREND');
-    drawTrendNumbers(trendTypes, trendByType);
+    drawTrendChart(padding, y, width - padding*2, trendH - 24, events);
+    y += trendH - 24;
   }
 
   sectionDivider();
