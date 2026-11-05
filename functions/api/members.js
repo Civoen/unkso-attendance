@@ -41,6 +41,19 @@ export async function onRequestPost({ request, env }) {
       headers: { 'Content-Type': 'application/json' }
     });
   }
+  // Safety net: if this save removes anyone who was on the roster, keep a snapshot of the
+  // roster as it was just before (30 days) so it can be restored from the Roster page.
+  try {
+    const prevRaw = await env.ATTENDANCE_KV.get('members:' + company);
+    const prev = prevRaw ? JSON.parse(prevRaw) : [];
+    if (Array.isArray(prev) && prev.length && prev.some(n => !body.includes(n))) {
+      await env.ATTENDANCE_KV.put(
+        'bak:members:' + company + ':' + new Date().toISOString(),
+        JSON.stringify(prev),
+        { expirationTtl: 60 * 60 * 24 * 30, metadata: { count: prev.length } }
+      );
+    }
+  } catch (e) { /* a failed snapshot must never block the save */ }
   await env.ATTENDANCE_KV.put('members:' + company, JSON.stringify(body));
   return new Response(JSON.stringify({ ok: true }), {
     headers: { 'Content-Type': 'application/json' }

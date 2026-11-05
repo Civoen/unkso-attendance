@@ -145,6 +145,44 @@
   .steps li{font-size:13px; line-height:1.5; color:var(--ink);}
   .steps li strong{font-family:'Gilroy'; letter-spacing:.02em;}
 
+  .login-overlay{
+    position:fixed; inset:0; z-index:500; background:#21262C;
+    display:flex; align-items:center; justify-content:center; padding:20px;
+  }
+  .login-box{
+    background:var(--khaki-card); border-radius:10px; max-width:360px; width:100%;
+    padding:28px 26px; box-shadow:0 20px 50px rgba(0,0,0,.4); text-align:center;
+  }
+  .login-box h2{font-family:'Gilroy'; font-weight:800; font-size:22px; margin:0 0 4px; color:var(--ink);}
+  .login-box p{font-size:13px; color:var(--ink-soft); margin:0 0 16px;}
+  .login-box .btn{width:100%; justify-content:center;}
+  .login-box input{text-align:center;}
+  .login-err{min-height:18px; font-size:12px; color:var(--amber); margin-bottom:10px;}
+  .restore-section{margin-bottom:18px;}
+  .restore-section h3{font-family:'Gilroy'; font-size:13px; letter-spacing:.06em; text-transform:uppercase; margin:0 0 4px; color:var(--ink);}
+  .restore-section .hint{font-size:12px; color:var(--ink-soft); margin:0 0 8px;}
+  .restore-row{display:flex; align-items:center; justify-content:space-between; gap:10px; padding:7px 0; border-bottom:1px solid var(--khaki-line); font-size:13px; color:var(--ink);}
+  .restore-row label{display:flex; align-items:center; gap:8px; cursor:pointer;}
+  .restore-row .meta{font-family:'JetBrains Mono'; font-size:11px; color:var(--ink-soft);}
+  .restore-empty{font-size:12.5px; color:var(--ink-soft); padding:6px 0;}
+
+  .save-pill{
+    position:fixed; right:20px; bottom:20px; z-index:190; display:none; align-items:center; gap:10px;
+    background:var(--olive-deep); color:#f0ede6; border:1px solid rgba(255,255,255,.14);
+    border-radius:999px; padding:8px 14px; font-family:'IBM Plex Sans'; font-size:12.5px;
+    box-shadow:0 8px 24px rgba(0,0,0,.35);
+  }
+  .save-pill .dot{width:8px; height:8px; border-radius:50%; background:#8c8983;}
+  .save-pill.saving .dot{animation:savepulse 1s ease-in-out infinite;}
+  .save-pill.saved .dot{background:var(--signal);}
+  .save-pill.error{background:rgba(208,84,7,.14); border-color:rgba(208,84,7,.55); color:var(--amber);}
+  .save-pill.error .dot{background:var(--amber);}
+  @keyframes savepulse{0%,100%{opacity:.3}50%{opacity:1}}
+  .attendance-chip.former{opacity:.6;}
+  .attendance-chip.former span:nth-child(2)::after{content:' (left)'; font-size:10.5px; color:var(--ink-soft);}
+  .edit-label{display:block; font-family:'Gilroy'; font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-soft); margin:4px 0 4px;}
+  .load-error{display:flex; align-items:center; gap:10px; padding:10px 0; font-size:13px; color:var(--amber);}
+
   .toast{
     position:fixed; bottom:24px; left:50%; transform:translateX(-50%); z-index:200;
     background:var(--olive-deep); color:#f0ede6; border:1px solid rgba(208,84,7,.4);
@@ -463,7 +501,7 @@
 
     <button class="how-it-works-btn" id="howItWorksBtn"><span class="ic">?</span>How It Works</button>
 
-    <div class="sidebar-foot" id="footerNote">v.25. Unknown Soldiers. Created by Civoen.</div>
+    <div class="sidebar-foot" id="footerNote">v.27. Unknown Soldiers. Created by Civoen.</div>
   </aside>
 
   <div class="modal-overlay" id="howItWorksOverlay" style="display:none;">
@@ -473,12 +511,13 @@
         <button class="modal-close" id="howItWorksClose" aria-label="Close">&#10005;</button>
       </div>
       <ol class="steps">
+        <li><strong>Log in.</strong> The site is password protected — enter the password once and this browser will remember it.</li>
         <li><strong>Pick your company.</strong> Use the company switcher at the top of the sidebar (Bravo, Charlie, or Delta). Each has its own roster and event history.</li>
-        <li><strong>Keep the Roster current.</strong> Add or remove members on the Roster page (removals can be undone for a few seconds via the toast that appears). Drag the grip handle to reorder, or use the search box to find someone quickly. Click a name to see their full attendance history. A member's bar turns orange if they've missed the last 3 events in a row.</li>
-        <li><strong>Log a new event.</strong> On the New Event page, choose the event type and date, then drop in (or paste) a Discord screenshot of who attended.</li>
+        <li><strong>Keep the Roster current.</strong> Add or remove members on the Roster page (removals can be undone for a few seconds via the toast that appears). Drag the grip handle to reorder, or use the search box to find someone quickly. Click a name to see their full attendance history. Removing a member never changes past events — they stay in the history marked "(left)". A member's bar turns orange if they've missed the last 3 events in a row. If someone is removed by mistake, use <strong>Restore</strong> to bring names back from Attendance History or an automatic backup.</li>
+        <li><strong>Log a new event.</strong> On the New Event page, choose the event type and date (it starts as today), then drop in (or paste) a Discord screenshot of who attended.</li>
         <li><strong>Read &amp; review.</strong> Click "Read names from screenshot" — it'll match detected names against your roster. Names at 55%+ confidence are included automatically; 30&ndash;54% needs your review. Use "+ Add member" for anyone it missed entirely.</li>
         <li><strong>Log it.</strong> Once the matches look right, click "Log this event's attendance."</li>
-        <li><strong>Review history.</strong> Events are always listed most-recent-first, and you can search by name or date. Expand any event to see who was Present, Absent, or Excused. Check the box next to an absent name to mark them Excused. Edit or delete an event at any time (deletions can be undone for a few seconds via the toast that appears).</li>
+        <li><strong>Review history.</strong> Events are always listed most-recent-first, and you can search by name or date. Expand any event to see who was Present, Absent, or Excused. Check the box next to an absent name to mark them Excused. Edit an event at any time (including its date), or delete it (deletions can be undone for a few seconds via the toast that appears).</li>
         <li><strong>Generate a report.</strong> On Generate Report, set a From and To, tick which members and events to include, and add any Promotions or Awards. The date range and a Needs Attention list (anyone missing from the last 3 events) are worked out automatically. Then either copy the report as plain text, or use "Copy Image" to copy a site-styled image — trend chart and all — straight to your clipboard for pasting into Discord or elsewhere.</li>
         <li><strong>Check the Statistics.</strong> This page is read-only — it shows an attendance trend chart over time (a separate line per event type), overall and per-event-type average attendance, your most and least active member, and total excused instances, all computed automatically from Attendance History.</li>
       </ol>
@@ -503,6 +542,7 @@
         <div class="add-row">
           <input type="text" id="newMember" placeholder="Add member name...">
           <button class="btn" id="addMemberBtn">+ Add</button>
+          <button class="btn ghost" id="restoreBtn" title="Recover missing members">Restore</button>
         </div>
         <input type="text" id="rosterSearch" placeholder="Search members...">
         <ul class="roster-list" id="rosterList"></ul>
@@ -656,6 +696,40 @@
   <button class="btn small" id="undoBtn">Undo</button>
 </div>
 
+<div class="save-pill" id="savePill" role="status" aria-live="polite">
+  <span class="dot"></span><span id="savePillText"></span>
+  <button class="btn small" id="savePillRetry" style="display:none;">Retry</button>
+</div>
+
+<div class="login-overlay" id="loginOverlay" style="display:none;">
+  <form class="login-box" id="loginForm">
+    <h2>UNKSO Attendance Tracker</h2>
+    <p>Enter the password to continue.</p>
+    <input type="password" id="loginPassword" placeholder="Password" autocomplete="current-password" style="width:100%; padding:10px 12px; border:1px solid var(--khaki-line); border-radius:6px; background:#fff; font-family:'IBM Plex Sans'; font-size:13px; margin-bottom:8px; color:var(--ink-on-light);">
+    <div class="login-err" id="loginErr"></div>
+    <button class="btn" type="submit">Enter</button>
+  </form>
+</div>
+
+<div class="modal-overlay" id="restoreOverlay" style="display:none;">
+  <div class="modal">
+    <div class="modal-head">
+      <h2>Restore Members</h2>
+      <button class="modal-close" id="restoreClose" aria-label="Close">&#10005;</button>
+    </div>
+    <div class="restore-section">
+      <h3>From Attendance History</h3>
+      <p class="hint">Names that appear in logged events but are no longer on the roster.</p>
+      <div id="restoreHistoryList"></div>
+    </div>
+    <div class="restore-section">
+      <h3>From automatic backups</h3>
+      <p class="hint">A snapshot of the roster is saved whenever someone is removed (kept for 30 days). Restoring adds back anyone missing, in their original order.</p>
+      <div id="restoreBackupList"></div>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="memberDetailOverlay" style="display:none;">
   <div class="modal">
     <div class="modal-head">
@@ -681,6 +755,62 @@ try{
 }catch(e){ /* localStorage unavailable (e.g. sandboxed preview) — default to Bravo */ }
 
 let MEMBERS = [];
+let LOADED = false; // true only once data has been read successfully — never save before that
+function todayISO(){
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+// Each event remembers who was on the roster when it was logged (ev.roster), so removing
+// a member later never changes a past event's totals, and members who joined later
+// aren't counted as absent from events before they joined. Older events without a stored
+// roster fall back to "current roster + anyone recorded on the event" until stamped.
+function eventRoster(ev){
+  if(ev.roster) return ev.roster;
+  return [...new Set([...MEMBERS, ...(ev.present||[]), ...(ev.excused||[])])];
+}
+function orderedEventRoster(ev){
+  const r = eventRoster(ev);
+  return [...MEMBERS.filter(n => r.includes(n)), ...r.filter(n => !MEMBERS.includes(n))];
+}
+function eventSize(ev){ return eventRoster(ev).length; }
+function wasInEvent(ev, name){ return eventRoster(ev).includes(name); }
+function memberEvents(name){ return EVENTS.filter(ev => wasInEvent(ev, name)); }
+function memberNeedsAttention(name){
+  if(EVENTS.length < 3) return false;
+  const idxs = getMostRecentEventIndices(3);
+  return idxs.every(i => wasInEvent(EVENTS[i], name)) && !idxs.some(i => EVENTS[i].present.includes(name));
+}
+function overallRate(evs){
+  evs = evs || EVENTS;
+  const tot = evs.reduce((a,ev)=>a+eventSize(ev),0);
+  const pres = evs.reduce((a,ev)=>a+ev.present.length,0);
+  return tot ? Math.round((pres/tot)*100) : 0;
+}
+function stampEventRosters(){
+  if(!MEMBERS.length) return false;
+  let changed = false;
+  EVENTS.forEach(ev => {
+    if(!ev.roster){ ev.roster = eventRoster(ev); changed = true; }
+  });
+  return changed;
+}
+// ---- save-state pill
+let saveInflight = 0, saveHideTimer = null;
+function setSaveState(state){
+  const pill = document.getElementById('savePill');
+  const txt = document.getElementById('savePillText');
+  const retry = document.getElementById('savePillRetry');
+  clearTimeout(saveHideTimer);
+  pill.className = 'save-pill ' + state;
+  pill.style.display = 'flex';
+  retry.style.display = state === 'error' ? 'inline-flex' : 'none';
+  txt.textContent = state === 'saving' ? 'Saving…' : state === 'saved' ? 'All changes saved' : (LOADED ? "Couldn't save — your changes aren't stored yet" : "Couldn't load data");
+  if(state === 'saved') saveHideTimer = setTimeout(()=>{ pill.style.display = 'none'; }, 2200);
+}
+window.addEventListener('beforeunload', (e)=>{
+  const pill = document.getElementById('savePill');
+  if(saveInflight > 0 || pill.classList.contains('error')){ e.preventDefault(); e.returnValue = ''; }
+});
 let EVENTS = []; // {name, date, present: [memberName,...]}
 let currentMatches = []; // working review state for the screenshot currently open
 let currentImageBase64 = null;
@@ -715,17 +845,27 @@ document.addEventListener('keydown', (e)=>{
 });
 
 // ---------- page nav ----------
+const PAGE_NAMES = [...document.querySelectorAll('nav.pagenav button')].map(b => b.dataset.page);
+function goToPage(page, fromHash){
+  if(!PAGE_NAMES.includes(page)) page = 'roster';
+  document.querySelectorAll('nav.pagenav button').forEach(b=>b.classList.toggle('active', b.dataset.page === page));
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  if(!fromHash && location.hash !== '#' + page) history.pushState(null, '', '#' + page);
+  if(page === 'report') renderReportControls();
+  if(page === 'event'){
+    // keep the date defaulting to today unless someone has picked one on purpose
+    const di = document.getElementById('eventDate');
+    if(di && !di.dataset.touched) di.value = todayISO();
+    checkDuplicateEventWarning();
+  }
+  if(page === 'statistics') renderStatistics();
+  window.scrollTo(0, 0);
+}
 document.querySelectorAll('nav.pagenav button').forEach(btn=>{
-  btn.addEventListener('click', ()=>{
-    document.querySelectorAll('nav.pagenav button').forEach(b=>b.classList.remove('active'));
-    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-    btn.classList.add('active');
-    document.getElementById('page-'+btn.dataset.page).classList.add('active');
-    if(btn.dataset.page === 'report') renderReportControls();
-    if(btn.dataset.page === 'event') checkDuplicateEventWarning();
-    if(btn.dataset.page === 'statistics') renderStatistics();
-  });
+  btn.addEventListener('click', ()=> goToPage(btn.dataset.page));
 });
+window.addEventListener('popstate', ()=> goToPage(location.hash.slice(1), true));
 
 // ---------- company switcher ----------
 // The chosen company is stored in this browser's localStorage only — it's a personal
@@ -773,13 +913,47 @@ document.addEventListener('click', (e)=>{
 // Fallback path: window.storage, which only works while previewing this file here in
 // chat — it does nothing once deployed — so the app is still testable before Cloudflare
 // KV is wired up.
+// Every API call carries the site password (kept in this browser after login). A 401
+// pops the login screen back up.
+function getSitePassword(){ try{ return localStorage.getItem('unksoPw') || ''; }catch(e){ return ''; } }
+async function authFetch(url, opts){
+  opts = opts || {};
+  opts.headers = Object.assign({}, opts.headers, { 'X-Site-Password': getSitePassword() });
+  const res = await fetch(url, opts);
+  if(res.status === 401){
+    showLogin('');
+    const err = new Error('auth'); err.code = 'auth'; throw err;
+  }
+  return res;
+}
+const loginOverlay = document.getElementById('loginOverlay');
+function showLogin(msg){
+  loginOverlay.style.display = 'flex';
+  document.getElementById('loginErr').textContent = msg || '';
+  document.getElementById('loginPassword').focus();
+}
+document.getElementById('loginForm').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const pw = document.getElementById('loginPassword').value;
+  try{
+    const res = await fetch('/api/auth', { headers: { 'X-Site-Password': pw } });
+    if(res.status === 401){ showLogin('Incorrect password.'); return; }
+    if(!res.ok) throw new Error('bad');
+  }catch(err){ showLogin('Could not reach the server — try again.'); return; }
+  try{ localStorage.setItem('unksoPw', pw); }catch(err){ /* ignore */ }
+  document.getElementById('loginPassword').value = '';
+  loginOverlay.style.display = 'none';
+  await load();
+  if(location.hash) goToPage(location.hash.slice(1), true);
+});
+
 async function apiGet(key){
-  const res = await fetch('/api/' + key + '?company=' + encodeURIComponent(CURRENT_COMPANY));
+  const res = await authFetch('/api/' + key + '?company=' + encodeURIComponent(CURRENT_COMPANY));
   if(!res.ok) throw new Error('api unavailable');
   return res.json();
 }
 async function apiPost(key, value){
-  const res = await fetch('/api/' + key + '?company=' + encodeURIComponent(CURRENT_COMPANY), {
+  const res = await authFetch('/api/' + key + '?company=' + encodeURIComponent(CURRENT_COMPANY), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(value)
@@ -788,12 +962,28 @@ async function apiPost(key, value){
 }
 
 async function persist(){
+  if(!LOADED){ setSaveState('error'); return false; } // never overwrite shared data with unloaded/empty state
+  saveInflight++;
+  setSaveState('saving');
+  let ok = false;
+  try{ ok = await persistRaw(); }catch(e){ ok = false; }
+  saveInflight--;
+  if(!ok) setSaveState('error');
+  else if(saveInflight === 0) setSaveState('saved');
+  return ok;
+}
+document.getElementById('savePillRetry').addEventListener('click', ()=>{ LOADED ? persist() : load(); });
+
+async function persistRaw(){
   if(usingSharedApi){
     try{
       await apiPost('members', MEMBERS);
       await apiPost('events', EVENTS);
       return true;
-    }catch(e){ /* fall through to preview storage below */ }
+    }catch(e){
+      if(e.code === 'auth') return false;
+      /* otherwise fall through to preview storage below */
+    }
   }
   try{
     await window.storage.set('members:' + CURRENT_COMPANY, JSON.stringify(MEMBERS), true);
@@ -802,7 +992,27 @@ async function persist(){
   }catch(e){ return false; /* no storage available at all */ }
 }
 
+function showLoadingState(){
+  rosterList.innerHTML = '<div class="empty">Loading…</div>';
+  historyWrap.innerHTML = '<div class="card"><div class="empty">Loading…</div></div>';
+}
+function showLoadError(){
+  const html = '<div class="load-error">Couldn\'t load data. <button class="btn small load-retry">Retry</button></div>';
+  rosterList.innerHTML = html;
+  historyWrap.innerHTML = '<div class="card">' + html + '</div>';
+  document.querySelectorAll('.load-retry').forEach(b => b.addEventListener('click', load));
+  setSaveState('error');
+}
+function refreshActivePage(){
+  const active = document.querySelector('nav.pagenav button.active');
+  if(!active) return;
+  if(active.dataset.page === 'statistics') renderStatistics();
+  if(active.dataset.page === 'report') renderReportControls();
+  if(active.dataset.page === 'event') checkDuplicateEventWarning();
+}
 async function load(){
+  LOADED = false;
+  showLoadingState();
   try{
     const membersRaw = await apiGet('members');
     EVENTS = await apiGet('events');
@@ -816,6 +1026,8 @@ async function load(){
       MEMBERS = membersRaw;
     }
   }catch(apiErr){
+    if(apiErr.code === 'auth') return; // login screen is showing; load() re-runs after login
+    if(typeof window.storage === 'undefined'){ showLoadError(); return; } // live site: don't show made-up data
     usingSharedApi = false;
     try{
       const m = await window.storage.get('members:' + CURRENT_COMPANY, true);
@@ -828,8 +1040,12 @@ async function load(){
       EVENTS = [];
     }
   }
+  LOADED = true;
+  if(document.getElementById('savePill').classList.contains('error')) document.getElementById('savePill').style.display = 'none';
   renderRoster();
   renderHistory();
+  refreshActivePage();
+  if(stampEventRosters()) persist();
 }
 
 const rosterStatus = document.getElementById('rosterStatus');
@@ -888,12 +1104,12 @@ function openMemberDetail(name){
   document.getElementById('memberDetailName').textContent = name;
   const body = document.getElementById('memberDetailBody');
 
-  const count = EVENTS.filter(ev => ev.present.includes(name)).length;
-  const pct = EVENTS.length ? Math.round((count / EVENTS.length) * 100) : 0;
-  const recentThreeIdx = getMostRecentEventIndices(3);
-  const isInactive = EVENTS.length >= 3 && !recentThreeIdx.some(i => EVENTS[i].present.includes(name));
+  const evs = memberEvents(name);
+  const count = evs.filter(ev => ev.present.includes(name)).length;
+  const pct = evs.length ? Math.round((count / evs.length) * 100) : 0;
+  const isInactive = memberNeedsAttention(name);
 
-  const ordered = EVENTS
+  const ordered = evs
     .map((ev, idx) => ({ev, idx}))
     .sort((a,b) => b.ev.date.localeCompare(a.ev.date));
 
@@ -910,12 +1126,12 @@ function openMemberDetail(name){
 
   body.innerHTML = `
     <div class="member-detail-stats">
-      <div class="stat-card"><div class="n">${count}/${EVENTS.length}</div><div class="l">Events attended</div></div>
+      <div class="stat-card"><div class="n">${count}/${evs.length}</div><div class="l">Events attended</div></div>
       <div class="stat-card"><div class="n">${pct}%</div><div class="l">Attendance rate</div></div>
     </div>
     ${isInactive ? `<div class="duplicate-warning" style="display:flex; margin-bottom:14px;">&#9888; No attendance in the last 3 events</div>` : ''}
     <div class="member-detail-list">
-      ${EVENTS.length ? rows : '<div class="empty">No events logged yet.</div>'}
+      ${evs.length ? rows : '<div class="empty">No events logged yet.</div>'}
     </div>
   `;
   overlay.style.display = 'flex';
@@ -940,12 +1156,7 @@ function renderRoster(){
   if(statMembers) statMembers.textContent = MEMBERS.length;
   if(statEvents) statEvents.textContent = EVENTS.length;
   if(statAvg){
-    let avgPct = 0;
-    if(MEMBERS.length && EVENTS.length){
-      const sum = MEMBERS.reduce((acc,name)=> acc + EVENTS.filter(ev=>ev.present.includes(name)).length, 0);
-      avgPct = Math.round((sum / (MEMBERS.length * EVENTS.length)) * 100);
-    }
-    statAvg.textContent = avgPct + '%';
+    statAvg.textContent = overallRate() + '%';
   }
 
   // Inactivity flag: no attendance in any of the 3 most recent events. Only applies
@@ -962,9 +1173,10 @@ function renderRoster(){
   MEMBERS.forEach((name, idx)=>{
     if(searchTerm && !name.toLowerCase().includes(searchTerm)) return;
     shown++;
-    const count = EVENTS.filter(ev=>ev.present.includes(name)).length;
-    const pct = EVENTS.length ? Math.round((count / EVENTS.length) * 100) : 0;
-    const isInactive = hasEnoughHistory && !recentThreeIdx.some(i => EVENTS[i].present.includes(name));
+    const evs = memberEvents(name);
+    const count = evs.filter(ev=>ev.present.includes(name)).length;
+    const pct = evs.length ? Math.round((count / evs.length) * 100) : 0;
+    const isInactive = memberNeedsAttention(name);
     const li = document.createElement('li');
     li.draggable = true;
     li.dataset.idx = idx;
@@ -973,7 +1185,7 @@ function renderRoster(){
       <span class="rname clickable" data-name="${escapeHtml(name)}" title="View member details">${escapeHtml(name)}</span>
       <span class="prog-wrap">
         <span class="prog-track"><span class="prog-fill${isInactive?' inactive':''}" style="width:${pct}%" ${isInactive?'title="No attendance in the last 3 events"':''}></span></span>
-        <span class="prog-frac mono${isInactive?' inactive-label':''}">${count}/${EVENTS.length}</span>
+        <span class="prog-frac mono${isInactive?' inactive-label':''}">${count}/${evs.length}</span>
       </span>
       <button class="remove-x" title="Remove from roster" data-name="${escapeHtml(name)}">&#10005;</button>`;
     rosterList.appendChild(li);
@@ -1036,7 +1248,12 @@ function attachRosterDragHandlers(){
 document.getElementById('addMemberBtn').addEventListener('click', async ()=>{
   const input = document.getElementById('newMember');
   const val = input.value.trim();
-  if(val && !MEMBERS.includes(val)){
+  if(val && MEMBERS.some(m => m.toLowerCase() === val.toLowerCase())){
+    rosterStatus.textContent = `"${val}" is already on the roster.`;
+    rosterStatus.className = 'status-line err';
+    return;
+  }
+  if(val){
     MEMBERS.push(val);
     input.value='';
     renderRoster(); renderHistory();
@@ -1085,7 +1302,8 @@ document.querySelectorAll('#eventTypeGroup input[type=radio]').forEach(radio=>{
     checkDuplicateEventWarning();
   });
 });
-document.getElementById('eventDate').addEventListener('change', checkDuplicateEventWarning);
+document.getElementById('eventDate').value = todayISO();
+document.getElementById('eventDate').addEventListener('change', (e)=>{ e.target.dataset.touched = '1'; checkDuplicateEventWarning(); });
 
 // Warns if an event of the selected type has already been logged within the 6 days
 // leading up to (and including) the selected date — defaults to today if no date
@@ -1095,7 +1313,7 @@ function checkDuplicateEventWarning(){
   const checkedRadio = document.querySelector('#eventTypeGroup input[name="eventType"]:checked');
   const selectedType = checkedRadio ? checkedRadio.value : null;
   const dateInput = document.getElementById('eventDate');
-  const effectiveDate = dateInput.value || new Date().toISOString().slice(0,10);
+  const effectiveDate = dateInput.value || todayISO();
 
   const effective = new Date(effectiveDate + 'T00:00:00');
   const cutoff = new Date(effective);
@@ -1190,7 +1408,7 @@ readBtn.addEventListener('click', async ()=>{
   clearMatchSections();
 
   try{
-    const response = await fetch("/api/read-screenshot", {
+    const response = await authFetch("/api/read-screenshot", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ image: "data:image/png;base64," + currentImageBase64 })
@@ -1353,7 +1571,7 @@ commitBtn.addEventListener('click', ()=>{
   const dateInput = document.getElementById('eventDate');
   const checkedRadio = document.querySelector('#eventTypeGroup input[name="eventType"]:checked');
   const eventType = checkedRadio ? checkedRadio.value : 'General Meeting';
-  const eventDate = dateInput.value || new Date().toISOString().slice(0,10);
+  const eventDate = dateInput.value || todayISO();
   const eventName = `${eventType} - ${formatEventDateTag(eventDate)}`;
 
   const present = [...new Set(
@@ -1366,7 +1584,7 @@ commitBtn.addEventListener('click', ()=>{
     return;
   }
 
-  EVENTS.push({ name: eventName, date: eventDate, present });
+  EVENTS.push({ name: eventName, date: eventDate, present, excused: [], roster: [...new Set([...MEMBERS, ...present])] });
   persist();
   renderRoster();
   renderHistory();
@@ -1375,7 +1593,8 @@ commitBtn.addEventListener('click', ()=>{
   const radios = document.querySelectorAll('#eventTypeGroup input[name="eventType"]');
   radios.forEach((r,i)=>{ r.checked = (i===0); });
   document.querySelectorAll('#eventTypeGroup .choice-option').forEach((opt,i)=>opt.classList.toggle('selected', i===0));
-  dateInput.value='';
+  delete dateInput.dataset.touched;
+  dateInput.value = todayISO();
   checkDuplicateEventWarning();
   dropzone.style.display = 'block';
   previewActions.style.display = 'none';
@@ -1383,7 +1602,13 @@ commitBtn.addEventListener('click', ()=>{
   clearMatchSections();
   commitBtn.style.display='none';
   currentImageBase64 = null; currentMatches = [];
-  statusLine.textContent = `Logged "${eventName}" with ${present.length} member(s) present.`;
+  statusLine.innerHTML = '';
+  statusLine.append(`Logged "${eventName}" with ${present.length} member(s) present. `);
+  const viewLink = document.createElement('a');
+  viewLink.href = '#attendance'; viewLink.textContent = 'View in Attendance History \u2192';
+  viewLink.style.cssText = 'color:var(--amber); font-weight:600;';
+  viewLink.addEventListener('click', (e)=>{ e.preventDefault(); goToPage('attendance'); });
+  statusLine.append(viewLink);
   statusLine.className = 'status-line';
 });
 
@@ -1418,15 +1643,16 @@ function renderHistory(){
 }
 
 function attendanceColumnsHTML(ev, idx){
-  const rosterMembers = MEMBERS;
+  const rosterMembers = orderedEventRoster(ev);
   const excusedSet = new Set(ev.excused || []);
   const present = rosterMembers.filter(name => ev.present.includes(name));
   const absent = rosterMembers.filter(name => !ev.present.includes(name) && !excusedSet.has(name));
   const excused = rosterMembers.filter(name => excusedSet.has(name) && !ev.present.includes(name));
 
-  const presentChip = name => `<div class="attendance-chip present"><span class="glyph">&#10003;</span><span>${escapeHtml(name)}</span></div>`;
-  const absentChip = name => `<div class="attendance-chip absent"><span class="glyph">X</span><span>${escapeHtml(name)}</span><label class="excuse-toggle" title="Mark excused"><input type="checkbox" class="excuse-checkbox" data-event-idx="${idx}" data-name="${escapeHtml(name)}"></label></div>`;
-  const excusedChip = name => `<div class="attendance-chip excused"><span class="glyph">&#9679;</span><span>${escapeHtml(name)}</span><label class="excuse-toggle" title="Unmark excused"><input type="checkbox" class="excuse-checkbox" data-event-idx="${idx}" data-name="${escapeHtml(name)}" checked></label></div>`;
+  const former = n => MEMBERS.includes(n) ? '' : ' former';
+  const presentChip = name => `<div class="attendance-chip present${former(name)}"><span class="glyph">&#10003;</span><span>${escapeHtml(name)}</span></div>`;
+  const absentChip = name => `<div class="attendance-chip absent${former(name)}"><span class="glyph">X</span><span>${escapeHtml(name)}</span><label class="excuse-toggle" title="Mark excused"><input type="checkbox" class="excuse-checkbox" data-event-idx="${idx}" data-name="${escapeHtml(name)}"></label></div>`;
+  const excusedChip = name => `<div class="attendance-chip excused${former(name)}"><span class="glyph">&#9679;</span><span>${escapeHtml(name)}</span><label class="excuse-toggle" title="Unmark excused"><input type="checkbox" class="excuse-checkbox" data-event-idx="${idx}" data-name="${escapeHtml(name)}" checked></label></div>`;
 
   const presentHtml = present.length ? present.map(presentChip).join('') : '<div class="empty" style="padding:6px 0;">None</div>';
   const absentHtml = absent.length ? absent.map(absentChip).join('') : '<div class="empty" style="padding:6px 0;">None</div>';
@@ -1450,7 +1676,7 @@ function attendanceColumnsHTML(ev, idx){
 }
 
 function eventCardHTML(ev, idx){
-  const rosterMembers = MEMBERS;
+  const rosterMembers = orderedEventRoster(ev);
   return `
   <div class="card event-card" data-idx="${idx}">
     <div class="event-head">
@@ -1531,10 +1757,12 @@ function openEditForm(idx){
   body.style.display = 'block';
   toggle.classList.add('open');
   // Member order here follows the Roster page's own order, not alphabetical.
-  const rosterMembers = MEMBERS;
+  const rosterMembers = orderedEventRoster(ev);
 
   body.innerHTML = `
+    <label class="edit-label" for="editName${idx}">Event name</label>
     <input type="text" id="editName${idx}" value="${escapeHtml(ev.name)}" placeholder="Event name">
+    <label class="edit-label" for="editDate${idx}">Event date</label>
     <input type="date" id="editDate${idx}" value="${ev.date}">
     <div class="member-grid">
       ${rosterMembers.map(name=>`
@@ -1554,7 +1782,15 @@ function openEditForm(idx){
     const newName = document.getElementById('editName'+idx).value.trim() || 'Untitled Event';
     const newDate = document.getElementById('editDate'+idx).value || ev.date;
     const checked = [...body.querySelectorAll('input[type=checkbox]:checked')].map(cb=>cb.dataset.name);
-    EVENTS[idx] = { name:newName, date:newDate, present:checked };
+    // If the date changed and the name carries the old date tag (e.g. "FTX - 24JUL26"),
+    // move the tag to the new date so the name doesn't contradict the date field.
+    let finalName = newName;
+    if(newDate !== ev.date){
+      const oldTag = formatEventDateTag(ev.date), newTag = formatEventDateTag(newDate);
+      if(newName.includes(oldTag)) finalName = newName.split(oldTag).join(newTag);
+    }
+    const stillExcused = (ev.excused || []).filter(n => !checked.includes(n));
+    EVENTS[idx] = { name:finalName, date:newDate, present:checked, excused:stillExcused, roster:eventRoster(ev) };
     persist();
     renderRoster();
     renderHistory();
@@ -1672,8 +1908,7 @@ function eventTypeOf(ev){
 }
 
 function buildAttendanceTrendSVG(){
-  const totalMembers = MEMBERS.length;
-  if(EVENTS.length === 0 || totalMembers === 0){
+  if(EVENTS.length === 0){
     return '<div class="empty">Not enough data yet — log a few events to see a trend.</div>';
   }
 
@@ -1722,8 +1957,8 @@ function buildAttendanceTrendSVG(){
     const chronological = [...byType[type]].sort((a,b) => a.date.localeCompare(b.date));
     const points = chronological.map(ev => ({
       date: ev.date,
-      pct: Math.round((ev.present.length / totalMembers) * 100),
-      fullLabel: `${ev.name} — ${ev.present.length}/${totalMembers}`
+      pct: Math.round((ev.present.length / eventSize(ev)) * 100),
+      fullLabel: `${ev.name} — ${ev.present.length}/${eventSize(ev)}`
     }));
 
     if(points.length === 1){
@@ -1761,11 +1996,7 @@ function renderStatistics(){
   const totalMembers = MEMBERS.length;
   const totalEvents = EVENTS.length;
 
-  let overallAvg = 0;
-  if(totalMembers && totalEvents){
-    const sum = MEMBERS.reduce((acc,name)=> acc + EVENTS.filter(ev=>ev.present.includes(name)).length, 0);
-    overallAvg = Math.round((sum / (totalMembers * totalEvents)) * 100);
-  }
+  const overallAvg = overallRate();
 
   const byType = {};
   EVENTS.forEach(ev=>{
@@ -1774,32 +2005,27 @@ function renderStatistics(){
   });
   const typeRows = Object.keys(byType).sort().map(type=>{
     const evs = byType[type];
-    let avg = 0;
-    if(totalMembers && evs.length){
-      const sum = evs.reduce((acc,ev)=> acc + ev.present.length, 0);
-      avg = Math.round((sum / (totalMembers * evs.length)) * 100);
-    }
-    return { type, count: evs.length, avg };
+    return { type, count: evs.length, avg: overallRate(evs) };
   });
 
-  let mostActiveNames = '', leastActiveNames = '', maxCount = 0, minCount = 0;
-  if(totalMembers && totalEvents){
-    const counts = MEMBERS.map(name => ({
-      name, count: EVENTS.filter(ev => ev.present.includes(name)).length
-    }));
-    maxCount = Math.max(...counts.map(c => c.count));
-    minCount = Math.min(...counts.map(c => c.count));
-    mostActiveNames = counts.filter(c => c.count === maxCount).map(c => c.name).join(', ');
-    leastActiveNames = counts.filter(c => c.count === minCount).map(c => c.name).join(', ');
+  // Per-member rates only count events the member was actually on the roster for, so
+  // someone who joined recently isn't ranked "least active" for events before they joined.
+  const memberRows = MEMBERS.map(name => {
+    const evs = memberEvents(name);
+    const count = evs.filter(ev => ev.present.includes(name)).length;
+    const pct = evs.length ? Math.round((count / evs.length) * 100) : 0;
+    return { name, count, total: evs.length, pct };
+  }).filter(m => m.total > 0).sort((a,b) => b.pct - a.pct);
+
+  let mostActiveNames = '', leastActiveNames = '', maxPct = 0, minPct = 0;
+  if(memberRows.length){
+    maxPct = Math.max(...memberRows.map(c => c.pct));
+    minPct = Math.min(...memberRows.map(c => c.pct));
+    mostActiveNames = memberRows.filter(c => c.pct === maxPct).map(c => c.name).join(', ');
+    leastActiveNames = memberRows.filter(c => c.pct === minPct).map(c => c.name).join(', ');
   }
 
   const totalExcused = EVENTS.reduce((acc,ev) => acc + (ev.excused ? ev.excused.length : 0), 0);
-
-  const memberRows = MEMBERS.map(name => {
-    const count = EVENTS.filter(ev => ev.present.includes(name)).length;
-    const pct = totalEvents ? Math.round((count / totalEvents) * 100) : 0;
-    return { name, count, pct };
-  }).sort((a,b) => b.pct - a.pct);
 
   wrap.innerHTML = `
     <div class="stat-row">
@@ -1830,8 +2056,8 @@ function renderStatistics(){
       <div class="card">
         <h2>Member Highlights</h2>
         ${totalEvents === 0 ? '<div class="empty">No events logged yet.</div>' : `
-          <div class="member-row"><span>Most active</span><span>${escapeHtml(mostActiveNames)} — ${maxCount}/${totalEvents}</span></div>
-          <div class="member-row"><span>Least active</span><span>${escapeHtml(leastActiveNames)} — ${minCount}/${totalEvents}</span></div>
+          <div class="member-row"><span>Most active</span><span>${escapeHtml(mostActiveNames)} — ${maxPct}%</span></div>
+          <div class="member-row"><span>Least active</span><span>${escapeHtml(leastActiveNames)} — ${minPct}%</span></div>
           <div class="member-row"><span>Total excused instances</span><span class="mono">${totalExcused}</span></div>
         `}
       </div>
@@ -1844,7 +2070,7 @@ function renderStatistics(){
           <span class="rname">${escapeHtml(m.name)}</span>
           <span class="prog-wrap">
             <span class="prog-track"><span class="prog-fill" style="width:${m.pct}%"></span></span>
-            <span class="prog-frac mono">${m.count}/${totalEvents}</span>
+            <span class="prog-frac mono">${m.count}/${m.total}</span>
           </span>
         </div>
       `).join('') : '<div class="empty">No members on the roster yet.</div>'}
@@ -1858,11 +2084,11 @@ function renderStatistics(){
 function computeNeedsAttention(members){
   if(EVENTS.length < 3) return [];
   const recentThreeIdx = getMostRecentEventIndices(3);
-  return members.filter(name => !recentThreeIdx.some(i => EVENTS[i].present.includes(name)));
+  return members.filter(name => memberNeedsAttention(name));
 }
 
 function buildReportText(){
-  const today = new Date().toISOString().slice(0,10);
+  const today = todayISO();
   const selectedMembers = getSelectedReportMembers();
   const selectedEvents = getSelectedReportEvents();
   const from = document.getElementById('reportFrom').value;
@@ -1887,6 +2113,7 @@ function buildReportText(){
     selectedMembers.forEach(name=>{
       let attended=0, absent=0, excused=0;
       selectedEvents.forEach(ev=>{
+        if(!wasInEvent(ev, name)) return; // not on the roster yet for this event
         if(ev.present.includes(name)) attended++;
         else if((ev.excused || []).includes(name)) excused++;
         else absent++;
@@ -1911,7 +2138,7 @@ function buildReportText(){
   }else{
     selectedEvents.forEach(ev=>{
       const excusedCount = (ev.excused || []).length;
-      lines.push(`  ${ev.name} — ${ev.present.length}/${MEMBERS.length} present${excusedCount ? `, ${excusedCount} excused` : ''}`);
+      lines.push(`  ${ev.name} — ${ev.present.length}/${eventSize(ev)} present${excusedCount ? `, ${excusedCount} excused` : ''}`);
     });
   }
   lines.push('');
@@ -2014,7 +2241,7 @@ async function buildReportCanvas(){
   // Mirrors the SVG trend chart on the Statistics page, redrawn with canvas 2D
   // primitives (canvas can't render SVG directly).
   function drawTrendChart(x, top, w, h, evs){
-    if(evs.length === 0 || MEMBERS.length === 0) return;
+    if(evs.length === 0) return;
 
     const byType = {};
     evs.forEach(ev => {
@@ -2055,7 +2282,7 @@ async function buildReportCanvas(){
       const color = palette[ti % palette.length];
       const chronological = [...byType[type]].sort((a,b) => a.date.localeCompare(b.date));
       const points = chronological.map(ev => ({
-        date: ev.date, pct: Math.round((ev.present.length / MEMBERS.length) * 100)
+        date: ev.date, pct: Math.round((ev.present.length / eventSize(ev)) * 100)
       }));
 
       if(points.length === 1){
@@ -2130,7 +2357,7 @@ async function buildReportCanvas(){
   ctx.fillStyle = COL.inkSoft;
   ctx.font = "400 12.5px 'IBM Plex Sans'";
   ctx.textAlign = 'right';
-  ctx.fillText('Generated ' + formatEventDateTag(new Date().toISOString().slice(0,10)), width - padding, y + 16);
+  ctx.fillText('Generated ' + formatEventDateTag(todayISO()), width - padding, y + 16);
   ctx.textAlign = 'left';
 
   y += headerH;
@@ -2154,11 +2381,12 @@ async function buildReportCanvas(){
     members.forEach(name => {
       let attended=0, absent=0, excused=0;
       events.forEach(ev => {
+        if(!wasInEvent(ev, name)) return;
         if(ev.present.includes(name)) attended++;
         else if((ev.excused || []).includes(name)) excused++;
         else absent++;
       });
-      const total = events.length || 1;
+      const total = (attended + absent + excused) || 1;
 
       ctx.fillStyle = COL.ink;
       ctx.font = "400 15px 'IBM Plex Sans'";
@@ -2219,7 +2447,7 @@ async function buildReportCanvas(){
       ctx.fillStyle = COL.inkSoft;
       ctx.font = "500 12.5px 'JetBrains Mono'";
       ctx.textAlign = 'right';
-      ctx.fillText(`${ev.present.length}/${MEMBERS.length} present`, width - padding, y);
+      ctx.fillText(`${ev.present.length}/${eventSize(ev)} present`, width - padding, y);
       ctx.textAlign = 'left';
 
       y += rowH;
@@ -2295,7 +2523,94 @@ document.getElementById('historySearch').addEventListener('input', (e)=>{
   renderHistory();
 });
 
-load();
+// ---------- restore missing members ----------
+const restoreOverlay = document.getElementById('restoreOverlay');
+function closeRestore(){ restoreOverlay.style.display = 'none'; }
+document.getElementById('restoreClose').addEventListener('click', closeRestore);
+restoreOverlay.addEventListener('click', (e)=>{ if(e.target === restoreOverlay) closeRestore(); });
+document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeRestore(); });
+
+function escapeHtmlR(t){ return String(t).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function renderRestoreHistory(){
+  const box = document.getElementById('restoreHistoryList');
+  const counts = new Map();
+  EVENTS.forEach(ev => [...(ev.present||[]), ...(ev.excused||[])].forEach(n => {
+    if(!MEMBERS.includes(n)) counts.set(n, (counts.get(n)||0) + 1);
+  }));
+  const names = [...counts.keys()].sort((a,b)=>a.localeCompare(b));
+  if(!names.length){
+    box.innerHTML = '<div class="restore-empty">Nobody missing — every name in the history is on the roster.</div>';
+    return;
+  }
+  box.innerHTML = names.map((n,i)=>`<div class="restore-row"><label><input type="checkbox" class="restore-cb" data-name="${escapeHtmlR(n)}" checked> ${escapeHtmlR(n)}</label><span class="meta">${counts.get(n)} event${counts.get(n)===1?'':'s'}</span></div>`).join('')
+    + '<div style="margin-top:10px;"><button class="btn small" id="restoreHistoryAdd">Add selected</button></div>';
+  document.getElementById('restoreHistoryAdd').addEventListener('click', async ()=>{
+    const picked = [...box.querySelectorAll('.restore-cb:checked')].map(cb => cb.dataset.name);
+    picked.forEach(n => { if(!MEMBERS.includes(n)) MEMBERS.push(n); });
+    renderRoster(); renderHistory();
+    showRosterStatus(await persist());
+    renderRestoreHistory();
+  });
+}
+
+function formatBackupWhen(iso){
+  const d = new Date(iso);
+  if(isNaN(d)) return iso;
+  return formatEventDateTag(iso.slice(0,10)) + ' ' + d.toTimeString().slice(0,5);
+}
+
+async function renderRestoreBackups(){
+  const box = document.getElementById('restoreBackupList');
+  box.innerHTML = '<div class="restore-empty">Loading…</div>';
+  if(!usingSharedApi){
+    box.innerHTML = '<div class="restore-empty">Automatic backups are only available on the live site.</div>';
+    return;
+  }
+  try{
+    const res = await authFetch('/api/backups?company=' + encodeURIComponent(CURRENT_COMPANY));
+    if(!res.ok) throw new Error('bad');
+    const items = await res.json();
+    if(!items.length){
+      box.innerHTML = '<div class="restore-empty">No backups yet. One is saved the next time anyone is removed from the roster.</div>';
+      return;
+    }
+    box.innerHTML = items.map((it,i)=>`<div class="restore-row"><span>${escapeHtmlR(formatBackupWhen(it.when))}<span class="meta"> &nbsp;${it.count==null?'':it.count+' members'}</span></span><button class="btn small ghost" data-i="${i}">Restore</button></div>`).join('');
+    box.querySelectorAll('button[data-i]').forEach(btn=>{
+      btn.addEventListener('click', async ()=>{
+        btn.disabled = true;
+        try{
+          const r = await authFetch('/api/backups?company=' + encodeURIComponent(CURRENT_COMPANY) + '&key=' + encodeURIComponent(items[btn.dataset.i].key));
+          const snap = await r.json();
+          if(!Array.isArray(snap)) throw new Error('bad');
+          MEMBERS = [...snap, ...MEMBERS.filter(n => !snap.includes(n))];
+          renderRoster(); renderHistory();
+          showRosterStatus(await persist());
+          closeRestore();
+        }catch(e){ if(e.code !== 'auth'){ btn.disabled = false; btn.textContent = 'Failed'; } }
+      });
+    });
+  }catch(e){
+    box.innerHTML = '<div class="restore-empty">Could not load backups.</div>';
+  }
+}
+
+document.getElementById('restoreBtn').addEventListener('click', ()=>{
+  restoreOverlay.style.display = 'flex';
+  renderRestoreHistory();
+  renderRestoreBackups();
+});
+
+// Gate: if the server wants a password and we don't have a valid one, show the login
+// screen; otherwise load. (No /api at all = chat preview, which skips the gate.)
+(async function init(){
+  try{
+    const res = await fetch('/api/auth', { headers: { 'X-Site-Password': getSitePassword() } });
+    if(res.status === 401){ showLogin(''); return; }
+  }catch(e){ /* preview / offline: fall through to load() */ }
+  await load();
+  if(location.hash) goToPage(location.hash.slice(1), true);
+})();
 </script>
 </body>
 </html>
