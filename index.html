@@ -178,6 +178,15 @@
   .save-pill.error{background:rgba(208,84,7,.14); border-color:rgba(208,84,7,.55); color:var(--amber);}
   .save-pill.error .dot{background:var(--amber);}
   @keyframes savepulse{0%,100%{opacity:.3}50%{opacity:1}}
+  .present-btn{
+    background:transparent; border:1px solid var(--khaki-line); color:var(--signal); border-radius:4px;
+    font-size:11px; font-weight:700; cursor:pointer; padding:2px 7px; margin-left:6px; font-family:'IBM Plex Sans';
+  }
+  .present-btn:hover{background:var(--signal); color:#fff; border-color:var(--signal);}
+  .add-to-event{display:flex; gap:8px; align-items:center; margin-bottom:12px; padding-bottom:12px; border-bottom:1px solid var(--khaki-line);}
+  .add-to-event-status:empty{display:none;}
+  .add-to-event-status{margin:-4px 0 10px;}
+  .add-to-event input{flex:1; margin-bottom:0;}
   .attendance-chip.former{opacity:.6;}
   .attendance-chip.former span:nth-child(2)::after{content:' (left)'; font-size:10.5px; color:var(--ink-soft);}
   .edit-label{display:block; font-family:'Gilroy'; font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-soft); margin:4px 0 4px;}
@@ -314,7 +323,7 @@
   .add-row input{margin-bottom:0;}
   .roster-list{list-style:none; margin:0; padding:0; max-height:520px; overflow-y:auto;}
   .roster-list li{
-    display:grid; grid-template-columns:20px 1fr 150px 26px; align-items:center; gap:12px;
+    display:grid; grid-template-columns:20px 1fr 150px 26px 26px; align-items:center; gap:10px;
     padding:9px 4px; border-bottom:1px solid var(--khaki-line);
   }
   .roster-list li:last-child{border-bottom:none;}
@@ -335,6 +344,9 @@
     background:none; border:none; color:var(--alert); cursor:pointer; font-size:13px; padding:0 4px; opacity:.75;
   }
   .remove-x:hover{opacity:1;}
+  .rename-btn{background:none; border:none; color:var(--ink-soft); cursor:pointer; font-size:13px; padding:0 4px; opacity:.75;}
+  .rename-btn:hover{opacity:1; color:var(--ink);}
+  .roster-list input.rename-input{margin:0; padding:6px 9px;}
 
   /* ---------- event type choice boxes ---------- */
   .choice-group{display:flex; gap:10px; margin-bottom:10px; flex-wrap:wrap;}
@@ -381,6 +393,35 @@
   .preview-wrap .preview-actions{display:flex; gap:8px; margin-bottom:10px;}
   .preview-wrap img{max-width:100%; border-radius:8px; border:1px solid var(--khaki-line); display:block;}
   .preview-actions{display:flex; gap:8px; margin-bottom:10px;}
+  .preview-head{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:8px;}
+  .preview-label{font-family:'Gilroy'; font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-soft); margin:0;}
+  .box-legend{display:flex; gap:14px; font-size:11.5px; color:var(--ink-soft);}
+  .box-legend span{display:inline-flex; align-items:center; gap:6px;}
+  .box-legend .lg{display:inline-block; width:14px; height:10px; border:2px solid; border-radius:2px;}
+  .box-legend .lg.high{border-color:var(--signal);}
+  .box-legend .lg.low{border-color:var(--amber);}
+  .box-legend .lg.miss{border-color:var(--alert); border-style:dashed;}
+  .box-note{font-size:12px; color:var(--ink-soft); min-height:0; margin-bottom:6px;}
+  .box-note:empty{display:none;}
+  .shot-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:12px;}
+  .shot{position:relative; border-radius:8px; overflow:hidden; border:1px solid var(--khaki-line); background:#111; cursor:zoom-in; align-self:start;}
+  .preview-wrap .shot img, .shot img{display:block; width:100%; height:auto; border:none; border-radius:0; max-width:none;}
+  .shot.large{cursor:default;}
+  .shot-boxes{position:absolute; inset:0; pointer-events:none;}
+  .nbox{position:absolute; border:2px solid; border-radius:3px;}
+  .nbox.high{border-color:var(--signal); background:rgba(95,156,82,.14);}
+  .nbox.low{border-color:var(--amber); background:rgba(208,84,7,.14);}
+  .nbox.miss{border-color:var(--alert); border-style:dashed; background:rgba(192,57,43,.12);}
+  .nbox.excluded{border-style:dashed; opacity:.5;}
+  .nbox-tag{display:none; position:absolute; left:-2px; bottom:100%; margin-bottom:1px; font:600 10px 'JetBrains Mono'; padding:1px 5px; border-radius:2px; color:#fff; white-space:nowrap;}
+  .shot.large .nbox-tag{display:block;}
+  .nbox.high .nbox-tag{background:var(--signal);}
+  .nbox.low .nbox-tag{background:var(--amber);}
+  .nbox.miss .nbox-tag{background:var(--alert);}
+  .shot-num{position:absolute; top:6px; left:6px; background:rgba(0,0,0,.65); color:#fff; font:600 11px 'JetBrains Mono'; padding:2px 7px; border-radius:4px;}
+  .shot-remove{position:absolute; top:6px; right:6px; width:26px; height:26px; border-radius:50%; border:none; background:rgba(0,0,0,.65); color:#fff; cursor:pointer; font-size:12px;}
+  .shot-remove:hover{background:var(--alert);}
+  .modal.shot-modal{max-width:min(1100px, 95vw); max-height:92vh;}
 
   /* ---------- match review tags ---------- */
   .tag-row{display:flex; flex-wrap:wrap; gap:10px; margin-top:12px;}
@@ -501,7 +542,7 @@
 
     <button class="how-it-works-btn" id="howItWorksBtn"><span class="ic">?</span>How It Works</button>
 
-    <div class="sidebar-foot" id="footerNote">v.27. Unknown Soldiers. Created by Civoen.</div>
+    <div class="sidebar-foot" id="footerNote">v.29. Unknown Soldiers. Created by Civoen.</div>
   </aside>
 
   <div class="modal-overlay" id="howItWorksOverlay" style="display:none;">
@@ -513,11 +554,11 @@
       <ol class="steps">
         <li><strong>Log in.</strong> The site is password protected — enter the password once and this browser will remember it.</li>
         <li><strong>Pick your company.</strong> Use the company switcher at the top of the sidebar (Bravo, Charlie, or Delta). Each has its own roster and event history.</li>
-        <li><strong>Keep the Roster current.</strong> Add or remove members on the Roster page (removals can be undone for a few seconds via the toast that appears). Drag the grip handle to reorder, or use the search box to find someone quickly. Click a name to see their full attendance history. Removing a member never changes past events — they stay in the history marked "(left)". A member's bar turns orange if they've missed the last 3 events in a row. If someone is removed by mistake, use <strong>Restore</strong> to bring names back from Attendance History or an automatic backup.</li>
-        <li><strong>Log a new event.</strong> On the New Event page, choose the event type and date (it starts as today), then drop in (or paste) a Discord screenshot of who attended.</li>
-        <li><strong>Read &amp; review.</strong> Click "Read names from screenshot" — it'll match detected names against your roster. Names at 55%+ confidence are included automatically; 30&ndash;54% needs your review. Use "+ Add member" for anyone it missed entirely.</li>
+        <li><strong>Keep the Roster current.</strong> Add or remove members on the Roster page (removals can be undone for a few seconds via the toast that appears). Drag the grip handle to reorder, or use the search box to find someone quickly. Click a name to see their full attendance history, or the pencil to rename someone (their history follows the new name; renaming to an existing member offers to merge the two). Removing a member never changes past events — they stay in the history marked "(left)". A member's bar turns orange if they've missed the last 3 events in a row. If someone is removed by mistake, use <strong>Restore</strong> to bring names back from Attendance History or an automatic backup.</li>
+        <li><strong>Log a new event.</strong> On the New Event page, choose the event type and date (it starts as today), then drop in (or paste) a Discord screenshot of who attended. If the list doesn't fit in one screenshot, add as many as you need.</li>
+        <li><strong>Read &amp; review.</strong> Click "Read names from screenshot" — it'll match detected names against your roster. Names at 55%+ confidence are included automatically; 30&ndash;54% needs your review. Use "+ Add member" for anyone it missed entirely. Each name it read is boxed on the screenshot in the colour of its match (green 55%+, orange 30&ndash;54%); a red dashed box marks a name it couldn't match, so missed members stand out. Click a screenshot to enlarge it.</li>
         <li><strong>Log it.</strong> Once the matches look right, click "Log this event's attendance."</li>
-        <li><strong>Review history.</strong> Events are always listed most-recent-first, and you can search by name or date. Expand any event to see who was Present, Absent, or Excused. Check the box next to an absent name to mark them Excused. Edit an event at any time (including its date), or delete it (deletions can be undone for a few seconds via the toast that appears).</li>
+        <li><strong>Review history.</strong> Events are always listed most-recent-first, and you can search by name or date. Expand any event to see who was Present, Absent, or Excused. Check the box next to an absent name to mark them Excused. To add someone to Present after the event was logged, click "Present" next to their name, or type any name into the "Add someone to Present" box at the top of the event (a name that isn't on the roster yet is added to it too). Edit an event at any time (including its date), or delete it (deletions can be undone for a few seconds via the toast that appears).</li>
         <li><strong>Generate a report.</strong> On Generate Report, set a From and To, tick which members and events to include, and add any Promotions or Awards. The date range and a Needs Attention list (anyone missing from the last 3 events) are worked out automatically. Then either copy the report as plain text, or use "Copy Image" to copy a site-styled image — trend chart and all — straight to your clipboard for pasting into Discord or elsewhere.</li>
         <li><strong>Check the Statistics.</strong> This page is read-only — it shows an attendance trend chart over time (a separate line per event type), overall and per-event-type average attendance, your most and least active member, and total excused instances, all computed automatically from Attendance History.</li>
       </ol>
@@ -576,14 +617,14 @@
 
         <div class="dropzone" id="dropzone" tabindex="0">
           <div class="icon">&#128203;</div>
-          <p><strong>Drop a screenshot</strong>, or click here then paste (Cmd/Ctrl+V)</p>
-          <p class="hint">Double-click to browse files &mdash; Discord voice channel, chat log, or reaction list</p>
-          <input type="file" id="fileInput" accept="image/*" style="display:none">
+          <p id="dropzoneTitle"><strong>Drop screenshots</strong>, or click here then paste (Cmd/Ctrl+V)</p>
+          <p class="hint">Double-click to browse files &mdash; add several if the list doesn't fit in one</p>
+          <input type="file" id="fileInput" accept="image/*" multiple style="display:none">
         </div>
 
         <div class="preview-actions" id="previewActions" style="display:none;">
           <button class="btn" id="readBtn">Read names from screenshot</button>
-          <button class="btn ghost icon-only" id="removeImgBtn" title="Remove screenshot" aria-label="Remove screenshot">&#10005;</button>
+          <button class="btn ghost icon-only" id="removeImgBtn" title="Remove all screenshots" aria-label="Remove all screenshots">&#10005;</button>
         </div>
 
         <div class="status-line" id="statusLine"></div>
@@ -604,8 +645,14 @@
         </div>
 
         <div class="preview-wrap" id="previewWrap" style="display:none;">
-          <p style="font-family:'Gilroy'; font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-soft); margin:0 0 8px;">Screenshot (for reference / double-checking)</p>
-          <img id="previewImg" alt="Screenshot preview">
+          <div class="preview-head">
+            <p class="preview-label">Screenshots (click to enlarge)</p>
+            <div class="box-legend" id="boxLegend" style="display:none;">
+              <span><i class="lg high"></i>55%+</span><span><i class="lg low"></i>30&ndash;54%</span><span><i class="lg miss"></i>Not matched</span>
+            </div>
+          </div>
+          <div class="box-note" id="boxNote"></div>
+          <div class="shot-grid" id="shotGrid"></div>
         </div>
       </div>
     </div>
@@ -694,6 +741,16 @@
 <div class="toast" id="undoToast" style="display:none;">
   <span id="undoToastMsg"></span>
   <button class="btn small" id="undoBtn">Undo</button>
+</div>
+
+<div class="modal-overlay" id="shotLightbox" style="display:none;">
+  <div class="modal shot-modal">
+    <div class="modal-head">
+      <h2 id="shotLightboxTitle">Screenshot</h2>
+      <button class="modal-close" id="shotLightboxClose" aria-label="Close">&#10005;</button>
+    </div>
+    <div id="shotLightboxBody"></div>
+  </div>
 </div>
 
 <div class="save-pill" id="savePill" role="status" aria-live="polite">
@@ -813,7 +870,6 @@ window.addEventListener('beforeunload', (e)=>{
 });
 let EVENTS = []; // {name, date, present: [memberName,...]}
 let currentMatches = []; // working review state for the screenshot currently open
-let currentImageBase64 = null;
 let usingSharedApi = false;
 
 const rosterList = document.getElementById('rosterList');
@@ -822,7 +878,6 @@ const dropzone = document.getElementById('dropzone');
 const fileInput = document.getElementById('fileInput');
 const previewWrap = document.getElementById('previewWrap');
 const previewActions = document.getElementById('previewActions');
-const previewImg = document.getElementById('previewImg');
 const readBtn = document.getElementById('readBtn');
 const statusLine = document.getElementById('statusLine');
 const commitBtn = document.getElementById('commitBtn');
@@ -1187,6 +1242,7 @@ function renderRoster(){
         <span class="prog-track"><span class="prog-fill${isInactive?' inactive':''}" style="width:${pct}%" ${isInactive?'title="No attendance in the last 3 events"':''}></span></span>
         <span class="prog-frac mono${isInactive?' inactive-label':''}">${count}/${evs.length}</span>
       </span>
+      <button class="rename-btn" title="Rename" aria-label="Rename ${escapeHtml(name)}" data-name="${escapeHtml(name)}">&#9998;</button>
       <button class="remove-x" title="Remove from roster" data-name="${escapeHtml(name)}">&#10005;</button>`;
     rosterList.appendChild(li);
   });
@@ -1209,7 +1265,77 @@ function renderRoster(){
   rosterList.querySelectorAll('.rname.clickable').forEach(el=>{
     el.addEventListener('click', ()=> openMemberDetail(el.dataset.name));
   });
+  rosterList.querySelectorAll('.rename-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=> startRename(btn.closest('li'), btn.dataset.name));
+  });
   attachRosterDragHandlers();
+}
+
+// ---------- rename member ----------
+// Renames carry through to every logged event (Present, Excused and the event's roster),
+// so a member keeps their full history under the new name.
+function startRename(li, oldName){
+  const span = li.querySelector('.rname');
+  if(!span) return;
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.className = 'rename-input';
+  input.value = oldName;
+  input.setAttribute('aria-label', 'New name for ' + oldName);
+  li.draggable = false;
+  span.replaceWith(input);
+  input.focus();
+  input.select();
+  let done = false;
+  const finish = (save)=>{
+    if(done) return;
+    done = true;
+    if(save) renameMember(oldName, input.value.trim());
+    else renderRoster();
+  };
+  input.addEventListener('keydown', e=>{
+    if(e.key === 'Enter'){ e.preventDefault(); finish(true); }
+    if(e.key === 'Escape'){ e.preventDefault(); finish(false); }
+  });
+  input.addEventListener('blur', ()=> finish(true));
+}
+
+async function renameMember(oldName, newName, merge){
+  if(!newName || newName === oldName){ renderRoster(); return; }
+  const clash = MEMBERS.find(m => m !== oldName && m.toLowerCase() === newName.toLowerCase());
+  if(clash && !merge){
+    renderRoster();
+    rosterStatus.innerHTML = '';
+    rosterStatus.append(`"${clash}" is already on the roster. `);
+    const b = document.createElement('button');
+    b.className = 'btn small';
+    b.textContent = `Merge ${oldName} into ${clash}`;
+    b.addEventListener('click', ()=> renameMember(oldName, clash, true));
+    rosterStatus.append(b);
+    rosterStatus.className = 'status-line err';
+    return;
+  }
+  finalizePendingUndo();
+  const idx = MEMBERS.indexOf(oldName);
+  if(idx === -1){ renderRoster(); return; }
+  const target = clash || newName;
+  const swap = arr => [...new Set((arr || []).map(n => n === oldName ? target : n))];
+  if(clash) MEMBERS.splice(idx, 1); else MEMBERS[idx] = target;
+  EVENTS.forEach(ev=>{
+    ev.present = swap(ev.present);
+    ev.excused = swap(ev.excused).filter(n => !ev.present.includes(n));
+    if(ev.roster) ev.roster = swap(ev.roster);
+  });
+  currentMatches.forEach(m => { if(m.match === oldName) m.match = target; });
+  renderRoster(); renderHistory();
+  if(currentMatches.length) renderTags();
+  const ok = await persist();
+  rosterStatus.textContent = !ok
+    ? 'Could not save — check your connection and try again.'
+    : clash
+      ? `Merged "${oldName}" into "${clash}" — their attendance history is combined.`
+      : `Renamed "${oldName}" to "${target}" — attendance history kept.`;
+  rosterStatus.className = 'status-line' + (ok ? '' : ' err');
 }
 
 let dragSrcIdx = null;
@@ -1328,9 +1454,15 @@ function checkDuplicateEventWarning(){
   warning.style.display = hasRecent ? 'flex' : 'none';
 }
 
-// ---------- upload ----------
+// ---------- upload (several screenshots per event) ----------
+// Each screenshot is kept in SHOTS. Names read from each one are cached on the shot, so
+// adding another screenshot and pressing Read again only sends the new one to the AI.
 // Single click selects the dropzone (so it can receive a pasted image);
 // double-click opens the file browser instead.
+let SHOTS = []; // {id, dataUrl, base64, names: null|[...], ocr: null|'pending'|'failed'|[candidates]}
+let shotSeq = 0;
+const shotGrid = document.getElementById('shotGrid');
+
 dropzone.addEventListener('click', ()=>{
   dropzone.classList.add('selected');
   dropzone.focus();
@@ -1342,25 +1474,24 @@ dropzone.addEventListener('dblclick', ()=>fileInput.click());
 dropzone.addEventListener('paste', e=>{
   const items = e.clipboardData && e.clipboardData.items;
   if(!items) return;
+  const files = [];
   for(const item of items){
     if(item.type && item.type.startsWith('image/')){
       const file = item.getAsFile();
-      if(file){
-        e.preventDefault();
-        handleFile(file);
-      }
-      break;
+      if(file) files.push(file);
     }
   }
+  if(files.length){ e.preventDefault(); handleFiles(files); }
 });
 dropzone.addEventListener('dragover', e=>{e.preventDefault(); dropzone.classList.add('drag');});
 dropzone.addEventListener('dragleave', ()=>dropzone.classList.remove('drag'));
 dropzone.addEventListener('drop', e=>{
   e.preventDefault(); dropzone.classList.remove('drag');
-  if(e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+  handleFiles(e.dataTransfer.files);
 });
 fileInput.addEventListener('change', ()=>{
-  if(fileInput.files[0]) handleFile(fileInput.files[0]);
+  handleFiles(fileInput.files);
+  fileInput.value = '';
 });
 
 function clearMatchSections(){
@@ -1370,115 +1501,450 @@ function clearMatchSections(){
   document.getElementById('lowSection').style.display = 'none';
 }
 
-function handleFile(file){
-  const reader = new FileReader();
-  reader.onload = () => {
-    currentImageBase64 = reader.result.split(',')[1];
-    previewImg.src = reader.result;
-    dropzone.style.display = 'none';
-    previewActions.style.display = 'flex';
-    previewWrap.style.display = 'block';
-    clearMatchSections();
-    commitBtn.style.display = 'none';
-    statusLine.textContent = '';
-    statusLine.className = 'status-line';
-  };
-  reader.readAsDataURL(file);
+function handleFiles(fileList){
+  const files = [...(fileList || [])].filter(f => f.type && f.type.startsWith('image/'));
+  files.forEach(file=>{
+    const reader = new FileReader();
+    reader.onload = () => {
+      SHOTS.push({ id: ++shotSeq, dataUrl: reader.result, base64: reader.result.split(',')[1], names: null, ocr: null });
+      renderShots();
+      if(currentMatches.length){
+        statusLine.textContent = 'Screenshot added — click Read to add its names to the list below.';
+        statusLine.className = 'status-line';
+      }else{
+        statusLine.textContent = '';
+        statusLine.className = 'status-line';
+      }
+    };
+    reader.readAsDataURL(file);
+  });
 }
 
-document.getElementById('removeImgBtn').addEventListener('click', ()=>{
-  currentImageBase64 = null;
-  previewImg.src = '';
-  dropzone.style.display = 'block';
-  previewActions.style.display = 'none';
-  previewWrap.style.display = 'none';
+function resetShots(){
+  SHOTS = [];
+  currentMatches = [];
   fileInput.value = '';
   clearMatchSections();
   commitBtn.style.display = 'none';
+  renderShots();
+}
+
+function removeShot(id){
+  SHOTS = SHOTS.filter(s => s.id !== id);
+  if(!SHOTS.length){
+    resetShots();
+    statusLine.textContent = '';
+    statusLine.className = 'status-line';
+    return;
+  }
+  if(currentMatches.length){
+    mergeMatches();
+    renderTags();
+  }
+  renderShots();
+}
+
+document.getElementById('removeImgBtn').addEventListener('click', ()=>{
+  resetShots();
   statusLine.textContent = '';
   statusLine.className = 'status-line';
 });
 
+// Same clean-up rules the AI is asked to follow, applied again on our side:
+// skip "[RECORDING]", drop the "RANK." prefix, drop a "=TAG=" suffix.
+function cleanReadName(n){
+  n = String(n || '');
+  if(/\[?recording\]?/i.test(n)) return '';
+  const dot = n.indexOf('.');
+  let cleaned = dot > -1 ? n.slice(dot + 1).trim() : n.trim();
+  cleaned = cleaned.split('=')[0].trim();
+  return cleaned;
+}
+
+async function readShotNames(shot){
+  const response = await authFetch("/api/read-screenshot", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ image: "data:image/png;base64," + shot.base64 })
+  });
+  const data = await response.json();
+  if(!response.ok){
+    throw new Error(data.error || 'Request failed');
+  }
+  const textBlock = typeof data.text === 'string' ? data.text : JSON.stringify(data.text || '');
+  let names;
+  // Try strict parsing first (fenced or plain JSON), then fall back to pulling the
+  // first [...] array out of the reply — smaller open models tend to add a bit of
+  // explanatory text around the array even when told not to.
+  const stripped = textBlock.trim().replace(/^```[a-zA-Z]*\n?/, '').replace(/```$/, '').trim();
+  try{
+    names = JSON.parse(stripped);
+  }catch(parseErr){
+    const match = textBlock.match(/\[[\s\S]*\]/);
+    if(match){
+      try{ names = JSON.parse(match[0]); }catch(parseErr2){ /* fall through */ }
+    }
+  }
+  if(!Array.isArray(names)){
+    throw new Error('Could not parse a name list from the response.');
+  }
+  return names.map(cleanReadName).filter(n => n.length > 0);
+}
+
+// Combines the names from every screenshot into one review list. Entries the person has
+// already adjusted (changed match, unticked, added manually) keep their state.
+function mergeMatches(){
+  const byKey = new Map();
+  SHOTS.forEach(s => (s.names || []).forEach(n=>{
+    const k = n.toLowerCase();
+    if(!byKey.has(k)) byKey.set(k, { raw:n, shots:new Set() });
+    byKey.get(k).shots.add(s.id);
+  }));
+  const kept = currentMatches.filter(m => m.manual || byKey.has(m.raw.toLowerCase()));
+  kept.forEach(m => { if(!m.manual) m.shots = byKey.get(m.raw.toLowerCase()).shots; });
+  const existing = new Set(kept.filter(m => !m.manual).map(m => m.raw.toLowerCase()));
+  byKey.forEach((v, k)=>{
+    if(existing.has(k)) return;
+    const {match, confidence} = bestMatch(v.raw);
+    if(confidence >= 30) kept.push({ raw:v.raw, match, confidence, included: confidence >= 55, shots:v.shots });
+  });
+  currentMatches = kept;
+}
+
 // ---------- read names via API ----------
 readBtn.addEventListener('click', async ()=>{
-  if(!currentImageBase64) return;
+  if(!SHOTS.length) return;
   readBtn.disabled = true;
-  statusLine.textContent = 'Reading screenshot…';
+  const toRead = SHOTS.filter(s => !s.names);
+  statusLine.textContent = toRead.length > 1 ? `Reading ${toRead.length} screenshots…` : 'Reading screenshot…';
   statusLine.className = 'status-line';
-  clearMatchSections();
 
-  try{
-    const response = await authFetch("/api/read-screenshot", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ image: "data:image/png;base64," + currentImageBase64 })
-    });
-    const data = await response.json();
-    if(!response.ok){
-      throw new Error(data.error || 'Request failed');
-    }
-    const textBlock = typeof data.text === 'string' ? data.text : JSON.stringify(data.text || '');
-    let names;
-    // Try strict parsing first (fenced or plain JSON), then fall back to pulling the
-    // first [...] array out of the reply — smaller open models tend to add a bit of
-    // explanatory text around the array even when told not to.
-    const stripped = textBlock.trim().replace(/^```[a-zA-Z]*\n?/, '').replace(/```$/, '').trim();
-    try{
-      names = JSON.parse(stripped);
-    }catch(parseErr){
-      const match = textBlock.match(/\[[\s\S]*\]/);
-      if(match){
-        try{ names = JSON.parse(match[0]); }catch(parseErr2){ /* fall through */ }
-      }
-    }
-    if(!Array.isArray(names)){
-      throw new Error('Could not parse a name list from the response.');
-    }
-    if(!Array.isArray(names) || names.length===0){
-      statusLine.textContent = 'No names detected — try a clearer screenshot.';
-      statusLine.className = 'status-line err';
-      readBtn.disabled = false;
-      return;
-    }
+  // Start locating names on each screenshot (for the coloured boxes) in the background.
+  // This is separate from the AI read and never blocks it.
+  locateNamesInShots();
 
-    names = names
-      .filter(n => !/\[recording\]/i.test(n))
-      .map(n => {
-        const dot = n.indexOf('.');
-        let cleaned = dot > -1 ? n.slice(dot + 1).trim() : n.trim();
-        cleaned = cleaned.split('=')[0].trim();
-        return cleaned;
-      })
-      .filter(n => n.length > 0);
-
-    if(names.length===0){
-      statusLine.textContent = 'Everything detected was filtered out (recording indicator only) — try a different screenshot.';
-      statusLine.className = 'status-line err';
-      readBtn.disabled = false;
-      return;
+  const errors = [];
+  await Promise.all(toRead.map(async shot=>{
+    try{ shot.names = await readShotNames(shot); }
+    catch(err){
+      if(err.code === 'auth') return;
+      errors.push(`screenshot ${SHOTS.indexOf(shot) + 1}: ${err.message}`);
     }
+  }));
 
-    currentMatches = names
-      .map(n=>{
-        const {match, confidence} = bestMatch(n);
-        return { raw:n, match, confidence, included: confidence >= 55 };
-      })
-      .filter(m => m.confidence >= 30);
+  mergeMatches();
+  renderShots();
+  const anyRead = SHOTS.some(s => s.names);
+  if(!anyRead){
+    statusLine.textContent = 'Could not read the screenshot' + (SHOTS.length > 1 ? 's' : '') + (errors.length ? ': ' + errors.join('; ') : '.');
+    statusLine.className = 'status-line err';
+    readBtn.disabled = false;
+    return;
+  }
 
-    if(currentMatches.length===0){
-      statusLine.textContent = 'No matches at or above 30% confidence. You can add members manually below.';
-      statusLine.className = 'status-line err';
-    }else{
-      statusLine.textContent = `Found ${currentMatches.length} name(s) at 30%+ confidence. Review the matches below, then log attendance.`;
-    }
-    renderTags();
-    commitBtn.style.display = 'inline-flex';
-  }catch(err){
-    statusLine.textContent = 'Could not read the screenshot: ' + err.message;
+  const shotsText = SHOTS.length > 1 ? ` across ${SHOTS.length} screenshots` : '';
+  if(currentMatches.length === 0){
+    statusLine.textContent = `No matches at or above 30% confidence${shotsText}. You can add members manually below.`;
+    statusLine.className = 'status-line err';
+  }else{
+    statusLine.textContent = `Found ${currentMatches.length} name(s) at 30%+ confidence${shotsText}. Review the matches below, then log attendance.`;
+    statusLine.className = 'status-line';
+  }
+  if(errors.length){
+    statusLine.textContent += ` Couldn't read ${errors.join('; ')} — remove it and try again.`;
     statusLine.className = 'status-line err';
   }
+  renderTags();
+  commitBtn.style.display = 'inline-flex';
   readBtn.disabled = false;
 });
+
+// ---------- name boxes on the screenshots ----------
+// The vision model only returns names, not where they are, so a small text reader
+// (Tesseract.js, free, runs in the browser) is used purely to find each name's position.
+// Boxes are coloured by the match confidence of the name they belong to:
+// green = 55%+, orange = 30–54%, red dashed = a "RANK.Name" entry nothing was matched to.
+let tessWorkerPromise = null;
+function loadScriptOnce(src){
+  return new Promise((resolve, reject)=>{
+    const s = document.createElement('script');
+    s.src = src; s.onload = resolve; s.onerror = ()=>reject(new Error('Could not load ' + src));
+    document.head.appendChild(s);
+  });
+}
+function getTessWorker(){
+  if(!tessWorkerPromise){
+    tessWorkerPromise = (async ()=>{
+      if(!window.Tesseract) await loadScriptOnce('https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js');
+      // errorHandler stops a failed download from surfacing as an uncaught page error;
+      // the failure still rejects and is shown as "Name boxes unavailable".
+      return window.Tesseract.createWorker('eng', 1, { errorHandler: ()=>{} });
+    })().catch(err=>{ tessWorkerPromise = null; throw err; });
+  }
+  return tessWorkerPromise;
+}
+function loadImageEl(src){
+  return new Promise((resolve, reject)=>{
+    const img = new Image();
+    img.onload = ()=>resolve(img); img.onerror = reject; img.src = src;
+  });
+}
+
+function withTimeout(promise, ms){
+  return Promise.race([promise, new Promise((_, reject)=> setTimeout(()=>reject(new Error('timed out')), ms))]);
+}
+let locatingNames = false;
+async function locateNamesInShots(){
+  if(locatingNames) return;
+  locatingNames = true;
+  try{
+    // One at a time: a single text-reader worker handles one image per job.
+    for(const shot of SHOTS){
+      if(shot.ocr && shot.ocr !== 'failed') continue;
+      if(!SHOTS.includes(shot)) continue;
+      shot.ocr = 'pending';
+      renderBoxes();
+      try{ shot.ocr = await withTimeout(ocrShot(shot), 90000); }
+      catch(err){ shot.ocr = 'failed'; }
+      renderBoxes();
+    }
+  }finally{
+    locatingNames = false;
+  }
+  // A screenshot may have been added while this was running.
+  if(SHOTS.some(s => !s.ocr)) locateNamesInShots();
+}
+
+async function ocrShot(shot){
+  const img = await loadImageEl(shot.dataUrl);
+  // Upscale small screenshots; the text reader is far more reliable on larger text.
+  const scale = img.naturalWidth < 1400 ? 2 : 1;
+  const W = img.naturalWidth * scale, H = img.naturalHeight * scale;
+  const base = document.createElement('canvas');
+  base.width = W; base.height = H;
+  const bctx = base.getContext('2d');
+  bctx.imageSmoothingQuality = 'high';
+  bctx.drawImage(img, 0, 0, W, H);
+  const src = bctx.getImageData(0, 0, W, H).data;
+
+  const lum = new Uint8ClampedArray(src.length / 4);
+  const hist = new Array(256).fill(0);
+  for(let i = 0, j = 0; i < src.length; i += 4, j++){
+    lum[j] = src[i]*0.299 + src[i+1]*0.587 + src[i+2]*0.114;
+    hist[lum[j]]++;
+  }
+  const bg = hist.indexOf(Math.max(...hist)); // background = most common brightness
+  let maxContrast = 0;
+  for(let j = 0; j < lum.length; j++){ const d = Math.abs(lum[j] - bg); if(d > maxContrast) maxContrast = d; }
+  const threshold = Math.max(40, maxContrast * 0.45);
+  const isDark = bg < 128;
+
+  // Two versions of the image, black text on white:
+  //  A) only strong-contrast pixels kept — drops avatars/icons so they don't merge into names
+  //  B) plain greyscale — keeps coloured role names that A can lose
+  const makeCanvas = (fn)=>{
+    const c = document.createElement('canvas');
+    c.width = W; c.height = H;
+    const ctx = c.getContext('2d');
+    const out = ctx.createImageData(W, H);
+    for(let i = 0, j = 0; i < src.length; i += 4, j++){
+      const g = fn(lum[j]);
+      out.data[i] = out.data[i+1] = out.data[i+2] = g; out.data[i+3] = 255;
+    }
+    ctx.putImageData(out, 0, 0);
+    return c;
+  };
+  const filtered = makeCanvas(v => Math.abs(v - bg) > threshold ? 0 : 255);
+  const grey = makeCanvas(v => isDark ? 255 - v : v);
+
+  const worker = await getTessWorker();
+  const a = buildNameCandidates((await worker.recognize(filtered)).data, W, H);
+  const b = buildNameCandidates((await worker.recognize(grey)).data, W, H);
+  // Prefer the filtered read; add any row from the greyscale read that it missed.
+  const sameRow = (p, q)=>{
+    const top = Math.max(p.box.t, q.box.t), bottom = Math.min(p.box.t + p.box.h, q.box.t + q.box.h);
+    const left = Math.max(p.box.l, q.box.l), right = Math.min(p.box.l + p.box.w, q.box.l + q.box.w);
+    return bottom - top > Math.min(p.box.h, q.box.h) * 0.5 && right > left;
+  };
+  const merged = a.slice();
+  b.forEach(cand=>{
+    const clash = merged.findIndex(x => sameRow(x, cand));
+    if(clash === -1){ merged.push(cand); return; }
+    // Same row read both ways: keep the one that found the "RANK." prefix.
+    if(cand.rankLike && !merged[clash].rankLike) merged[clash] = cand;
+  });
+  return merged;
+}
+
+// Turns the text reader's lines into name candidates with a box in % of the image size.
+function buildNameCandidates(data, W, H){
+  const out = [];
+  const RANK_WORD = /^[^A-Za-z0-9]*[A-Z0-9]{2,4}[.,]/;
+  (data.lines || []).forEach(line=>{
+    let words = (line.words || []).filter(w => w.text && w.text.trim());
+    if(!words.length) return;
+    const lineText = words.map(w => w.text).join(' ');
+    if(/recording/i.test(lineText)) return;
+    let start = words.findIndex(w => RANK_WORD.test(w.text));
+    const rankLike = start > -1;
+    if(!rankLike) start = 0;
+    words = words.slice(start);
+    // Drop trailing junk the reader picks up from icons (no letters / single characters).
+    while(words.length > 1 && (!/[A-Za-z]/.test(words[words.length-1].text) || words[words.length-1].text.length < 2)) words.pop();
+    const name = cleanReadName(words.map(w => w.text).join(' ')).replace(/[^A-Za-z0-9 _\-']+$/,'').trim();
+    if(name.length < 2) return;
+    // If the first word starts with stray symbols (e.g. a merged icon), start the box at
+    // the first letter/number using the reader's per-character boxes where available.
+    let firstX = words[0].bbox.x0;
+    const syms = words[0].symbols || [];
+    const firstReal = syms.findIndex(sy => /[A-Za-z0-9]/.test(sy.text));
+    if(firstReal > 0) firstX = syms[firstReal].bbox.x0;
+    const x0 = Math.min(firstX, ...words.slice(1).map(w => w.bbox.x0)), y0 = Math.min(...words.map(w => w.bbox.y0));
+    const x1 = Math.max(...words.map(w => w.bbox.x1)), y1 = Math.max(...words.map(w => w.bbox.y1));
+    const padX = (x1 - x0) * 0.04 + 4, padY = (y1 - y0) * 0.18 + 2;
+    out.push({
+      name, rankLike,
+      box: {
+        l: Math.max(0, (x0 - padX) / W * 100),
+        t: Math.max(0, (y0 - padY) / H * 100),
+        w: Math.min(100, (x1 - x0 + padX * 2) / W * 100),
+        h: Math.min(100, (y1 - y0 + padY * 2) / H * 100)
+      }
+    });
+  });
+  return out;
+}
+
+function nameSimilarity(a, b){
+  a = String(a || '').toLowerCase(); b = String(b || '').toLowerCase();
+  if(!a || !b) return 0;
+  if(a === b) return 1;
+  if(a.includes(b) || b.includes(a)){
+    return Math.min(a.length, b.length) / Math.max(a.length, b.length) >= 0.5 ? 0.9 : 0.6;
+  }
+  let best = 1 - levenshtein(a, b) / Math.max(a.length, b.length);
+  // The reader sometimes glues stray characters onto a name ("evrprower"), so also
+  // compare against same-length stretches of the longer string.
+  const [shortS, longS] = a.length <= b.length ? [a, b] : [b, a];
+  if(shortS.length >= 4){
+    for(let len = shortS.length - 1; len <= shortS.length + 1; len++){
+      for(let i = 0; i + len <= longS.length; i++){
+        const sim = 1 - levenshtein(shortS, longS.slice(i, i + len)) / Math.max(shortS.length, len);
+        if(sim > best) best = sim;
+      }
+    }
+  }
+  return best;
+}
+
+// Pairs each located name with the review-list entry it belongs to (best similarity
+// first, one box per entry per screenshot), and returns boxes grouped by screenshot.
+function computeShotBoxes(){
+  const all = [];
+  SHOTS.forEach(s => { if(Array.isArray(s.ocr)) s.ocr.forEach(c => all.push({ shot:s, c, link:null })); });
+  const pairs = [];
+  currentMatches.forEach((m, mi)=>{
+    all.forEach((a, ai)=>{
+      if(!m.manual && m.shots && !m.shots.has(a.shot.id)) return;
+      const sim = Math.max(nameSimilarity(a.c.name, m.raw), m.match ? nameSimilarity(a.c.name, m.match) : 0);
+      if(sim >= 0.6) pairs.push({ mi, ai, sim });
+    });
+  });
+  pairs.sort((x, y) => y.sim - x.sim);
+  const usedA = new Set(), usedM = new Set();
+  pairs.forEach(p=>{
+    const a = all[p.ai];
+    const key = p.mi + ':' + a.shot.id;
+    if(usedA.has(p.ai) || usedM.has(key)) return;
+    usedA.add(p.ai); usedM.add(key);
+    a.link = currentMatches[p.mi];
+  });
+  const byShot = new Map();
+  const haveMatches = currentMatches.length > 0 || SHOTS.some(s => s.names);
+  all.forEach(a=>{
+    let cls, label;
+    if(a.link){
+      const m = a.link;
+      cls = m.confidence >= 55 ? 'high' : 'low';
+      if(!m.included || !m.match) cls += ' excluded';
+      label = m.match ? `${m.match} · ${m.confidence}%` : 'skipped';
+    }else if(a.c.rankLike && haveMatches){
+      cls = 'miss'; label = 'not matched';
+    }else{
+      return;
+    }
+    if(!byShot.has(a.shot.id)) byShot.set(a.shot.id, []);
+    byShot.get(a.shot.id).push({ box:a.c.box, cls, label });
+  });
+  return byShot;
+}
+
+function boxesHTML(list){
+  return (list || []).map(b => `<div class="nbox ${b.cls}" style="left:${b.box.l}%; top:${b.box.t}%; width:${b.box.w}%; height:${b.box.h}%;"><span class="nbox-tag">${escapeHtml(b.label)}</span></div>`).join('');
+}
+
+function renderShots(){
+  const has = SHOTS.length > 0;
+  previewWrap.style.display = has ? 'block' : 'none';
+  previewActions.style.display = has ? 'flex' : 'none';
+  document.getElementById('dropzoneTitle').innerHTML = has
+    ? '<strong>Add another screenshot</strong> &mdash; drop it here, or click then paste (Cmd/Ctrl+V)'
+    : '<strong>Drop screenshots</strong>, or click here then paste (Cmd/Ctrl+V)';
+  const unread = SHOTS.filter(s => !s.names).length;
+  readBtn.textContent = !unread && SHOTS.length ? 'Read again' : (SHOTS.length > 1 ? `Read names from ${SHOTS.length} screenshots` : 'Read names from screenshot');
+  shotGrid.innerHTML = SHOTS.map((s, i) => `
+    <div class="shot" data-shot-id="${s.id}" title="Click to enlarge">
+      <img src="${s.dataUrl}" alt="Screenshot ${i+1}">
+      <div class="shot-boxes"></div>
+      <span class="shot-num">${i+1}${s.names ? ' &#10003;' : ''}</span>
+      <button class="shot-remove" data-shot-id="${s.id}" title="Remove this screenshot" aria-label="Remove screenshot ${i+1}">&#10005;</button>
+    </div>`).join('');
+  shotGrid.querySelectorAll('.shot-remove').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{ e.stopPropagation(); removeShot(Number(btn.dataset.shotId)); });
+  });
+  shotGrid.querySelectorAll('.shot').forEach(el=>{
+    el.addEventListener('click', ()=> openShotLightbox(Number(el.dataset.shotId)));
+  });
+  renderBoxes();
+}
+
+function renderBoxes(){
+  const boxes = computeShotBoxes();
+  shotGrid.querySelectorAll('.shot').forEach(el=>{
+    el.querySelector('.shot-boxes').innerHTML = boxesHTML(boxes.get(Number(el.dataset.shotId)));
+  });
+  const note = document.getElementById('boxNote');
+  const legend = document.getElementById('boxLegend');
+  const pending = SHOTS.some(s => s.ocr === 'pending');
+  const failed = SHOTS.some(s => s.ocr === 'failed');
+  const anyBoxes = [...boxes.values()].some(l => l.length);
+  legend.style.display = anyBoxes ? 'flex' : 'none';
+  note.textContent = pending ? 'Locating names on the screenshot…' : failed ? 'Name boxes unavailable for one or more screenshots.' : '';
+  if(lightboxShotId !== null){
+    const layer = document.querySelector('#shotLightboxBody .shot-boxes');
+    if(layer) layer.innerHTML = boxesHTML(boxes.get(lightboxShotId));
+  }
+}
+
+let lightboxShotId = null;
+const shotLightbox = document.getElementById('shotLightbox');
+function openShotLightbox(id){
+  const shot = SHOTS.find(s => s.id === id);
+  if(!shot) return;
+  lightboxShotId = id;
+  document.getElementById('shotLightboxTitle').textContent = `Screenshot ${SHOTS.indexOf(shot) + 1}`;
+  document.getElementById('shotLightboxBody').innerHTML = `<div class="shot large"><img src="${shot.dataUrl}" alt=""><div class="shot-boxes"></div></div>`;
+  shotLightbox.style.display = 'flex';
+  renderBoxes();
+}
+function closeShotLightbox(){
+  shotLightbox.style.display = 'none';
+  lightboxShotId = null;
+  document.getElementById('shotLightboxBody').innerHTML = '';
+}
+document.getElementById('shotLightboxClose').addEventListener('click', closeShotLightbox);
+shotLightbox.addEventListener('click', (e)=>{ if(e.target === shotLightbox) closeShotLightbox(); });
+document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape' && lightboxShotId !== null) closeShotLightbox(); });
 
 function renderTags(){
   const tagRowHigh = document.getElementById('tagRowHigh');
@@ -1517,13 +1983,16 @@ function renderTags(){
   document.getElementById('matchSections').querySelectorAll('select').forEach(sel=>{
     sel.addEventListener('change', ()=>{
       currentMatches[sel.dataset.idx].match = sel.value || null;
+      renderBoxes();
     });
   });
   document.getElementById('matchSections').querySelectorAll('input[type=checkbox]').forEach(cb=>{
     cb.addEventListener('change', ()=>{
       currentMatches[cb.dataset.idx].included = cb.checked;
+      renderBoxes();
     });
   });
+  renderBoxes();
 }
 
 function buildAddMemberTile(){
@@ -1548,7 +2017,7 @@ function buildAddMemberTile(){
     `;
     wrap.querySelector('#confirmAddBtn').addEventListener('click', ()=>{
       const name = wrap.querySelector('#manualAddSelect').value;
-      currentMatches.push({ raw: name, match: name, confidence: 100, included: true });
+      currentMatches.push({ raw: name, match: name, confidence: 100, included: true, manual: true });
       renderTags();
     });
     wrap.querySelector('#cancelAddBtn').addEventListener('click', renderTags);
@@ -1596,12 +2065,7 @@ commitBtn.addEventListener('click', ()=>{
   delete dateInput.dataset.touched;
   dateInput.value = todayISO();
   checkDuplicateEventWarning();
-  dropzone.style.display = 'block';
-  previewActions.style.display = 'none';
-  previewWrap.style.display='none';
-  clearMatchSections();
-  commitBtn.style.display='none';
-  currentImageBase64 = null; currentMatches = [];
+  resetShots();
   statusLine.innerHTML = '';
   statusLine.append(`Logged "${eventName}" with ${present.length} member(s) present. `);
   const viewLink = document.createElement('a');
@@ -1651,14 +2115,15 @@ function attendanceColumnsHTML(ev, idx){
 
   const former = n => MEMBERS.includes(n) ? '' : ' former';
   const presentChip = name => `<div class="attendance-chip present${former(name)}"><span class="glyph">&#10003;</span><span>${escapeHtml(name)}</span></div>`;
-  const absentChip = name => `<div class="attendance-chip absent${former(name)}"><span class="glyph">X</span><span>${escapeHtml(name)}</span><label class="excuse-toggle" title="Mark excused"><input type="checkbox" class="excuse-checkbox" data-event-idx="${idx}" data-name="${escapeHtml(name)}"></label></div>`;
-  const excusedChip = name => `<div class="attendance-chip excused${former(name)}"><span class="glyph">&#9679;</span><span>${escapeHtml(name)}</span><label class="excuse-toggle" title="Unmark excused"><input type="checkbox" class="excuse-checkbox" data-event-idx="${idx}" data-name="${escapeHtml(name)}" checked></label></div>`;
+  const absentChip = name => `<div class="attendance-chip absent${former(name)}"><span class="glyph">X</span><span>${escapeHtml(name)}</span><label class="excuse-toggle" title="Mark excused"><input type="checkbox" class="excuse-checkbox" data-event-idx="${idx}" data-name="${escapeHtml(name)}"></label><button class="present-btn" data-event-idx="${idx}" data-name="${escapeHtml(name)}" title="Mark present" aria-label="Mark ${escapeHtml(name)} present">&#10003; Present</button></div>`;
+  const excusedChip = name => `<div class="attendance-chip excused${former(name)}"><span class="glyph">&#9679;</span><span>${escapeHtml(name)}</span><label class="excuse-toggle" title="Unmark excused"><input type="checkbox" class="excuse-checkbox" data-event-idx="${idx}" data-name="${escapeHtml(name)}" checked></label><button class="present-btn" data-event-idx="${idx}" data-name="${escapeHtml(name)}" title="Mark present" aria-label="Mark ${escapeHtml(name)} present">&#10003; Present</button></div>`;
 
   const presentHtml = present.length ? present.map(presentChip).join('') : '<div class="empty" style="padding:6px 0;">None</div>';
   const absentHtml = absent.length ? absent.map(absentChip).join('') : '<div class="empty" style="padding:6px 0;">None</div>';
   const excusedHtml = excused.length ? excused.map(excusedChip).join('') : '<div class="empty" style="padding:6px 0;">None</div>';
 
   return `
+    ${addToEventHTML(ev, idx)}
     <div class="attendance-columns three-col">
       <div class="attendance-col">
         <h4>Present (${present.length})</h4>
@@ -1673,6 +2138,53 @@ function attendanceColumnsHTML(ev, idx){
         ${excusedHtml}
       </div>
     </div>`;
+}
+
+// One box at the top of every event to add anyone to Present after the event was logged:
+// absent or excused members, members who joined later, or a brand-new name (which is
+// also added to the roster, after a second click to confirm).
+function addToEventHTML(ev, idx){
+  const present = new Set(ev.present);
+  const options = [...new Set([...orderedEventRoster(ev), ...MEMBERS])].filter(n => !present.has(n));
+  return `<div class="add-to-event">
+    <input type="text" class="add-to-event-input" list="addPresentList${idx}" data-event-idx="${idx}" placeholder="Add someone to Present — type or pick a name…" autocomplete="off">
+    <datalist id="addPresentList${idx}">${options.map(n => `<option value="${escapeHtml(n)}"></option>`).join('')}</datalist>
+    <button class="btn small add-to-event-btn" data-event-idx="${idx}">+ Add to Present</button>
+  </div>
+  <div class="status-line add-to-event-status" id="addPresentStatus${idx}"></div>`;
+}
+
+const pendingNewPresent = {}; // event idx -> name awaiting a confirming second click
+async function addToPresentByName(idx, typed){
+  const ev = EVENTS[idx];
+  if(!ev) return;
+  const t = (typed || '').trim();
+  const st = document.getElementById('addPresentStatus' + idx);
+  if(!t) return;
+  const known = [...new Set([...eventRoster(ev), ...MEMBERS])];
+  let name = known.find(n => n.toLowerCase() === t.toLowerCase());
+  let addedToRoster = false;
+  if(name && ev.present.includes(name)){
+    if(st){ st.textContent = `${name} is already marked Present.`; st.className = 'status-line add-to-event-status err'; }
+    return;
+  }
+  if(!name){
+    if(pendingNewPresent[idx] !== t.toLowerCase()){
+      pendingNewPresent[idx] = t.toLowerCase();
+      if(st){ st.textContent = `"${t}" isn't on the roster. Click "+ Add to Present" again to add them to the roster and mark them Present.`; st.className = 'status-line add-to-event-status err'; }
+      return;
+    }
+    name = t;
+    MEMBERS.push(name);
+    addedToRoster = true;
+  }
+  delete pendingNewPresent[idx];
+  await markPresent(idx, name);
+  const st2 = document.getElementById('addPresentStatus' + idx);
+  if(st2){
+    st2.textContent = addedToRoster ? `Added ${name} to Present and to the roster.` : `Added ${name} to Present.`;
+    st2.className = 'status-line add-to-event-status';
+  }
 }
 
 function eventCardHTML(ev, idx){
@@ -1695,6 +2207,28 @@ function eventCardHTML(ev, idx){
   </div>`;
 }
 
+function refreshEventCard(idx){
+  const ev = EVENTS[idx];
+  const bodyEl = document.getElementById('eventBody'+idx);
+  if(!ev || !bodyEl) return;
+  bodyEl.innerHTML = attendanceColumnsHTML(ev, idx);
+  attachExcuseCheckboxHandlers(bodyEl);
+  const countEl = document.querySelector(`.event-card[data-idx="${idx}"] .event-count`);
+  if(countEl) countEl.textContent = `${ev.present.length}/${eventSize(ev)} present`;
+  renderRoster();
+}
+
+async function markPresent(idx, name){
+  const ev = EVENTS[idx];
+  if(!ev) return;
+  ev.roster = eventRoster(ev).slice();
+  if(!ev.roster.includes(name)) ev.roster.push(name);
+  if(!ev.present.includes(name)) ev.present.push(name);
+  ev.excused = (ev.excused || []).filter(n => n !== name);
+  refreshEventCard(idx);
+  await persist();
+}
+
 async function toggleExcused(idx, name, isExcused){
   const ev = EVENTS[idx];
   if(!ev) return;
@@ -1704,20 +2238,30 @@ async function toggleExcused(idx, name, isExcused){
   }else{
     ev.excused = ev.excused.filter(n => n !== name);
   }
-  await persist();
   // Refresh just this card's columns in place, so checking a box doesn't collapse
   // the card the person is actively looking at (a full renderHistory() would).
-  const bodyEl = document.getElementById('eventBody'+idx);
-  if(bodyEl){
-    bodyEl.innerHTML = attendanceColumnsHTML(ev, idx);
-    attachExcuseCheckboxHandlers(bodyEl);
-  }
+  refreshEventCard(idx);
+  await persist();
 }
 
 function attachExcuseCheckboxHandlers(scopeEl){
   scopeEl.querySelectorAll('.excuse-checkbox').forEach(cb=>{
     cb.addEventListener('change', ()=>{
       toggleExcused(Number(cb.dataset.eventIdx), cb.dataset.name, cb.checked);
+    });
+  });
+  scopeEl.querySelectorAll('.present-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=> markPresent(Number(btn.dataset.eventIdx), btn.dataset.name));
+  });
+  scopeEl.querySelectorAll('.add-to-event-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const input = btn.parentElement.querySelector('input');
+      addToPresentByName(Number(btn.dataset.eventIdx), input ? input.value : '');
+    });
+  });
+  scopeEl.querySelectorAll('.add-to-event-input').forEach(input=>{
+    input.addEventListener('keydown', e=>{
+      if(e.key === 'Enter'){ e.preventDefault(); addToPresentByName(Number(input.dataset.eventIdx), input.value); }
     });
   });
 }
