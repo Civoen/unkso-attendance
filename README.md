@@ -54,8 +54,10 @@ above the version number in the sidebar):
 
 9. **Check the Statistics.** This page is read-only — it shows an attendance
    trend chart over time (a separate line per event type), overall and
-   per-event-type average attendance, your most and least active member, and
-   total excused instances, all computed automatically from Attendance History.
+   per-event-type average attendance, your most and least active member, total
+   excused instances, and each member's attendance bar split by event type (in
+   the same colours as the chart), all computed automatically from Attendance
+   History.
 
 ## That's it.
 
