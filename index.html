@@ -556,7 +556,7 @@
 
     <button class="how-it-works-btn" id="howItWorksBtn"><span class="ic">?</span>How It Works</button>
 
-    <div class="sidebar-foot" id="footerNote">v.30. Unknown Soldiers. Created by Civoen.</div>
+    <div class="sidebar-foot" id="footerNote">v.31. Unknown Soldiers. Created by Civoen.</div>
   </aside>
 
   <div class="modal-overlay" id="howItWorksOverlay" style="display:none;">
@@ -2471,12 +2471,21 @@ function eventTypeOf(ev){
 // and avoid reusing the present/absent status colors, which could read as a
 // good/bad judgement rather than a neutral category comparison.
 const EVENT_TYPE_PALETTE = ['var(--amber)', '#e8e5de', '#6b8fb0', '#b08fd6'];
+// Display order follows the week: General Meeting, then FTX, then anything else A–Z.
+const EVENT_TYPE_ORDER = ['General Meeting', 'FTX'];
 function eventTypesSorted(){
-  return [...new Set(EVENTS.map(eventTypeOf))].sort();
+  const types = [...new Set(EVENTS.map(eventTypeOf))];
+  const rank = t => { const i = EVENT_TYPE_ORDER.indexOf(t); return i < 0 ? EVENT_TYPE_ORDER.length : i; };
+  return types.sort((a, b) => rank(a) - rank(b) || a.localeCompare(b));
+}
+// Colour stays tied to the type (assigned A–Z, so FTX keeps orange and General Meeting
+// keeps light grey) regardless of display order.
+function eventTypeColorIndex(type){
+  const i = [...new Set(EVENTS.map(eventTypeOf))].sort().indexOf(type);
+  return i < 0 ? 0 : i;
 }
 function eventTypeColor(type){
-  const i = eventTypesSorted().indexOf(type);
-  return EVENT_TYPE_PALETTE[(i < 0 ? 0 : i) % EVENT_TYPE_PALETTE.length];
+  return EVENT_TYPE_PALETTE[eventTypeColorIndex(type) % EVENT_TYPE_PALETTE.length];
 }
 
 function buildAttendanceTrendSVG(){
@@ -2492,7 +2501,7 @@ function buildAttendanceTrendSVG(){
     const type = eventTypeOf(ev);
     (byType[type] = byType[type] || []).push(ev);
   });
-  const types = Object.keys(byType).sort();
+  const types = eventTypesSorted().filter(t => byType[t]);
 
   const allDates = EVENTS.map(ev => ev.date).slice().sort();
   const minDate = allDates[0], maxDate = allDates[allDates.length - 1];
@@ -2522,7 +2531,7 @@ function buildAttendanceTrendSVG(){
   let seriesSVG = '';
   let legendSVG = '';
   types.forEach((type, ti) => {
-    const color = palette[ti % palette.length];
+    const color = palette[eventTypeColorIndex(type) % palette.length];
     const chronological = [...byType[type]].sort((a,b) => a.date.localeCompare(b.date));
     const points = chronological.map(ev => ({
       date: ev.date,
@@ -2572,7 +2581,7 @@ function renderStatistics(){
     const type = eventTypeOf(ev);
     (byType[type] = byType[type] || []).push(ev);
   });
-  const typeRows = Object.keys(byType).sort().map(type=>{
+  const typeRows = eventTypesSorted().map(type=>{
     const evs = byType[type];
     return { type, count: evs.length, avg: overallRate(evs) };
   });
@@ -2833,7 +2842,7 @@ async function buildReportCanvas(){
       const type = eventTypeOf(ev);
       (byType[type] = byType[type] || []).push(ev);
     });
-    const types = Object.keys(byType).sort();
+    const types = eventTypesSorted().filter(t => byType[t]);
 
     const allDates = evs.map(ev => ev.date).slice().sort();
     const minDate = allDates[0], maxDate = allDates[allDates.length-1];
@@ -2864,7 +2873,7 @@ async function buildReportCanvas(){
     const palette = [COL.amber, COL.ink, '#6b8fb0', '#b08fd6'];
 
     types.forEach((type, ti) => {
-      const color = palette[ti % palette.length];
+      const color = palette[eventTypeColorIndex(type) % palette.length];
       const chronological = [...byType[type]].sort((a,b) => a.date.localeCompare(b.date));
       const points = chronological.map(ev => ({
         date: ev.date, pct: Math.round((ev.present.length / eventSize(ev)) * 100)
